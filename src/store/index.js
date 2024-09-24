@@ -24,6 +24,7 @@ export default createStore({
     },
     sidebarMinimize(state) {
       let sidenav_show = document.querySelector("#app");
+
       if (state.isPinned) {
         sidenav_show.classList.add("g-sidenav-hidden");
         sidenav_show.classList.remove("g-sidenav-pinned");

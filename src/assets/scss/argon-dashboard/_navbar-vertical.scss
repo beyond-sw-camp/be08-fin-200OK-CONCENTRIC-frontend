@@ -213,7 +213,7 @@
     .sidenav-toggler {
       padding: 1.5rem;
     }
-
+    //사이드바가 열릴 때 메인콘텐츠 이동 코드 주석 처리
     &.fixed-start + .main-content {
       margin-left: $navbar-vertical-open-width + 1.5;
     }
@@ -267,6 +267,7 @@
 // Media fixes for iPhone 5 like resolutions
 @include media-breakpoint-down(xl) {
   .g-sidenav-show {
+    // sidebar 축소 시 나타나게 하는 코드 주석 처리
     &.rtl {
       .sidenav {
         transform: translateX($navbar-vertical-open-width + 1.5);

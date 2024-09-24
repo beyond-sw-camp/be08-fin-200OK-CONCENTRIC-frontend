@@ -40,6 +40,7 @@
     }
 
     .navbar-collapse {
+      display: none !important;
       border-radius: $border-radius-xl;
     }
   }
@@ -88,6 +89,7 @@
 }
 
 .navbar-toggler {
+  display: block !important;
   .navbar-toggler-icon {
     background-image: none;
 
