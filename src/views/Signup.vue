@@ -7,9 +7,36 @@ import AppFooter from "@/examples/PageLayout/Footer.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonCheckbox from "@/components/ArgonCheckbox.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
+
+import axios from 'axios';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useCookies } from 'vue3-cookies';
+
 const body = document.getElementsByTagName("body")[0];
 
 const store = useStore();
+
+const { cookies } = useCookies();
+const email = ref('');
+const password = ref('');
+const name = ref('');
+const router = useRouter();
+
+const signup = async () => {
+  try{
+      const response = axios.post('/member/register',{
+      name:name.value,
+      email:email.value,
+      password:password.value,
+      nickname: 'fff'
+    }, {withCredentials: true});
+        router.push("/");
+    }catch(err){
+      console.log(err);
+    }
+}
+
 onBeforeMount(() => {
   store.state.hideConfigButton = true;
   store.state.showNavbar = false;
@@ -176,18 +203,21 @@ onBeforeUnmount(() => {
                   type="text"
                   placeholder="Name"
                   aria-label="Name"
+                  v-model="name"
                 />
                 <argon-input
                   id="email"
                   type="email"
                   placeholder="Email"
                   aria-label="Email"
+                  v-model="email"
                 />
                 <argon-input
                   id="password"
                   type="password"
                   placeholder="Password"
                   aria-label="Password"
+                  v-model="password"
                 />
                 <argon-checkbox checked>
                   <label class="form-check-label" for="flexCheckDefault">
@@ -203,6 +233,7 @@ onBeforeUnmount(() => {
                     color="dark"
                     variant="gradient"
                     class="my-4 mb-2"
+                    @click="signup"
                     >Sign up</argon-button
                   >
                 </div>

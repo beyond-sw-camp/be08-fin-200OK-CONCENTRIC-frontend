@@ -7,6 +7,48 @@ import ArgonSwitch from "@/components/ArgonSwitch.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 const body = document.getElementsByTagName("body")[0];
 
+import axios from 'axios';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useCookies } from 'vue3-cookies';
+
+const { cookies } = useCookies();
+const email = ref('');
+const password = ref('');
+const router = useRouter();
+
+const login = () => {
+  console.log(email.value);
+  console.log(password.value);
+  loginApi();
+}
+
+const loginApi = async () => {
+  try{
+      const response = axios.post('/member/login',{
+        email:email.value,
+        password:password.value,      
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+        alert("로그인을 성공했습니다.");
+        // store.isLoggedIn = 'true'; 
+        // localStorage.setItem("isLoggedIn", true);
+        // localStorage.setItem("userInfo", JSON.stringify(res.data));
+        // console.log(JSON.parse(localStorage.getItem("userInfo")));
+
+        console.log(cookies.get('access_token'));
+
+        router.push("/dashboard-default");
+    }catch(err){
+      console.log(err);
+    }
+}
+
+
 const store = useStore();
 onBeforeMount(() => {
   store.state.hideConfigButton = true;
@@ -57,6 +99,7 @@ onBeforeUnmount(() => {
                         placeholder="Email"
                         name="email"
                         size="lg"
+                        v-model="email"
                       />
                     </div>
                     <div class="mb-3">
@@ -66,6 +109,7 @@ onBeforeUnmount(() => {
                         placeholder="Password"
                         name="password"
                         size="lg"
+                        v-model="password"
                       />
                     </div>
                     <argon-switch id="rememberMe" name="remember-me"
@@ -79,6 +123,7 @@ onBeforeUnmount(() => {
                         color="success"
                         fullWidth
                         size="lg"
+                        @click="login"
                         >Sign in</argon-button
                       >
                     </div>
