@@ -17,7 +17,7 @@
 .dropdown-menu {
   position: absolute;
   z-index: $zindex-dropdown;
-  display: none; // none by default, but block on "open" of the menu
+  display: block; // none by default, but block on "open" of the menu
   min-width: $dropdown-min-width;
   padding: $dropdown-padding-y $dropdown-padding-x;
   margin: 0; // Override default margin of ul
