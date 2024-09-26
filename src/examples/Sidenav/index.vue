@@ -20,7 +20,7 @@ const darkMode = computed(() => store.state.darkMode);
   />
 
   <aside
-    class="my-3 overflow-auto border-0 sidenav navbar navbar-vertical navbar-expand-xs border-radius-xl"
+    class="my-3 overflow-hidden border-0 sidenav navbar navbar-vertical navbar-expand-xs border-radius-xl"
     :class="`${isRTL ? 'me-3 rotate-caret fixed-end' : 'fixed-start ms-3'}
       ${
         layout === 'landing' ? 'bg-transparent shadow-none' : ' '
@@ -47,7 +47,6 @@ const darkMode = computed(() => store.state.darkMode);
 <!--    </div>-->
 
     <hr class="mt-0 horizontal dark" />
-
     <sidenav-list />
   </aside>
 </template>
