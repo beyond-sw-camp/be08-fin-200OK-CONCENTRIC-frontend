@@ -62,7 +62,7 @@
         @include media-breakpoint-up(#{$breakpoint}) {
           display: block;
           position: fixed;
-          top: 0;
+          top: 6rem;
           bottom: 0;
           width: 100%;
           max-width: $navbar-vertical-open-width !important;
@@ -214,13 +214,13 @@
       padding: 1.5rem;
     }
     //사이드바가 열릴 때 메인콘텐츠 이동 코드 주석 처리
-    &.fixed-start + .main-content {
-      margin-left: $navbar-vertical-open-width + 1.5;
-    }
-
-    &.fixed-end + .main-content {
-      margin-right: $navbar-vertical-open-width + 1.5;
-    }
+    //&.fixed-start + .main-content {
+    //  margin-left: $navbar-vertical-open-width + 1.5;
+    //}
+    //
+    //&.fixed-end + .main-content {
+    //  margin-right: $navbar-vertical-open-width + 1.5;
+    //}
   }
 
   .navbar-heading .docs-mini {
@@ -255,7 +255,7 @@
   .sidenav {
     .nav-item .collapse {
       height: auto;
-      @include transition($transition-base);
+      @include transition(0);
     }
 
     .nav-link-text {
@@ -288,7 +288,9 @@
 
     &.g-sidenav-pinned {
       .sidenav {
-        transform: translateX(0);
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+        pointer-events: all; /* 보이는 상태에서 클릭 가능 */
       }
     }
   }
@@ -494,6 +496,11 @@
 }
 
 .g-sidenav-hidden {
+  .sidenav{
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+  }
   .sidenav-footer {
     display: none;
   }
@@ -523,7 +530,8 @@
       max-width: $navbar-vertical-hidden-width !important;
 
       &.fixed-start + .main-content {
-        margin-left: $navbar-vertical-hidden-width + 1.5;
+        margin-left: 0;
+        //margin-left: $navbar-vertical-hidden-width + 1.5;
       }
 
       .navbar-brand {
