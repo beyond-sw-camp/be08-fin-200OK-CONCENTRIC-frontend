@@ -2,7 +2,8 @@
 import AuthorsTable from "./components/AuthorsTable.vue";
 import ProjectsTable from "./components/ProjectsTable.vue";
 import Tasks from "@/views/Tasks.vue";
-</script>
+import Pagination from "@/views/components/Pagination.vue";
+</script>e
 <template>
   <div class="py-4 container-fluid">
 <!--    <div class="row">-->
@@ -10,15 +11,45 @@ import Tasks from "@/views/Tasks.vue";
 <!--        <authors-table />-->
 <!--      </div>-->
 <!--    </div>-->
-    <div class="row">
-      <div class="col-12">
-        <projects-table />
+<!--    <div class="row">-->
+<!--      <div class="col-12">-->
+<!--        <projects-table />-->
+<!--      </div>-->
+<!--    </div>-->
+    <div>
+      <!-- Left arrow (fixed) -->
+      <a
+          class="page-link"
+          href="#"
+          aria-label="Previous"
+          style="position: fixed; left: 20px; top: 50%; transform: translateY(-50%); z-index: 10;"
+      >
+        <i class="fa fa-angle-left"></i>
+        <span class="sr-only">Previous</span>
+      </a>
+
+      <!-- Tasks component (scrollable) -->
+      <div class="tasks-container mx-5">
+        <Tasks />
       </div>
+
+      <!-- Right arrow (fixed) -->
+      <a
+          class="page-link"
+          href="#"
+          aria-label="Next"
+          style="position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10;"
+      >
+        <i class="fa fa-angle-right"></i>
+        <span class="sr-only">Next</span>
+      </a>
     </div>
-    <div class="row">
-      <div class="col-12">
-        <Tasks/>
-      </div>
-    </div>
+
+<!--    <div class="row">-->
+<!--      <div class="col-12 d-flex justify-content-center">-->
+<!--        <Pagination>-->
+<!--        </Pagination>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </template>
