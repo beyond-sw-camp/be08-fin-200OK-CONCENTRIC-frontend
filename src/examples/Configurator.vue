@@ -37,7 +37,7 @@ const darkMode = () => {
       class="px-3 py-2 fixed-plugin-button text-dark position-fixed"
       @click="toggleConfigurator"
     >
-      <i class="py-2 fa fa-cog"></i>
+      <i class="py-2 fa fa-comments-o"></i>
     </a>
     <div class="shadow-lg card">
       <div class="pt-3 pb-0 bg-transparent card-header">

@@ -1,7 +1,13 @@
 <template>
   <div class="card mb-4">
-    <div class="card-header pb-0">
+    <div class="card-header pb-0 d-flex justify-content-between align-items-center">
       <h5>Tasks</h5>
+      <button type="button" class="btn btn-primary ms-auto">
+        <a class="mx-1">
+          <i class="fa fa-bars"></i>
+        </a>
+        정렬
+      </button>
     </div>
     <div class="card-body px-0 pt-0 pb-2">
       <div class="table-responsive p-2">
@@ -24,31 +30,55 @@
           </tr>
           </thead>
           <tbody>
-            <tr v-for="task in tasks" :key="task.id">
-              <td v-for="(column, index) in columns" :key="index">
-                <div v-if="column.key === 'completion'" class="align-items-center">
-                  <span class="me-2">{{ task[column.key] }}</span>
-                  <div class="progress flex-grow-1 ml-auto" style="width: 40%">
-                    <div
-                        class="progress-bar bg-gradient-success"
-                        role="progressbar"
-                        :aria-valuenow="task[column.key].replace('%', '')"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                        :style="{ width: task[column.key] }"
-                    ></div>
-                  </div>
+          <tr v-for="task in tasks" :key="task.id">
+            <td v-for="(column, index) in columns" :key="index" @click="startEditingTask(task.id, column.key)">
+              <!-- 완료율 열에만 progress bar 표시, 수정 가능하도록 처리 -->
+              <div v-if="column.key === 'completion' && !isEditingTask(task.id, column.key)">
+                <span class="me-2">{{ task[column.key] }}</span>
+                <div class="progress flex-grow-1 ml-auto" style="width: 40%">
+                  <div
+                      class="progress-bar bg-gradient-success"
+                      role="progressbar"
+                      :aria-valuenow="task[column.key].replace('%', '')"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      :style="{ width: task[column.key] }"
+                  ></div>
                 </div>
-                <div v-else>
-                  {{ task[column.key] || '' }}
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <button class="btn shadow-none">+&nbsp;New Task</button>
-              </td>
-            </tr>
+              </div>
+
+              <!-- 완료율 수정 모드 -->
+              <div v-else-if="column.key === 'completion' && isEditingTask(task.id, column.key)">
+                <input
+                    v-model="task[column.key]"
+                    class="form-control form-control-sm"
+                    ref="input_{{task.id}}_{{column.key}}"
+                    @blur="stopEditingTask(task.id, column.key)"
+                    @keyup.enter="stopEditingTask(task.id, column.key)"
+                />
+              </div>
+
+              <div v-else-if="isEditingTask(task.id, column.key)">
+                <input
+                    v-model="task[column.key]"
+                    class="form-control form-control-sm"
+                    ref="input_{{task.id}}_{{column.key}}"
+                    @blur="stopEditingTask(task.id, column.key)"
+                    @keyup.enter="stopEditingTask(task.id, column.key)"
+                />
+              </div>
+
+              <!-- 기본 표시 모드 -->
+              <div v-else>
+                {{ task[column.key] || '' }}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button class="btn shadow-none" @click="addTask">+&nbsp;New Task</button>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -59,49 +89,47 @@
 <script>
 import DropdownComponent from './components/ContentsDropdown.vue';
 import axios from 'axios';
-import ArgonButton from "@/components/ArgonButton.vue";
 
 export default {
   components: {
-    // ArgonButton,
     DropdownComponent
   },
   data() {
     return {
       mainImage: require('@/assets/img/애옹.png'),
       columns: [
-        { key: 'projectName', label: '프로젝트명', isEditing: false },
-        { key: 'budget', label: '예산', isEditing: false },
-        { key: 'status', label: '상태', isEditing: false },
-        { key: 'completion', label: '완료율', isEditing: false },
+        {key: 'projectName', label: '프로젝트명', isEditing: false},
+        {key: 'budget', label: '예산', isEditing: false},
+        {key: 'status', label: '상태', isEditing: false},
+        {key: 'completion', label: '완료율', isEditing: false},
       ],
       tasks: [
-        { id: 1, projectName: 'Spotify', budget: '$2,500', status: '진행 중', completion: '60%' },
-        { id: 2, projectName: 'Invision', budget: '$5,000', status: '완료', completion: '100%' },
-        { id: 3, projectName: 'Jira', budget: '$3,400', status: '취소됨', completion: '30%' },
-        { id: 4, projectName: 'Slack', budget: '$1,000', status: '취소됨', completion: '0%' },
-        { id: 5, projectName: 'Webdev', budget: '$14,000', status: '진행 중', completion: '80%' },
-        { id: 6, projectName: 'Adobe XD', budget: '$2,300', status: '완료', completion: '100%' },
+        {id: 1, projectName: 'Spotify', budget: '$2,500', status: '진행 중', completion: '60%'},
+        {id: 2, projectName: 'Invision', budget: '$5,000', status: '완료', completion: '100%'},
+        {id: 3, projectName: 'Jira', budget: '$3,400', status: '취소됨', completion: '30%'},
+        {id: 4, projectName: 'Slack', budget: '$1,000', status: '취소됨', completion: '0%'},
+        {id: 5, projectName: 'Webdev', budget: '$14,000', status: '진행 중', completion: '80%'},
+        {id: 6, projectName: 'Adobe XD', budget: '$2,300', status: '완료', completion: '100%'},
       ],
-      columnOptions: ['projectName', 'budget', 'status', 'completion']
+      columnOptions: ['projectName', 'budget', 'status', 'completion'],
+      editingTask: {
+        taskId: null,
+        columnKey: null
+      }
     };
   },
-  created() {
-    this.fetchData(); // 컴포넌트 생성 시 데이터를 가져오는 함수 호출
-  },
   methods: {
-
     async fetchData() {
       try {
-        const response = await axios.get('/api/getTasks'); // API 요청으로 데이터 가져오기
+        const response = await axios.get('/api/getTasks'); // API 요청하는 부분입니당
         this.tasks = response.data.tasks;
-        this.columns = response.data.columns; // 열 데이터도 가져옴
+        this.columns = response.data.columns;
       } catch (error) {
         console.error('데이터를 불러오지 못했습니다.', error);
       }
     },
     addColumn() {
-      this.columns.push({ key: '', label: '', isEditing: true });
+      this.columns.push({key: '', label: '', isEditing: true});
     },
     editColumn(index) {
       this.columns[index].isEditing = true;
@@ -123,7 +151,37 @@ export default {
         content: '내용',
       };
       return labelMap[key] || '새 열';
-    }
+    },
+    addTask() {
+      const newTaskId = this.tasks.length + 1;
+      const newTask = {
+        id: newTaskId,
+        projectName: '',
+        budget: '',
+        status: '',
+        completion: '0%'
+      };
+      this.tasks.push(newTask);
+    },
+    startEditingTask(taskId, columnKey) {
+      this.editingTask.taskId = taskId;
+      this.editingTask.columnKey = columnKey;
+      this.$nextTick(() => {
+        const inputRef = this.$refs[`input_${taskId}_${columnKey}`];
+        if (inputRef) {
+          inputRef.focus();
+        }
+      });
+    },
+    stopEditingTask(taskId, columnKey) {
+      if (this.editingTask.taskId === taskId && this.editingTask.columnKey === columnKey) {
+        this.editingTask.taskId = null;
+        this.editingTask.columnKey = null;
+      }
+    },
+    isEditingTask(taskId, columnKey) {
+      return this.editingTask.taskId === taskId && this.editingTask.columnKey === columnKey;
+    },
   }
 };
 </script>
