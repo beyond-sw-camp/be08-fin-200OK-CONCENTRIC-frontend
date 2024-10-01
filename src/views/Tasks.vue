@@ -14,7 +14,7 @@
         <table class="table align-items-center justify-content-center mb-3">
           <thead>
           <tr>
-            <th v-for="(column, index) in columns" :key="index" colspan="1">
+            <th v-for="(column, index) in columns" :key="index" colspan="1" class="position-relative" @mouseenter="showIcon(index)" @mouseleave="hideIcon(index)">
                 <span v-if="!column.isEditing" @click="editColumn(index)" class="btn mb-0 shadow-none">
                   {{ column.label || 'New Column' }}
                 </span>
@@ -23,6 +23,13 @@
                   :options="columnOptions"
                   @columnSelected="updateColumnLabel(index, $event)"
               />
+
+              <i
+                  v-show="iconVisible === index"
+                  class="fa fa-minus-circle position-absolute text-danger"
+                  @click="removeColumn(index)"
+                  style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer; z-index: 10;"
+              ></i>
             </th>
             <th>
               <button class="btn btn-primary btn-sm mx-2 py-1 mb-0" @click="addColumn">+&nbsp;New</button>
@@ -30,9 +37,8 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="task in tasks" :key="task.id">
+          <tr v-for="task in tasks" :key="task.id" @mouseenter="hoverRow = task.id" @mouseleave="hoverRow = null">
             <td v-for="(column, index) in columns" :key="index" @click="startEditingTask(task.id, column.key)">
-              <!-- 완료율 열에만 progress bar 표시, 수정 가능하도록 처리 -->
               <div v-if="column.key === 'completion' && !isEditingTask(task.id, column.key)">
                 <span class="me-2">{{ task[column.key] }}</span>
                 <div class="progress flex-grow-1 ml-auto" style="width: 40%">
@@ -46,12 +52,10 @@
                   ></div>
                 </div>
               </div>
-
-              <!-- 완료율 수정 모드 -->
               <div v-else-if="column.key === 'completion' && isEditingTask(task.id, column.key)">
                 <input
                     v-model="task[column.key]"
-                    class="form-control form-control-sm"
+                    class="form-control form-control-alternative"
                     ref="input_{{task.id}}_{{column.key}}"
                     @blur="stopEditingTask(task.id, column.key)"
                     @keyup.enter="stopEditingTask(task.id, column.key)"
@@ -61,17 +65,23 @@
               <div v-else-if="isEditingTask(task.id, column.key)">
                 <input
                     v-model="task[column.key]"
-                    class="form-control form-control-sm"
+                    class="form-control form-control-alternative"
                     ref="input_{{task.id}}_{{column.key}}"
                     @blur="stopEditingTask(task.id, column.key)"
                     @keyup.enter="stopEditingTask(task.id, column.key)"
                 />
               </div>
-
-              <!-- 기본 표시 모드 -->
               <div v-else>
                 {{ task[column.key] || '' }}
               </div>
+            </td>
+            <td class="position-relative">
+              <i
+                  v-show="hoverRow === task.id"
+                  class="fa fa-minus-circle position-absolute text-danger"
+                  style="top: 50%; right: 75%; transform: translateY(-50%); cursor: pointer; z-index: 10;"
+                  @click="openModal(task.id)"
+              ></i>
             </td>
           </tr>
           <tr>
@@ -83,19 +93,36 @@
         </table>
       </div>
     </div>
+    <ModalDeleteRow
+        :isVisible="modals.modal1"
+        title="Delete?"
+        @close="closeModal"
+        @confirm="handleConfirm"
+    >
+      <p>Task will be deleted</p>
+    </ModalDeleteRow>
   </div>
 </template>
 
 <script>
 import DropdownComponent from './components/ContentsDropdown.vue';
 import axios from 'axios';
+import ModalDeleteRow from "@/views/components/ModalDeleteRow.vue";
 
 export default {
   components: {
+    ModalDeleteRow,
     DropdownComponent
   },
   data() {
     return {
+      hoverRow: null,
+      iconVisible: null,
+      hoverColumn: null,
+      selectedTaskId: null,
+      modals: {
+        modal1: false,
+      },
       mainImage: require('@/assets/img/애옹.png'),
       columns: [
         {key: 'projectName', label: '프로젝트명', isEditing: false},
@@ -119,17 +146,14 @@ export default {
     };
   },
   methods: {
-    async fetchData() {
-      try {
-        const response = await axios.get('/api/getTasks'); // API 요청하는 부분입니당
-        this.tasks = response.data.tasks;
-        this.columns = response.data.columns;
-      } catch (error) {
-        console.error('데이터를 불러오지 못했습니다.', error);
-      }
+    showIcon(index) {
+      this.iconVisible = index;
+    },
+    hideIcon(index) {
+      this.iconVisible = null;
     },
     addColumn() {
-      this.columns.push({key: '', label: '', isEditing: true});
+      this.columns.push({ key: '', label: '', isEditing: true });
     },
     editColumn(index) {
       this.columns[index].isEditing = true;
@@ -138,6 +162,9 @@ export default {
       this.columns[index].key = selectedValue;
       this.columns[index].label = this.getLabelForKey(selectedValue);
       this.columns[index].isEditing = false;
+    },
+    removeColumn(index) {
+      this.columns.splice(index, 1);
     },
     getLabelForKey(key) {
       const labelMap = {
@@ -152,6 +179,7 @@ export default {
       };
       return labelMap[key] || '새 열';
     },
+
     addTask() {
       const newTaskId = this.tasks.length + 1;
       const newTask = {
@@ -182,6 +210,29 @@ export default {
     isEditingTask(taskId, columnKey) {
       return this.editingTask.taskId === taskId && this.editingTask.columnKey === columnKey;
     },
+
+    async fetchData() {
+      try {
+        const response = await axios.get('/api/getTasks');
+        this.tasks = response.data.tasks;
+        this.columns = response.data.columns;
+      } catch (error) {
+        console.error('데이터를 불러오지 못했습니다.', error);
+      }
+    },
+
+    openModal(taskId) {
+      this.selectedTaskId = taskId;
+      this.modals.modal1 = true;
+    },
+    closeModal() {
+      this.selectedTaskId = null;
+      this.modals.modal1 = false;
+    },
+    handleConfirm(){
+      this.tasks = this.tasks.filter(task => task.id !== this.selectedTaskId);
+      this.closeModal();
+    }
   }
 };
 </script>
