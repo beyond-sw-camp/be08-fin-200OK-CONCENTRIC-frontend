@@ -47,7 +47,7 @@ const closeMenu = () => {
         id="navbar"
       >
         <div
-          class="pe-md-3 d-flex align-items-center"
+          class="pe-md-5 d-flex align-items-center"
         >
         </div>
         <ul class="navbar-nav justify-content-end">
