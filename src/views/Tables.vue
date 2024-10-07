@@ -3,19 +3,10 @@ import AuthorsTable from "./components/AuthorsTable.vue";
 import ProjectsTable from "./components/ProjectsTable.vue";
 import Tasks from "@/views/Tasks.vue";
 import Pagination from "@/views/components/Pagination.vue";
+import MonthCalender from "@/views/Calender/MonthCalender.vue";
 </script>e
 <template>
   <div class="py-4 container-fluid">
-<!--    <div class="row">-->
-<!--      <div class="col-12">-->
-<!--        <authors-table />-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="col-12">-->
-<!--        <projects-table />-->
-<!--      </div>-->
-<!--    </div>-->
     <div>
       <!-- Left arrow (fixed) -->
       <a
@@ -43,6 +34,9 @@ import Pagination from "@/views/components/Pagination.vue";
         <i class="fa fa-angle-right"></i>
         <span class="sr-only">Next</span>
       </a>
+    </div>
+    <div>
+      <month-calender/>
     </div>
 
 <!--    <div class="row">-->
