@@ -1,6 +1,7 @@
 <script setup>
 import { onBeforeUnmount, onBeforeMount } from "vue";
 import { useStore } from "vuex";
+import { useUserStore } from '@/store/user.js';
 import Navbar from "@/examples/PageLayout/Navbar.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonSwitch from "@/components/ArgonSwitch.vue";
@@ -16,8 +17,10 @@ const { cookies } = useCookies();
 const email = ref('');
 const password = ref('');
 const router = useRouter();
+const userStore = useUserStore();
 
-const login = () => {
+const login = (event) => {
+  event.preventDefault();
   console.log(email.value);
   console.log(password.value);
   loginApi();
@@ -25,24 +28,29 @@ const login = () => {
 
 const loginApi = async () => {
   try{
-      const response = axios.post('/member/login',{
-        email:email.value,
-        password:password.value,      
+      const res = await axios.post('/member/login', {
+        email: email.value,
+        password: password.value
       }, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        validateStatus: false,
         withCredentials: true
       });
-        alert("로그인을 성공했습니다.");
-        // store.isLoggedIn = 'true'; 
-        // localStorage.setItem("isLoggedIn", true);
-        // localStorage.setItem("userInfo", JSON.stringify(res.data));
-        // console.log(JSON.parse(localStorage.getItem("userInfo")));
+        console.log(res.status);
+        if(res.status == 200){
+          console.log(res);
+  
+          userStore.setUser(res.data);
+          userStore.setLogin();
+  
+          console.log(userStore.userInfo);
 
-        console.log(cookies.get('access_token'));
+          router.push("/");
+        }else if(res.status == 404 || res.status == 400){
+          alert("아이디 또는 패스워드가 잘못되었다.");
+        }else if(res.status == 403){
+          alert("탈퇴한 사용자다.");
+        }
 
-        router.push("/dashboard-default");
     }catch(err){
       console.log(err);
     }
