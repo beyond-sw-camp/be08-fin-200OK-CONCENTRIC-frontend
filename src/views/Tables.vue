@@ -1,10 +1,14 @@
 <script setup>
+
 import AuthorsTable from "./components/AuthorsTable.vue";
 import ProjectsTable from "./components/ProjectsTable.vue";
 import Tasks from "@/views/Tasks.vue";
 import Pagination from "@/views/components/Pagination.vue";
 import MonthCalender from "@/views/Calender/MonthCalender.vue";
-</script>e
+import Clock from "@/views/RightTopClock.vue";
+import RightTopClock from "@/views/RightTopClock.vue";
+
+</script>
 <template>
   <div class="py-4 container-fluid">
     <div>
@@ -35,8 +39,11 @@ import MonthCalender from "@/views/Calender/MonthCalender.vue";
         <span class="sr-only">Next</span>
       </a>
     </div>
-    <div>
+    <div class="tasks-container mx-5">
       <month-calender/>
+    </div>
+    <div>
+      <right-top-clock/>
     </div>
 
 <!--    <div class="row">-->
