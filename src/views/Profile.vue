@@ -232,11 +232,8 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
-    <profile-card/>
     <div class="py-4 container-fluid">
-      <div class="col">
-        <div class="col-md-4">
-
+      <div class="">
         <div class="col-md-8">
           <div class="card">
             <div class="card-header pb-0">
@@ -322,8 +319,8 @@ onBeforeUnmount(() => {
             </div>
           </div>
         </div>
-
-
+        <div class="col-md-4">
+          <profile-card />
         </div>
       </div>
     </div>
