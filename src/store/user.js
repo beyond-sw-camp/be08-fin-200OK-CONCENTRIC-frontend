@@ -4,30 +4,40 @@ import { reactive, computed } from 'vue';
 export const useUserStore = defineStore('user', () => {
     const state = reactive({
         userInfo: null,
-        isLoggedIn: false
+        isLoggedIn: false,
+        accessToken: null
     });
-    
-    const setUser = (user) => {
+
+    const setUser = (user, accessToken) => {
         state.userInfo = user;
+        state.isLoggedIn = true;
+        state.accessToken = accessToken;
     }
 
     const clearUser = () => {
         state.userInfo = null;
         state.isLoggedIn = false;
+        state.accessToken = null;
     }
 
-    const setLogin = () => {
-        state.isLoggedIn = true;
+    const updateToken = (accessToken) => {
+        state.accessToken = accessToken;
     }
 
     const userInfo = computed(() => state.userInfo);
     const isLoggedIn = computed(() => state.isLoggedIn);
+    const accessToken = computed(() => state.accessToken);
 
     return { 
+        state,
         setUser,
-        setLogin,
         clearUser, 
+        updateToken,
         userInfo,
         isLoggedIn,
+        accessToken,
     };
+},
+{
+    persist: true
 });

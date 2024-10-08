@@ -11,9 +11,7 @@ const body = document.getElementsByTagName("body")[0];
 import axios from 'axios';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useCookies } from 'vue3-cookies';
 
-const { cookies } = useCookies();
 const email = ref('');
 const password = ref('');
 const router = useRouter();
@@ -28,26 +26,29 @@ const login = (event) => {
 
 const loginApi = async () => {
   try{
-      const res = await axios.post('/member/login', {
+      const response = await axios.post('/member/login', {
         email: email.value,
         password: password.value
       }, {
         validateStatus: false,
         withCredentials: true
       });
-        console.log(res.status);
-        if(res.status == 200){
-          console.log(res);
-  
-          userStore.setUser(res.data);
-          userStore.setLogin();
-  
+        console.log(response.status);
+        if(response.status == 200){
+          console.log(response.data);
+          let accessToken = response.headers.authorization;
+          
+          userStore.setUser(response.data, accessToken);
+          
           console.log(userStore.userInfo);
+          console.log(userStore.accessToken);
+
+          axios.defaults.headers.common['Authorization'] = accessToken;
 
           router.push("/");
-        }else if(res.status == 404 || res.status == 400){
+        }else if(response.status == 404 || response.status == 400){
           alert("아이디 또는 패스워드가 잘못되었다.");
-        }else if(res.status == 403){
+        }else if(response.status == 403){
           alert("탈퇴한 사용자다.");
         }
 
