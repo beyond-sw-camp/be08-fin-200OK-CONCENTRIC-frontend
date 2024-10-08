@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+import piniaPersistedstate from 'pinia-plugin-persistedstate';
 import App from "./App.vue";
 import store from "./store";
 import router from "./router";
@@ -12,6 +13,7 @@ axios.defaults.baseURL = 'http://localhost:8080/v1/api';
 
 const appInstance = createApp(App);
 const pinia = createPinia();
+pinia.use(piniaPersistedstate);
 
 appInstance.config.globalProperties.$axios = axios;
 appInstance.use(store);
