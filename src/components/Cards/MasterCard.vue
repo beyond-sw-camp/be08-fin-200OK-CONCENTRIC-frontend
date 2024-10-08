@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { useStore } from "vuex";
-import ArgonAvatar from "@/components/ArgonAvatar.vue";
+import ArgonAvatar from "@/components/ArgonComponents/ArgonAvatar.vue";
 import img1 from "../../assets/img/logos/mastercard.png";
 
 const store = useStore();

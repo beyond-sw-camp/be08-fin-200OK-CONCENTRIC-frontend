@@ -1,11 +1,20 @@
 <script setup>
 import { computed } from "vue";
 import { useStore } from "vuex";
-import Sidenav from "./examples/Sidenav";
-import Configurator from "@/examples/Configurator.vue";
-import Navbar from "@/examples/Navbars/Navbar.vue";
+import Sidenav from "./views/Sidenav/SidenavIndex.vue";
+import Configurator from "@/views/PageCustom/Configurator.vue";
+import Navbar from "@/views/Navbar/Navbar.vue";
 import {VueperSlides, VueperSlide} from "vueperslides";
-import AppFooter from "@/examples/Footer.vue";
+import AppFooter from "@/examples/FooterExample.vue";
+import ActiveUsersChart from "@/components/Charts/ActiveUsersChart.vue";
+import GradientLineChart from "@/components/Charts/GradientLineChart.vue";
+import ArgonAlert from "@/components/ArgonComponents/ArgonAlert.vue";
+import ArgonAvatar from "@/components/ArgonComponents/ArgonAvatar.vue";
+import ArgonPagination from "@/components/ArgonComponents/ArgonPagination.vue";
+import FooterExample from "@/examples/FooterExample.vue";
+import Footer from "@/examples/FooterExample2.vue";
+import FooterExample2 from "@/examples/FooterExample2.vue";
+import Globe from "@/examples/Globe.vue";
 
 const store = useStore();
 const isNavFixed = computed(() => store.state.isNavFixed);
@@ -31,6 +40,9 @@ const navClasses = computed(() => {
 });
 </script>
 <template>
+  <div>
+
+  </div>
   <div
     v-show="layout === 'landing'"
     class="landing-bg h-100 bg-gradient-primary position-fixed w-100"

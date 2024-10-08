@@ -165,9 +165,9 @@ import { useRouter } from "vue-router";
 import { useCookies } from "vue3-cookies";
 import axios from "axios";
 
-import ArgonInput from "@/components/ArgonInput.vue";
-import ArgonButton from "@/components/ArgonButton.vue";
-import ArgonSwitch from "@/components/ArgonSwitch.vue";
+import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
+import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
+import ArgonSwitch from "@/components/ArgonComponents/ArgonSwitch.vue";
 
 
 const store = useStore();

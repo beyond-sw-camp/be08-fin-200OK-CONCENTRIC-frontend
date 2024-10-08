@@ -1,10 +1,10 @@
 <script setup>
-import MasterCard from "@/examples/Cards/MasterCard.vue";
-import DefaultInfoCard from "@/examples/Cards/DefaultInfoCard.vue";
-import PaymentCard from "./components/PaymentCard.vue";
-import InvoiceCard from "./components/InvoiceCard.vue";
-import BillingCard from "./components/BillingCard.vue";
-import TransactionCard from "./components/TransactionCard.vue";
+import MasterCard from "@/components/Cards/MasterCard.vue";
+import DefaultInfoCard from "@/components/Cards/DefaultInfoCard.vue";
+import PaymentCard from "../views/components/PaymentCard.vue";
+import InvoiceCard from "../views/components/InvoiceCard.vue";
+import BillingCard from "../views/components/BillingCard.vue";
+import TransactionCard from "../views/components/TransactionCard.vue";
 </script>
 <template>
   <div class="container-fluid">

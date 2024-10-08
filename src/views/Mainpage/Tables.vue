@@ -1,12 +1,12 @@
 <script setup>
 
-import AuthorsTable from "./components/AuthorsTable.vue";
-import ProjectsTable from "./components/ProjectsTable.vue";
-import Tasks from "@/views/Tasks.vue";
+import AuthorsTable from "../components/AuthorsTable.vue";
+import ProjectsTable from "../components/ProjectsTable.vue";
+import Tasks from "@/views/Mainpage/TableComponents/Tasks.vue";
 import Pagination from "@/views/components/Pagination.vue";
 import MonthCalender from "@/views/Calender/MonthCalender.vue";
-import Clock from "@/views/RightTopClock.vue";
-import RightTopClock from "@/views/RightTopClock.vue";
+import Clock from "@/views/Mainpage/RightTopClock.vue";
+import RightTopClock from "@/views/Mainpage/RightTopClock.vue";
 
 </script>
 <template>

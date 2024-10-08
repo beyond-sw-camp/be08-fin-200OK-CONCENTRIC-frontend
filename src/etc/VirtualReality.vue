@@ -1,14 +1,14 @@
 <script setup>
 import { onMounted, onBeforeMount, onBeforeUnmount } from "vue";
 import { useStore } from "vuex";
-import Sidenav from "@/examples/Sidenav";
-import AppFooter from "@/examples/Footer.vue";
-import Navbar from "@/examples/Navbars/Navbar.vue";
-import CardCalendar from "./components/CardCalendar.vue";
-import CardEmail from "./components/CardEmail.vue";
-import CardToDo from "./components/CardToDo.vue";
-import CardPlayer from "./components/CardPlayer.vue";
-import CardMessage from "./components/CardMessage.vue";
+import Sidenav from "@/views/Sidenav/SidenavIndex.vue";
+import AppFooter from "@/examples/FooterExample.vue";
+import Navbar from "@/views/Navbar/Navbar.vue";
+import CardCalendar from "../views/components/CardCalendar.vue";
+import CardEmail from "../views/components/CardEmail.vue";
+import CardToDo from "../views/components/CardToDo.vue";
+import CardPlayer from "../views/components/CardPlayer.vue";
+import CardMessage from "../views/components/CardMessage.vue";
 import setTooltip from "@/assets/js/tooltip.js";
 
 const body = document.getElementsByTagName("body")[0];
@@ -81,7 +81,7 @@ onBeforeUnmount(() => {
                 <img
                   class="border-radius-lg"
                   alt="Image placeholder"
-                  src="@/assets/img/team-1.jpg"
+                  src="../assets/img/team-1.jpg"
                 />
               </a>
               <button
@@ -121,7 +121,7 @@ onBeforeUnmount(() => {
                 <div class="ms-auto">
                   <img
                     class="w-50 float-end mt-lg-n4"
-                    src="@/assets/img/small-logos/icon-sun-cloud.png"
+                    src="../assets/img/small-logos/icon-sun-cloud.png"
                     alt="image sun"
                   />
                 </div>

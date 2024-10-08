@@ -29,7 +29,7 @@ defineProps({
     <div v-if=false class="p-3 card-body text-center w-100 pt-0">
       <img
         class="w-50 mx-auto"
-        src="@/assets/img/illustrations/icon-documentation.svg"
+        src="../../assets/img/illustrations/icon-documentation.svg"
         alt="sidebar_illustration"
       />
 

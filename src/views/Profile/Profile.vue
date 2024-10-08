@@ -4,9 +4,9 @@ import { useStore } from "vuex";
 
 import setNavPills from "@/assets/js/nav-pills.js";
 import setTooltip from "@/assets/js/tooltip.js";
-import ProfileCard from "./components/ProfileCard.vue";
-import ArgonInput from "@/components/ArgonInput.vue";
-import ArgonButton from "@/components/ArgonButton.vue";
+import ProfileCard from "../components/ProfileCard.vue";
+import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
+import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
 
 const body = document.getElementsByTagName("body")[0];
 
@@ -52,7 +52,7 @@ onBeforeUnmount(() => {
             <div class="col-auto">
               <div class="avatar avatar-xl position-relative">
                 <img
-                  src="../assets/img/team-1.jpg"
+                  src="../../assets/img/team-1.jpg"
                   alt="profile_image"
                   class="shadow-sm w-100 border-radius-lg"
                 />
