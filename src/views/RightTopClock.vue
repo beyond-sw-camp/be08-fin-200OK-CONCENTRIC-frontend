@@ -40,7 +40,7 @@ const formatTime = (date) => {
 <style scoped>
 h1 {
   font-family: 'Consolas', sans-serif;
-  color: #FBB584;
+  color: #8A9BF9;
 }
 p {
   font-size: 24px;
