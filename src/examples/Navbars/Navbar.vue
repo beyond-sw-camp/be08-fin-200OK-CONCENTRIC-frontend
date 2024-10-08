@@ -5,11 +5,18 @@ import { useRoute } from "vue-router";
 import Breadcrumbs from "../Breadcrumbs.vue";
 import SidenavProfile from "@/examples/Sidenav/SidenavProfile.vue";
 
+import { useUserStore } from "@/store/user.js";
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+import { useCookies } from 'vue3-cookies';
+
 const showMenu = ref(false);
 const store = useStore();
 const isRTL = computed(() => store.state.isRTL);
 
 const route = useRoute();
+const userStore = useUserStore();
+const router = useRouter();
 
 const currentRouteName = computed(() => {
   return route.name;
@@ -27,6 +34,34 @@ const closeMenu = () => {
     showMenu.value = false;
   }, 100);
 };
+
+const logout = async () => {
+  try{
+    const response = await axios.post('member/logout', {},
+      {
+        validateStatus: false,
+        withCredentials: true
+      }
+    );
+
+    if(response.status == 200 || response.status == 400 || response.status == 401){
+      userStore.clearUser();
+      axios.defaults.headers.common['Authorization'] = null;
+
+      router.push("/");
+    }
+
+  }catch(err){
+    console.log(err);
+  }
+
+  // if(response.headers.authorization !== undefined){
+  //   axios.defaults.headers.common['Authorization'] = response.headers.authorization;
+  //   userStore.updateToken(response.headers.authorization);
+  //   console.log(response.headers.authorization);
+  // }
+}
+
 </script>
 <template>
   <nav
@@ -55,14 +90,20 @@ const closeMenu = () => {
         </div>
         <ul class="navbar-nav justify-content-end">
           <li class="nav-item d-flex align-items-center">
-            <router-link
+            <router-link v-if="!userStore.isLoggedIn"
               :to="{ name: 'Signin' }"
               class="px-0 nav-link font-weight-bold text-white"
-              target="_blank"
             >
               <i class="fa fa-user" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>
               <span class="d-sm-inline d-none">Sign In</span>
             </router-link>
+            <button v-if="userStore.isLoggedIn"
+              @click="logout"
+              class="px-0 nav-link font-weight-bold text-white"
+            >
+              <i class="fa fa-user" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>
+              <span class="d-sm-inline d-none">Logout</span>
+            </button>
           </li>
           <li class="nav-item ps-3 d-flex align-items-center">
             <a

@@ -11,7 +11,7 @@ import Signin from "../views/Signin.vue";
 const routes = [
   {
     path: "/",
-    name: "/",
+    name: "Home",
     redirect: "/tables",
   },
   {
