@@ -138,7 +138,7 @@
                 </argon-button>
               </div>
               <div class="overlay-panel overlay-right">
-                <h1>Hello, Friend!</h1>
+                <h1 style="color: #9de0f6">Hi!</h1>
                 <p>Enter your personal details and start your journey with us</p>
                 <argon-button
                     class="ghost"
