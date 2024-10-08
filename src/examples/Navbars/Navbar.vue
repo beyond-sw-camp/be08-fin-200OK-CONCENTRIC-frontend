@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import Breadcrumbs from "../Breadcrumbs.vue";
+import SidenavProfile from "@/examples/Sidenav/SidenavProfile.vue";
 
 import { useUserStore } from "@/store/user.js";
 import axios from 'axios';
@@ -76,7 +77,9 @@ const logout = async () => {
 <!--        :current-page="currentRouteName"-->
 <!--        :current-directory="currentDirectory"-->
 <!--      />-->
-
+      <div>
+        <sidenav-profile/>
+      </div>
       <div
         class="mt-2 collapse navbar-collapse mt-sm-0 me-md-0 me-sm-4"
         id="navbar"

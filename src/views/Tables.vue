@@ -1,21 +1,16 @@
 <script setup>
+
 import AuthorsTable from "./components/AuthorsTable.vue";
 import ProjectsTable from "./components/ProjectsTable.vue";
 import Tasks from "@/views/Tasks.vue";
 import Pagination from "@/views/components/Pagination.vue";
-</script>e
+import MonthCalender from "@/views/Calender/MonthCalender.vue";
+import Clock from "@/views/RightTopClock.vue";
+import RightTopClock from "@/views/RightTopClock.vue";
+
+</script>
 <template>
   <div class="py-4 container-fluid">
-<!--    <div class="row">-->
-<!--      <div class="col-12">-->
-<!--        <authors-table />-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row">-->
-<!--      <div class="col-12">-->
-<!--        <projects-table />-->
-<!--      </div>-->
-<!--    </div>-->
     <div>
       <!-- Left arrow (fixed) -->
       <a
@@ -43,6 +38,12 @@ import Pagination from "@/views/components/Pagination.vue";
         <i class="fa fa-angle-right"></i>
         <span class="sr-only">Next</span>
       </a>
+    </div>
+    <div class="tasks-container mx-5">
+      <month-calender/>
+    </div>
+    <div>
+      <right-top-clock/>
     </div>
 
 <!--    <div class="row">-->

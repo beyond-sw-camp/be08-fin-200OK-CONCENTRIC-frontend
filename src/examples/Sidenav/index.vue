@@ -27,7 +27,7 @@ const darkMode = computed(() => store.state.darkMode);
       } ${sidebarType}`"
     id="sidenav-main"
   >
-    <sidenav-profile/>
+<!--    <sidenav-profile/>-->
 <!--    <div class="sidenav-header">-->
 <!--      <i-->
 <!--        class="top-0 p-3 cursor-pointer fas fa-times text-secondary opacity-5 position-absolute end-0 d-none d-xl-none"-->
@@ -46,7 +46,7 @@ const darkMode = computed(() => store.state.darkMode);
 <!--      </router-link>-->
 <!--    </div>-->
 
-    <hr class="mt-0 horizontal dark" />
+<!--    <hr class="mt-0 horizontal dark" />-->
     <sidenav-list />
   </aside>
 </template>

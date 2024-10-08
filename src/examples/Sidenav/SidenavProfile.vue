@@ -1,7 +1,7 @@
 <template>
   <div>
     <router-link class="m-0 navbar-brand d-flex align-items-center" to="/">
-      <img :src="selectedItem.image || defaultImage" class="navbar-brand-img" alt="profile_image" />
+      <img :src="selectedItem.image || defaultImage" class="navbar-brand-img w-25 ms-5" alt="profile_image" />
 
 <!--      <button @click="toggleDropdown" class="ms-2 font-weight-bold me-2 btn btn-primary">-->
 <!--        {{ selectedItem.name || "Personal Page" }}-->
@@ -15,7 +15,7 @@
           @click="toggleMenu"
       >
       {{ selectedItem.name || "Personal Page" }}
-        <img :src="require('@/assets/img/icons/expand_more_40dp_000000.png')" class="navbar-brand-img" alt="profile_image" />
+        <img :src="require('@/assets/img/icons/expand_more_40dp_000000.png')" class="navbar-brand-img w-25" alt="profile_image" />
         <DropdownItems class="text-black" :items="dropdownItems" :visible="showMenu" @select="selectItem" @toggle="toggleMenu" />
       </a>
 
