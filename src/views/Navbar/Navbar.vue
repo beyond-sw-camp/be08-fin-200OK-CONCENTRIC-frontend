@@ -2,8 +2,8 @@
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
-import Breadcrumbs from "../Breadcrumbs.vue";
-import SidenavProfile from "@/examples/Sidenav/SidenavProfile.vue";
+import Breadcrumbs from "../../examples/Breadcrumbs.vue";
+import SidenavProfile from "@/views/Sidenav/SidenavProfile.vue";
 
 import { useUserStore } from "@/store/user.js";
 import axios from 'axios';

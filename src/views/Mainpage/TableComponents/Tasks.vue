@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import DropdownComponent from './components/ContentsDropdown.vue';
+import DropdownComponent from '../../components/ContentsDropdown.vue';
 import axios from 'axios';
 import ModalDeleteRow from "@/views/components/ModalDeleteRow.vue";
 

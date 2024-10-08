@@ -1,6 +1,6 @@
 <script setup>
-import MiniStatisticsCard from "@/examples/Cards/MiniStatisticsCard.vue";
-import GradientLineChart from "@/examples/Charts/GradientLineChart.vue";
+import MiniStatisticsCard from "@/components/Cards/MiniStatisticsCard.vue";
+import GradientLineChart from "@/components/Charts/GradientLineChart.vue";
 import Carousel from "./components/Carousel.vue";
 import CategoriesList from "./components/CategoriesList.vue";
 
