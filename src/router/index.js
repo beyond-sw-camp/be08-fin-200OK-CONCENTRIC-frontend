@@ -7,6 +7,8 @@ import RTL from "../etc/Rtl.vue";
 import Profile from "../views/Profile/Profile.vue";
 import Signup from "../views/Sign/Signup.vue";
 import Signin from "../views/Sign/Signin.vue";
+import ChatView from "../views/Chat/ChatView.vue";
+import ChatRoomTest from "../views/Chat/ChatComponents/ChatRoomTest.vue";
 
 const routes = [
   {
@@ -53,6 +55,16 @@ const routes = [
     path: "/signup",
     name: "Signup",
     component: Signup,
+  },
+  {
+    path: "/chat",
+    name: "Chat",
+    component: ChatView,
+  },
+  {
+    path: "/chat-test",
+    name: "Chat Test",
+    component: ChatRoomTest,
   },
 ];
 
