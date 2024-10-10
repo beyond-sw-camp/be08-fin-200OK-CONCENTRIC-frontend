@@ -92,16 +92,17 @@ const logout = async () => {
         </div>
         <ul class="navbar-nav justify-content-end">
           <li class="nav-item d-flex align-items-center">
-            <router-link v-if="!userStore.isLoggedIn"
+            <!-- <router-link v-if="userStore.isLoggedIn"
               :to="{ name: 'Signin' }"
               class="px-0 nav-link font-weight-bold text-white"
             >
               <i class="fa fa-user" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>
               <span class="d-sm-inline d-none">Sign In</span>
-            </router-link>
+            </router-link> -->
             <button v-if="userStore.isLoggedIn"
               @click="logout"
               class="px-0 nav-link font-weight-bold text-white"
+              style="border: none; background-color: transparent;"
             >
               <i class="fa fa-user" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>
               <span class="d-sm-inline d-none">Logout</span>
