@@ -13,8 +13,8 @@ import ChatRoomTest from "../views/Chat/ChatComponents/ChatRoomTest.vue";
 const routes = [
   {
     path: "/",
-    name: "Home",
-    redirect: "/tables",
+    name: "Login",
+    redirect: "/signin",
   },
   {
     path: "/dashboard-default",

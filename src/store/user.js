@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { reactive, computed } from 'vue';
+import axios from 'axios';
 
 export const useUserStore = defineStore('user', () => {
     const state = reactive({
@@ -8,10 +9,9 @@ export const useUserStore = defineStore('user', () => {
         accessToken: null
     });
 
-    const setUser = (user, accessToken) => {
+    const setUser = (user) => {
         state.userInfo = user;
         state.isLoggedIn = true;
-        state.accessToken = accessToken;
     }
 
     const clearUser = () => {
@@ -20,8 +20,11 @@ export const useUserStore = defineStore('user', () => {
         state.accessToken = null;
     }
 
-    const updateToken = (accessToken) => {
-        state.accessToken = accessToken;
+    const setToken = (accessToken) => {
+        if(accessToken !== undefined){
+            state.accessToken = accessToken;
+            axios.defaults.headers.common['authorization'] = accessToken;
+        }
     }
 
     const userInfo = computed(() => state.userInfo);
@@ -32,7 +35,7 @@ export const useUserStore = defineStore('user', () => {
         state,
         setUser,
         clearUser, 
-        updateToken,
+        setToken,
         userInfo,
         isLoggedIn,
         accessToken,
