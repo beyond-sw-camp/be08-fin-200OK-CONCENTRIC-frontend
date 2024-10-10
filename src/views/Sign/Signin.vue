@@ -397,12 +397,23 @@ const signupApi = async () => {
           withCredentials: true,
         }
     );
-    alert("회원가입을 성공했습니다.");
-    // 회원가입 후 추가 로직
+    
+    if(response.status == 201){
+      alert("회원가입을 성공했습니다.");
+      isVerified.value = false;
+      onVerifying.value = false;
+      isSent.value = false;
+      duplicated.value = false;
+
+      verificationCode.value = "";
+      signupEmail.value = "";
+      signupPassword.value = "";
+      signupName.value = "";
+      signupNickname.value = "";
+    }
 
     console.log(response.data);
 
-    // 회원가입 후 로그인 페이지로 이동
     signIn();
   } catch (err) {
     console.log(err);
