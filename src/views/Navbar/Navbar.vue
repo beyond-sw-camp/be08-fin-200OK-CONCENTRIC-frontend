@@ -37,7 +37,9 @@ const closeMenu = () => {
 
 const logout = async () => {
   try{
-    const response = await axios.post('member/logout', {},
+    const response = await axios.post(
+      'member/logout',
+      null,
       {
         validateStatus: false,
         withCredentials: true
