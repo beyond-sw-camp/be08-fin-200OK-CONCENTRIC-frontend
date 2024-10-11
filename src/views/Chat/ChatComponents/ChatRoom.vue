@@ -29,7 +29,7 @@
         <!-- 채팅 입력 창 -->
         <div class="chat-room-footer">
             <input v-model="newMessage" type="text" placeholder="메시지를 입력하세요..." class="message-input"
-                @keyup.enter.prevent="sendMessage" />
+                @keyup.enter.prevent="sendMessage"/>
             <button @click="attachFile" class="attach-button">+</button>
             <button @click="sendMessage" class="send-button">전송</button>
         </div>
@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, nextTick } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/store/user';
 import SockJS from "sockjs-client";
@@ -99,6 +99,12 @@ watch(
             connectToChatRoom();
         }
     },
+
+    // chatMessages,
+    // async () => {
+    //     await scrollToBottom();
+    // },
+    // { immediate: true, deep: true }
 );
 
 // STOMP 구독 설정
@@ -132,9 +138,8 @@ const connectToChatRoom = () => {
 // };
 
 // 메세지 전송
-const sendMessage = () => {
+const sendMessage = async () => {
     if (!newMessage.value || newMessage.value.trim() === "") {
-        alert("메시지를 입력하세요.");
         return;
     }
 
@@ -155,7 +160,9 @@ const sendMessage = () => {
     // }
 };
 
-const scrollToBottom = () => {
+
+const scrollToBottom = async () => {
+    await nextTick();
     if (messageContainer.value) {
         messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
     }
