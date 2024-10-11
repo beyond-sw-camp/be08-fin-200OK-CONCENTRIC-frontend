@@ -5,7 +5,6 @@ import Billing from "../etc/Billing.vue";
 import VirtualReality from "../etc/VirtualReality.vue";
 import RTL from "../etc/Rtl.vue";
 import Profile from "../views/Profile/Profile.vue";
-import Signup from "../views/Sign/Signup.vue";
 import Signin from "../views/Sign/Signin.vue";
 import ChatView from "../views/Chat/ChatView.vue";
 import ChatRoomTest from "../views/Chat/ChatComponents/ChatRoomTest.vue";
@@ -50,11 +49,6 @@ const routes = [
     path: "/signin",
     name: "Signin",
     component: Signin,
-  },
-  {
-    path: "/signup",
-    name: "Signup",
-    component: Signup,
   },
   {
     path: "/chat",
