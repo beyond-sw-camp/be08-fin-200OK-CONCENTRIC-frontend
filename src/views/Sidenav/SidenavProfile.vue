@@ -1,6 +1,6 @@
 <template>
   <div>
-    <router-link class="m-0 navbar-brand d-flex align-items-center" to="/">
+    <router-link class="m-0 navbar-brand d-flex align-items-center" to="/tables">
       <img :src="selectedItem.image || defaultImage" class="navbar-brand-img w-25 ms-5" alt="profile_image" />
 
 <!--      <button @click="toggleDropdown" class="ms-2 font-weight-bold me-2 btn btn-primary">-->

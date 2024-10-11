@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import Breadcrumbs from "../../examples/Breadcrumbs.vue";
@@ -8,7 +8,6 @@ import SidenavProfile from "@/views/Sidenav/SidenavProfile.vue";
 import { useUserStore } from "@/store/user.js";
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { useCookies } from 'vue3-cookies';
 
 const showMenu = ref(false);
 const store = useStore();
@@ -17,6 +16,8 @@ const isRTL = computed(() => store.state.isRTL);
 const route = useRoute();
 const userStore = useUserStore();
 const router = useRouter();
+
+const notifications = ref();
 
 const currentRouteName = computed(() => {
   return route.name;
@@ -63,6 +64,22 @@ const logout = async () => {
   //   console.log(response.headers.authorization);
   // }
 }
+
+const loadNotifications = async () => {
+  const response = await axios.get('notification/list',
+    {
+      headers: {
+        authorization: userStore.accessToken
+      },
+      validateStatus: false
+    }
+  );
+  console.log(response.data);
+}
+
+onMounted(() => {
+  loadNotifications();
+});
 
 </script>
 <template>
