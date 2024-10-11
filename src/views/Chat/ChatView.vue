@@ -15,7 +15,8 @@
 
         <!-- 채팅방 상세 페이지 (ChatRoomDetails) -->
         <div v-if="showChatRoomDetails" class="chat-room-details-view">
-            <ChatRoomDetails :chat="selectedChatRoom" @close-details="toggleChatRoomDetails" />
+            <ChatRoomDetails :chat="selectedChatRoom" @close-details="toggleChatRoomDetails" 
+            @chat-room-updated="updateChatName"/>
         </div>
 
         <!-- 파일함 (ChatFile) -->
@@ -50,6 +51,14 @@ const selectChatRoom = (chat) => {
 //     if (selectedChatRoom.value) {
 //         selectedChatRoom.value.messages.push(newMessage);
 // };
+
+// 채팅방 이름 전역 업데이트
+const updateChatName = ({ chatRoomId, newNickname }) => {
+    if (selectedChatRoom.value && selectedChatRoom.value.chatRoomId === chatRoomId) {
+        selectedChatRoom.value.nickname = newNickname;
+    }
+    console.log(`채팅방 이름이 '${newNickname}'으로 업데이트되었습니다.`);
+};
 
 const closeChatRoom = () => {
     // 채팅방을 닫을 때 파일함도 닫기

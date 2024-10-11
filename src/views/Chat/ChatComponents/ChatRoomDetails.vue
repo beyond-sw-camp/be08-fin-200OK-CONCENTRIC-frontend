@@ -55,6 +55,7 @@ const newChatRoomName = ref(props.chat.nickname); // 수정 중인 채팅방 이
 const chatRoomId = props.chat.chatRoomId;
 
 const members = ref([]); // 참여자 목록
+const emit = defineEmits(['chat-room-updated'])
 
 // 채팅방 참여자 목록 API 호출
 const findChatParticipantApi = async () => {
@@ -103,6 +104,8 @@ const saveTitle = async () => {
         );
         chatRoomName.value = newChatRoomName.value; // 이름 업데이트
         isEditingTitle.value = false; // 수정 모드 종료
+
+        emit("chat-room-updated", { chatRoomId: chatRoomId, newNickname: newChatRoomName.value });
     } catch (err) {
         console.error("채팅방 이름 수정에 실패했습니다.", err);
     }

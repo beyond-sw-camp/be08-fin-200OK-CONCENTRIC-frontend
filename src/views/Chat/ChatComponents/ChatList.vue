@@ -49,7 +49,7 @@ import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 
 // Emit 선언
-const emit = defineEmits(["select-chat-room", "select-favorite"]);
+const emit = defineEmits(["select-chat-room", "select-favorite", "chat-room-updated"]);
 
 // 상태 변수 정의
 const showModal = ref(false);
