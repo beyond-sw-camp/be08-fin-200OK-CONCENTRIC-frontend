@@ -4,21 +4,22 @@
             <h5 class="chat-header-text">채팅</h5>
             <!-- 채팅방 추가 버튼 -->
             <button class="add-chat-button" @click="toggleModal">
-                +</button>
+                +
+            </button>
         </div>
 
         <!-- 채팅 목록 -->
         <ul class="chat-list">
             <li v-for="(chat, index) in sortedChatRooms" :key="index" @click="goToChatRoom(chat)"
                 class="chat-list-item">
-                <img :src="chat.profileImage" class="profile-image" alt="Profile" />
+                <img :src="chat.profileImage" class="profile-image" />
                 <div class="chat-info">
-                    <h4 class="chat-name">{{ chat.name }}</h4>
+                    <h4 class="chat-name">{{ chat.nickname }}</h4>
                     <p class="chat-last-message">{{ chat.lastMessage }}</p>
                 </div>
                 <!-- 즐겨찾기 버튼 -->
-                <button @click.stop="toggleFavorite(chat)" class="favorite-button">
-                    {{ chat.isFavorite ? '★' : '☆' }}
+                <button @click.stop="chatBookmarkApi(chat)" class="favorite-button">
+                    {{ chat.bookmark ? '★' : '☆' }}
                 </button>
             </li>
         </ul>
@@ -38,41 +39,117 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: "ChatList",
-    props: {
-        chatRooms: {
-            type: Array,
-            required: true,
-        },
-    },
-    data() {
-        return {
-            showModal: false, // 모달 창 표시 여부
-        };
-    },
-    computed: {
-        sortedChatRooms() {
-            return [...this.chatRooms].sort((a, b) => b.isFavorite - a.isFavorite);
-        },
-    },
-    methods: {
-        goToChatRoom(chat) {
-            this.$emit("select-chat-room", chat);
-        },
-        toggleFavorite(chat) {
-            chat.isFavorite = !chat.isFavorite;
-            this.$emit("select-favorite", chat);
-        },
-        toggleModal() {
-            this.showModal = !this.showModal; // 모달 창 표시 토글
-        },
-        closeModal() {
-            this.showModal = false; // 모달 창 닫기
-        },
-    },
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
+import { useUserStore } from '@/store/user';
+const userStore = useUserStore();
+const accessToken = userStore.accessToken;
+import SockJS from 'sockjs-client';
+import Stomp from 'stompjs';
+
+// Emit 선언
+const emit = defineEmits(["select-chat-room", "select-favorite"]);
+
+// 상태 변수 정의
+const showModal = ref(false);
+const stompClient = ref(null);
+const chat = ref([]);
+
+// 채팅방 리스트 호출
+const chatListApi = async () => {
+    try {
+        const response = await axios.get("/chat/list",
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    // "Authorization": `${accessToken}`,
+                },
+            });
+        chat.value = response.data;
+        console.log(chat.value)
+        connectChatRoom(chat.value);
+    } catch (err) {
+        console.error("채팅방 목록을 가져오는데 실패했습니다.", err);
+    }
 };
+
+onMounted(() => {
+    chatListApi();
+});
+
+// 채팅방 북마크 설정
+const chatBookmarkApi = async (chat) => {
+    try {
+        const chatRoomId = chat.chatRoomId;
+        const response = await axios.put(
+            `/chat/bookmark?chatRoomId=${chatRoomId}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    // "Authorization": `${accessToken}`,
+                },
+            });
+        if (response.status == 204) {
+            emit("select-favorite", chat);
+            chatListApi();
+        }
+    } catch (err) {
+        console.error("북마크를 지정하는데 실패했습니다.", err);
+    }
+};
+
+// Computed: 즐겨찾기 정렬된 채팅 목록
+const sortedChatRooms = computed(() => {
+    return [...chat.value].sort((a, b) => b.bookmark - a.bookmark);
+});
+
+// 채팅방 구독
+const connectChatRoom = (chatRoom) => {
+    const socket = new SockJS('http://localhost:8080/ws');
+    stompClient.value = Stomp.over(socket); stompClient.value.connect({ Authorization: `${accessToken}` }, (frame) => {
+        console.log('Connected: ' + frame);
+
+        // 채팅방 목록의 모든 chatRoomId에 대해 구독 설정
+        chatRoom.forEach((room) => {
+            stompClient.value.subscribe(`/sub/chat/${room.chatRoomId}`, (message) => {
+                const receivedMessage = JSON.parse(message.body);
+                console.log(`Received message from chatRoom ${room.chatRoomId}:`, receivedMessage);
+
+                // 각 채팅방의 최신 메시지를 업데이트
+                // updateChatRoomLatestMessage(room.chatRoomId, receivedMessage);
+            });
+        });
+    });
+};
+
+// 채팅방의 최신 메시지 업데이트
+// const updateChatRoomLatestMessage = (chatRoomId, message) => {
+//     const targetRoom = chat.value.find((room) => room.chatRoomId === chatRoomId);
+//     if (targetRoom) {
+//         targetRoom.lastMessage = message.message || '파일을 전송했습니다';
+//     }
+// };
+
+
+// 메서드 정의
+const goToChatRoom = (chat) => {
+    emit("select-chat-room", chat);
+};
+
+const toggleFavorite = (chat) => {
+    chat.isFavorite = !chat.isFavorite;
+    emit("select-favorite", chat);
+};
+
+const toggleModal = () => {
+    showModal.value = !showModal.value; // 모달 창 표시 토글
+};
+
+const closeModal = () => {
+    showModal.value = false; // 모달 창 닫기
+};
+
 </script>
 
 <style scoped>
@@ -88,7 +165,6 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* margin-bottom: 10px; */
     padding: 20px;
 }
 
@@ -98,11 +174,10 @@ export default {
 
 .add-chat-button {
     border: none;
-    /* padding: 0px 8px 10px 0px; */
     border-radius: 5px;
     cursor: pointer;
     background: none;
-    color: #444
+    color: #444;
 }
 
 .add-chat-button:hover {
@@ -141,7 +216,7 @@ export default {
 .chat-name {
     margin: 0;
     font-size: 15px;
-    font-weight: bold;
+    font-weight: 400;
 }
 
 .chat-last-message {
