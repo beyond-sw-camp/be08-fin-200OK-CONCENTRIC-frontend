@@ -7,7 +7,7 @@
                 <h3 class="profile-name">{{ chat.nickname }}</h3>
             </div>
             <!-- 닫기 및 파일함 버튼 -->
-            <button @click="goToFileBox" class="header-button file-button">
+            <button @click="goToFileList" class="header-button file-button">
                 <i class="fa fa-folder-open" aria-hidden="true"></i>
             </button>
             <button @click="closeChatRoom" class="header-button close-button">
@@ -21,7 +21,10 @@
                 :class="['chat-message', chatMessage.memberId === loggedInMemberId || chatMessage.sentByMe ? 'my-message' : 'partner-message']">
                 <div class="message-bubble">
                     <p v-if="chatMessage.message" class="chat-message-text">{{ chatMessage.message }}</p>
-                    <p v-else-if="chatMessage.fileUrl" class="chat-message-file">{{ chatMessage.fileUrl }}</p>
+                    <template v-else-if="chatMessage.fileUrl">
+                        <img v-if="isImage(chatMessage.fileUrl)" :src="chatMessage.loadedImageUrl" class="chat-message-file" />
+                        <a v-else :href="chatMessage.fileUrl" target="_blank" class="chat-message-file">{{ getFileName(chatMessage.fileUrl) }}</a>
+                    </template>
                 </div>
             </div>
         </div>
@@ -56,6 +59,7 @@ const stompClient = ref(null);
 const messageContainer = ref(null);
 const files = ref(null);
 const chatFiles = ref([]);
+const imageSrc = ref("");
 
 const props = defineProps({
     chat: {
@@ -66,7 +70,7 @@ const props = defineProps({
 
 const emit = defineEmits([ 
     'close-chat-room', 
-    'go-to-file-box', 
+    'select-file-list', 
     'toggle-details'
 ]);
 
@@ -78,6 +82,15 @@ const chatMessageListApi = async () => {
                 "Content-Type": "application/json",
             },
         });
+
+        //추가
+        const messages = response.data;
+        await Promise.all(messages.map(async (message) => {
+            if (message.fileUrl && isImage(message.fileUrl)) {
+                message.loadedImageUrl = await getImage(message.fileUrl);
+            }
+        }));
+        
         chatMessages.value = response.data;
         scrollToBottom();
     } catch (err) {
@@ -146,6 +159,35 @@ const sendMessage = async () => {
     newMessage.value = '';
 };
 
+// 이미지와 일반 파일 분리
+const isImage = (fileUrl) => {
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
+    const extension = fileUrl.split('.').pop().toLowerCase();
+    return imageExtensions.includes(extension);
+};
+
+// 파일 이름 추출(나중에 api로 original 이름 추출..해야할 듯)
+const getFileName = (fileUrl) => {
+    return fileUrl.split('/').pop();
+};
+
+// 이미지 로드
+const getImage = async (fileUrl) => {
+    try {
+        const response = await axios.post(
+            `storage/image/profile?path=${fileUrl}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        return response.data.imageUrl;        
+    } catch (err) {
+        console.error("이미지를 불러오는데 실패했습니다.", err);
+    }
+};
+
 // 첨부파일 전송
 const sendFile = async (event) => {
     files.value = event.target.files;
@@ -183,8 +225,8 @@ const closeChatRoom = () => {
     emit("close-chat-room");
 };
 
-const goToFileBox = () => {
-    emit("go-to-file-box");
+const goToFileList = () => {
+    emit("select-file-list");
 };
 
 const toggleDetails = () => {
@@ -276,8 +318,7 @@ const toggleDetails = () => {
 }
 
 .chat-message-file {
-    display: block;
-    margin-bottom: 0px;
+    display: flex;
     font-size: 14px;
 }
 

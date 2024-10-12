@@ -9,7 +9,7 @@
         <div v-if="selectedChatRoom" class="chat-room-view">
             <ChatRoom :chat="selectedChatRoom" 
                 @close-chat-room="closeChatRoom"
-                @go-to-file-box="openFileBox"
+                @select-file-list="openFileList"
                 @toggle-details="toggleChatRoomDetails" />
         </div>
 
@@ -20,8 +20,8 @@
         </div>
 
         <!-- 파일함 (ChatFile) -->
-        <div v-if="selectedFileList" class="file-box-view">
-            <ChatFile :fileList="selectedFileList" @close-file-box="closeFileBox" />
+        <div v-if="selectedFileList" class="file-list-view">
+            <ChatFile :chat="selectedChatRoom" @close-file-list="closeFileList" />
         </div>
     </div>
 </template>
@@ -35,7 +35,7 @@ import ChatList from './ChatComponents/ChatList.vue';
 import ChatRoomDetails from './ChatComponents/ChatRoomDetails.vue';
 
 const selectedChatRoom = ref(null);
-const selectedFileList = ref(null);
+const selectedFileList = ref(false);
 const showChatRoomDetails = ref(false);
 
 const selectChatRoom = (chat) => {
@@ -54,18 +54,16 @@ const updateChatName = ({ chatRoomId, newNickname }) => {
 
 const closeChatRoom = () => {
     selectedChatRoom.value = null;
-    selectedFileList.value = null;
+    selectedFileList.value = false;
     showChatRoomDetails.value = false;
 };
 
-const openFileBox = () => {
-    if (selectedChatRoom.value) {
-        selectedFileList.value = selectedChatRoom.value.files;
-    }
+const openFileList = () => {
+    selectedFileList.value = true;
 };
 
-const closeFileBox = () => {
-    selectedFileList.value = null;
+const closeFileList = () => {
+    selectedFileList.value = false;
 };
 
 const toggleChatRoomDetails = () => {
@@ -92,7 +90,7 @@ const toggleChatRoomDetails = () => {
     margin-right: 10px;
 }
 
-.file-box-view {
+.file-list-view {
     flex-grow: 0;
     margin-right: 10px;
     width: 350px;

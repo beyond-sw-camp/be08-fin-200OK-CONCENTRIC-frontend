@@ -56,7 +56,6 @@ const findChatParticipantApi = async () => {
             `/chat/participant?chatRoomId=${chatRoomId}`, {
             headers: {
                 "Content-Type": "application/json",
-                // "Authorization": `${accessToken}`,
             },
         });
         members.value = response.data;
