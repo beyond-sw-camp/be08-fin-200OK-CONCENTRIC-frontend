@@ -30,7 +30,10 @@
         <div class="chat-room-footer">
             <input v-model="newMessage" type="text" placeholder="메시지를 입력하세요..." class="message-input"
                 @keyup.enter.prevent="sendMessage"/>
-            <button @click="attachFile" class="attach-button">+</button>
+                <label class="attach-button">
+                    +
+                    <input type="file" ref="fileInput" @change="sendFile" multiple hidden />
+                </label>
             <button @click="sendMessage" class="send-button">전송</button>
         </div>
     </div>
@@ -51,7 +54,8 @@ const chatMessages = ref([]);
 const newMessage = ref("");
 const stompClient = ref(null);
 const messageContainer = ref(null);
-const fileInput = ref(null);
+const files = ref(null);
+const chatFiles = ref([]); // 업로드 후 받은 파일 정보를 저장
 
 // console.log("로그인된 사용자 ID:", loggedInMemberId.value);
 
@@ -160,16 +164,40 @@ const sendMessage = async () => {
     // }
 };
 
+// 첨부파일 전송
+const sendFile = async (event) => {
+    files.value = event.target.files;
+    try {
+        // FormData 객체 생성
+        const formData = new FormData();
+        formData.append("chatRoomId", props.chat.chatRoomId); // 채팅방 ID 추가
+        formData.append("memberId", loggedInMemberId.value); // 멤버 ID 추가
+
+        // 파일들 추가
+        for (let i = 0; i < files.value.length; i++) {
+            formData.append("files", files.value[i]); // 여러 개의 파일을 반복문을 통해 추가
+        }
+
+        // 서버로 파일 전송
+        const response = await axios.post(`/chat/upload`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                // "Authorization": `${accessToken}`, // 필요한 경우 인증 헤더 추가
+            },
+        });
+
+        chatFiles.value = response.data; // 파일 전송 후 서버로부터 응답을 chatFiles에 저장
+        scrollToBottom(); // 채팅 메시지 창을 아래로 스크롤
+    } catch (err) {
+        console.error("첨부파일을 전송하는 데 실패했습니다.", err);
+    }
+};
 
 const scrollToBottom = async () => {
     await nextTick();
     if (messageContainer.value) {
         messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
     }
-};
-
-const attachFile = () => {
-    alert("첨부파일 기능은 아직 구현되지 않았습니다.");
 };
 
 const closeChatRoom = () => {
