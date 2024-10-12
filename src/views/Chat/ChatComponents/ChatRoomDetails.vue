@@ -1,0 +1,204 @@
+<template>
+    <div class="chat-room-detail-container">
+        <!-- 채팅방 헤더 -->
+        <div class="chat-title-header">
+            <div class="chat-room-title">
+                <h6 v-if="!isEditingTitle">
+                    {{ chatRoomName }}
+                    <button @click="editTitle" class="edit-button">
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                    </button>
+                </h6>
+
+                <div v-else class="edit-title-container">
+                    <input v-model="newChatRoomName" class="edit-title-input" />
+                    <button @click="saveTitle" class="save-button">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 참여자 -->
+        <ul class="member-list">
+            <li v-for="member in members" :key="member.memberId" class="member-item">
+                <img :src="member.imageUrl" class="profile-image" />
+                <span class="member-name">{{ member.nickname }}</span>
+            </li>
+        </ul>
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { useUserStore } from '@/store/user';
+
+const userStore = useUserStore();
+
+const props = defineProps({
+    chat: {
+        type: Object,
+        required: true,
+    },
+});
+
+const isEditingTitle = ref(false);
+const chatRoomName = ref(props.chat.nickname); // 초기 채팅방 이름
+const newChatRoomName = ref(props.chat.nickname); // 수정 채팅방 이름
+const chatRoomId = props.chat.chatRoomId;
+
+const members = ref([]); // 참여자 목록
+const emit = defineEmits(['chat-room-updated'])
+
+// 채팅방 참여자 목록
+const findChatParticipantApi = async () => {
+    try {
+        const response = await axios.get(
+            `/chat/participant?chatRoomId=${chatRoomId}`, {
+            headers: {
+                "Content-Type": "application/json",
+                // "Authorization": `${accessToken}`,
+            },
+        });
+        members.value = response.data;
+    } catch (err) {
+        console.error("참여자 목록을 가져오는데 실패했습니다.", err);
+    }
+};
+
+onMounted(() => {
+    findChatParticipantApi();
+});
+
+// 채팅방 이름 수정 모드로 전환
+const editTitle = () => {
+    isEditingTitle.value = true;
+    newChatRoomName.value = chatRoomName.value;
+};
+
+// 채팅방 이름 변경
+const saveTitle = async () => {
+    if (newChatRoomName.value.trim() === "") {
+        alert("채팅방 이름을 입력하세요.");
+        return;
+    }
+
+    try {
+        const response = await axios.put(
+            "/chat/rename",
+            {   chatRoomId: chatRoomId,
+                nickname: newChatRoomName.value },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        chatRoomName.value = newChatRoomName.value;
+        isEditingTitle.value = false;
+
+        emit("chat-room-updated", { chatRoomId: chatRoomId, newNickname: newChatRoomName.value });
+    } catch (err) {
+        console.error("채팅방 이름 수정에 실패했습니다.", err);
+    }
+};
+
+</script>
+
+<style scoped>
+.chat-room-detail-container {
+    width: 350px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+.chat-title-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-room-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 10px 20px;
+}
+
+.edit-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #444;
+    font-size: 11pt;
+}
+
+.edit-title-container {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    gap: 10px;
+}
+
+.edit-title-input {
+    width: 150px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.save-button {
+    border: none;
+    font-size: 13px;
+    color: #444;
+    border-radius: 10px;
+    padding: 0px 10px;
+    cursor: pointer;
+    height: 30px;
+}
+
+.save-button:hover {
+    background-color: #ececec;
+}
+
+.member-list {
+    list-style: none;
+    padding: 0;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px 10px 20px;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 40%;
+    margin-right: 12px;
+}
+
+.member-name {
+    font-size: 14px;
+}
+
+.leave-container {
+    align-items: end;
+}
+
+.leave-button {
+    border: none;
+    font-size: 13px;
+    color: #444;
+    border-radius: 10px;
+    padding: 0px 10px;
+    cursor: pointer;
+    height: 30px;
+    margin: 10px;
+}
+
+.leave-button:hover {
+    background-color: #ececec;
+}
+</style>
