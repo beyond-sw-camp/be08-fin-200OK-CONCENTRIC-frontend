@@ -24,7 +24,7 @@
             </li>
         </ul>
 
-        <!-- 모달리스 채팅방 추가 창 -->
+        <!-- 구현해야 할 것(모달리스 - 채팅방 추가) -->
         <div v-if="showModal" class="modal-container">
             <div class="modal-header">
                 <h5>채팅방 추가</h5>
@@ -48,10 +48,8 @@ const accessToken = userStore.accessToken;
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 
-// Emit 선언
 const emit = defineEmits(["select-chat-room", "select-favorite", "chat-room-updated"]);
 
-// 상태 변수 정의
 const showModal = ref(false);
 const stompClient = ref(null);
 const chat = ref([]);
@@ -63,7 +61,6 @@ const chatListApi = async () => {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    // "Authorization": `${accessToken}`,
                 },
             });
         chat.value = response.data;
@@ -87,7 +84,6 @@ const chatBookmarkApi = async (chat) => {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    // "Authorization": `${accessToken}`,
                 },
             });
         if (response.status == 204) {
@@ -95,16 +91,16 @@ const chatBookmarkApi = async (chat) => {
             chatListApi();
         }
     } catch (err) {
-        console.error("북마크를 지정하는데 실패했습니다.", err);
+        console.error("즐겨찾기를 지정하는데 실패했습니다.", err);
     }
 };
 
-// Computed: 즐겨찾기 정렬된 채팅 목록
+// Computed: 즐겨찾기 기준으로 정렬
 const sortedChatRooms = computed(() => {
     return [...chat.value].sort((a, b) => b.bookmark - a.bookmark);
 });
 
-// 채팅방 구독
+// 리스트에서 채팅방 구독
 const connectChatRoom = (chatRoom) => {
     const socket = new SockJS('http://localhost:8080/ws');
     stompClient.value = Stomp.over(socket); stompClient.value.connect({ Authorization: `${accessToken}` }, (frame) => {
@@ -132,14 +128,8 @@ const connectChatRoom = (chatRoom) => {
 // };
 
 
-// 메서드 정의
 const goToChatRoom = (chat) => {
     emit("select-chat-room", chat);
-};
-
-const toggleFavorite = (chat) => {
-    chat.isFavorite = !chat.isFavorite;
-    emit("select-favorite", chat);
 };
 
 const toggleModal = () => {
@@ -239,12 +229,10 @@ const closeModal = () => {
     color: #609be8;
 }
 
-/* 모달리스 스타일 */
+/* 채팅방 추가 */
 .modal-container {
     position: absolute;
-    /* 부모 컴포넌트 내부에 오버레이로 표시 */
     top: 50px;
-    /* 부모 요소 기준으로 상단 위치 */
     left: 20px;
     width: 300px;
     border: 1px solid #ddd;
@@ -252,7 +240,6 @@ const closeModal = () => {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 999;
-    /* 다른 요소들보다 위에 표시 */
 }
 
 .modal-header {

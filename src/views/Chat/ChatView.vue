@@ -34,12 +34,10 @@ import ChatFile from './ChatComponents/ChatFile.vue';
 import ChatList from './ChatComponents/ChatList.vue';
 import ChatRoomDetails from './ChatComponents/ChatRoomDetails.vue';
 
-// 선택된 채팅방 및 파일 리스트 상태 변수
 const selectedChatRoom = ref(null);
 const selectedFileList = ref(null);
 const showChatRoomDetails = ref(false);
 
-// 메서드 선언
 const selectChatRoom = (chat) => {
     selectedChatRoom.value = chat;
     console.log("선택된 채팅방:", selectedChatRoom.value);
@@ -47,35 +45,26 @@ const selectChatRoom = (chat) => {
     showChatRoomDetails.value = false;
 };
 
-// const handleSendMessage = (newMessage) => {
-//     if (selectedChatRoom.value) {
-//         selectedChatRoom.value.messages.push(newMessage);
-// };
-
 // 채팅방 이름 전역 업데이트
 const updateChatName = ({ chatRoomId, newNickname }) => {
     if (selectedChatRoom.value && selectedChatRoom.value.chatRoomId === chatRoomId) {
         selectedChatRoom.value.nickname = newNickname;
     }
-    console.log(`채팅방 이름이 '${newNickname}'으로 업데이트되었습니다.`);
 };
 
 const closeChatRoom = () => {
-    // 채팅방을 닫을 때 파일함도 닫기
     selectedChatRoom.value = null;
     selectedFileList.value = null;
     showChatRoomDetails.value = false;
 };
 
 const openFileBox = () => {
-    // 선택된 채팅방의 파일 리스트를 표시
     if (selectedChatRoom.value) {
         selectedFileList.value = selectedChatRoom.value.files;
     }
 };
 
 const closeFileBox = () => {
-    // 파일함 닫기
     selectedFileList.value = null;
 };
 

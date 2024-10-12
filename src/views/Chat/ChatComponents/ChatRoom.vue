@@ -55,11 +55,8 @@ const newMessage = ref("");
 const stompClient = ref(null);
 const messageContainer = ref(null);
 const files = ref(null);
-const chatFiles = ref([]); // 업로드 후 받은 파일 정보를 저장
+const chatFiles = ref([]);
 
-// console.log("로그인된 사용자 ID:", loggedInMemberId.value);
-
-// Prop 선언
 const props = defineProps({
     chat: {
         type: Object,
@@ -67,23 +64,24 @@ const props = defineProps({
     },
 });
 
-// Emit 선언
-const emit = defineEmits([ 'close-chat-room', 'go-to-file-box', 'toggle-details']);
+const emit = defineEmits([ 
+    'close-chat-room', 
+    'go-to-file-box', 
+    'toggle-details'
+]);
 
 // 채팅 내역 불러오기
-// const chatRoomId = props.chat.chatRoomId;
 const chatMessageListApi = async () => {
     try {
         const response = await axios.get(`/chat/${props.chat.chatRoomId}`, {
             headers: {
                 "Content-Type": "application/json",
-                // "Authorization": `${accessToken}`,
             },
         });
         chatMessages.value = response.data;
         scrollToBottom();
     } catch (err) {
-        console.error("채팅방 메세지 목록을 가져오는데 실패했습니다.", err);
+        console.error("채팅 메세지 내역을 불러오는데 실패했습니다.", err);
     }
 }
 
@@ -99,19 +97,13 @@ watch(
         if (newChatRoomId !== oldChatRoomId) {
             console.log(`채팅방 ID가 ${oldChatRoomId}에서 ${newChatRoomId}로 변경되었습니다.`);
             // unsubscribe();
-            chatMessageListApi(); // 새로운 방의 메시지를 불러오기
+            chatMessageListApi(); 
             connectToChatRoom();
         }
     },
-
-    // chatMessages,
-    // async () => {
-    //     await scrollToBottom();
-    // },
-    // { immediate: true, deep: true }
 );
 
-// STOMP 구독 설정
+// STOMP 연결
 const connectToChatRoom = () => {
     const socket = new SockJS('http://localhost:8080/ws');
     stompClient.value = Stomp.over(socket);
@@ -119,21 +111,17 @@ const connectToChatRoom = () => {
     stompClient.value.connect({ Authorization: `${accessToken}` }, (frame) => {
         console.log('Connected to chat room:', props.chat.chatRoomId);
 
-        // 채팅방에 구독 설정
+        // 채팅방 구독 설정
         stompClient.value.subscribe(`/sub/chat/${props.chat.chatRoomId}`, (message) => {
             const receivedMessage = JSON.parse(message.body);
             console.log(`Received message from chatRoom ${props.chat.chatRoomId}:`, receivedMessage);
             chatMessages.value = [...chatMessages.value, receivedMessage];
-            // chatMessages.value.push({
-            //     text: receivedMessage.message || null,
-            //     fileUrl: receivedMessage.fileUrl || null,
-            // });
             scrollToBottom();
         });
     });
 };
 
-// 기존 구독 해제
+// 채팅방 구독 해제
 // const unsubscribe = () => {
 //     if (stompClient.value && stompClient.value.connected) {
 //         stompClient.value.disconnect();
@@ -154,42 +142,33 @@ const sendMessage = async () => {
     };
 
     stompClient.value.send(`/pub/chat/${props.chat.chatRoomId}`, {}, JSON.stringify(message));
-    // emit("send-message", { text: newMessage.value, sentByMe: true });
     scrollToBottom();
     newMessage.value = '';
-    // if (newMessage.value.trim() !== "") {
-        // 부모 컴포넌트로 새로운 메시지 이벤트 전송
-        // 
-
-    // }
 };
 
 // 첨부파일 전송
 const sendFile = async (event) => {
     files.value = event.target.files;
     try {
-        // FormData 객체 생성
+        // FormData 생성
         const formData = new FormData();
-        formData.append("chatRoomId", props.chat.chatRoomId); // 채팅방 ID 추가
-        formData.append("memberId", loggedInMemberId.value); // 멤버 ID 추가
+        formData.append("chatRoomId", props.chat.chatRoomId);
+        formData.append("memberId", loggedInMemberId.value);
 
-        // 파일들 추가
         for (let i = 0; i < files.value.length; i++) {
-            formData.append("files", files.value[i]); // 여러 개의 파일을 반복문을 통해 추가
+            formData.append("files", files.value[i]);
         }
 
-        // 서버로 파일 전송
         const response = await axios.post(`/chat/upload`, formData, {
             headers: {
-                "Content-Type": "multipart/form-data",
-                // "Authorization": `${accessToken}`, // 필요한 경우 인증 헤더 추가
+                "Content-Type": "multipart/form-data", 
             },
         });
 
-        chatFiles.value = response.data; // 파일 전송 후 서버로부터 응답을 chatFiles에 저장
-        scrollToBottom(); // 채팅 메시지 창을 아래로 스크롤
+        chatFiles.value = response.data;
+        scrollToBottom();
     } catch (err) {
-        console.error("첨부파일을 전송하는 데 실패했습니다.", err);
+        console.error("첨부파일을 전송하는데 실패했습니다.", err);
     }
 };
 

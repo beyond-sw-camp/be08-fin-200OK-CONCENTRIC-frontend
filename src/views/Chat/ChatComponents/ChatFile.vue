@@ -47,7 +47,6 @@ export default {
     display: flex;
     flex-direction: column;
     width: 350px;
-    /* height: 550px; */
     border: 1px solid #ddd;
     border-radius: 10px;
     overflow: hidden;
