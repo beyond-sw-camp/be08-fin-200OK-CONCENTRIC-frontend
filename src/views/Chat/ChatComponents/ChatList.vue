@@ -3,7 +3,7 @@
         <div class="chat-header">
             <h5 class="chat-header-text">채팅</h5>
             <!-- 채팅방 추가 버튼 -->
-            <button class="add-chat-button" @click="toggleModal">
+            <button class="add-chat-button" @click="openFriendList">
                 +
             </button>
         </div>
@@ -25,18 +25,28 @@
         </ul>
 
         <!-- 구현해야 할 것(모달리스 - 채팅방 추가) -->
-        <div v-if="showModal" class="modal-container">
-            <div class="modal-header">
-                <h5>채팅방 추가</h5>
-                <button @click="closeModal" class="close-button">✖</button>
+        <div>
+            <!-- 모달 창 -->
+            <div v-if="showFriendList" class="friend-list-container">
+            <div class="friend-list-header">
+                <h5 class="friend-list-header-text">대화상대 선택</h5>
+                <button @click="closeFriendList" class="close-button">
+                <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <p>이곳에 친구 목록 또는 새로운 채팅방 생성 기능을 추가할 수 있습니다.</p>
-                <input type="text" placeholder="채팅방 이름을 입력하세요..." class="modal-input" />
-                <button class="modal-add-button">추가</button>
-            </div>
+            
+            <ul class="friend-list-body">
+                <li v-for="friend in friends" :key="friend.id" class="friend-list-item">
+                    <img :src="friend.imageUrl" class="profile-image" />
+                    <span class="friend-name">{{ friend.nickname }}</span>
+                <button @click="selectFriend(friend)" class="friend-list-select">
+                    추가
+                </button>
+                </li>
+            </ul>
         </div>
     </div>
+</div>
 </template>
 
 <script setup>
@@ -50,9 +60,10 @@ import Stomp from 'stompjs';
 
 const emit = defineEmits(["select-chat-room", "select-favorite", "chat-room-updated"]);
 
-const showModal = ref(false);
+const showFriendList = ref(false);
 const stompClient = ref(null);
 const chat = ref([]);
+const friends = ref([]);
 
 // 채팅방 리스트 호출
 const chatListApi = async () => {
@@ -132,12 +143,28 @@ const goToChatRoom = (chat) => {
     emit("select-chat-room", chat);
 };
 
-const toggleModal = () => {
-    showModal.value = !showModal.value; // 모달 창 표시 토글
+const openFriendList = () => {
+    showFriendList.value = !showFriendList.value;
+    getFriendListApi();
 };
 
-const closeModal = () => {
-    showModal.value = false; // 모달 창 닫기
+// 친구 목록 조회
+const getFriendListApi = async () => {
+    try {
+        const response = await axios.get("/friendship/list/accept",
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+        friends.value = response.data;
+    } catch (err) {
+        console.error("친구 목록을 가져오는데 실패했습니다.", err);
+    }
+};
+
+const closeFriendList = () => {
+    showFriendList.value = false;
 };
 
 </script>
@@ -145,12 +172,11 @@ const closeModal = () => {
 <style scoped>
 .chat-list-container {
     position: relative;
-    /* 모달리스 창을 오버레이하기 위한 상대 위치 */
     padding: 0px;
     background-color: #f5f5f5;
 }
 
-/* 채팅 목록 헤더 스타일 */
+/* 채팅 목록 헤더 */
 .chat-header {
     display: flex;
     justify-content: space-between;
@@ -198,6 +224,9 @@ const closeModal = () => {
     border-radius: 40%;
     margin-right: 12px;
 }
+.friend-name {
+    flex-grow: 1;
+}
 
 .chat-info {
     flex-grow: 1;
@@ -215,7 +244,6 @@ const closeModal = () => {
     color: #888;
 }
 
-/* 즐겨찾기 버튼 스타일 */
 .favorite-button {
     background: none;
     border: none;
@@ -230,7 +258,7 @@ const closeModal = () => {
 }
 
 /* 채팅방 추가 */
-.modal-container {
+.friend-list-container {
     position: absolute;
     top: 50px;
     left: 20px;
@@ -242,31 +270,48 @@ const closeModal = () => {
     z-index: 999;
 }
 
-.modal-header {
+.friend-list-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f5f5f5;
+}
+
+.friend-list-header-text {
+    font-size: 16px;
+    margin: 0px 10px;
+}
+
+.friend-list-body {
+    padding: 0px;
+    list-style-type: none;
+    margin: 0;
+    overflow-y: auto;
+}
+
+.friend-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 13px 15px 20px;
     border-bottom: 1px solid #ddd;
 }
 
-.modal-body {
-    padding: 10px 20px;
-}
-
 .close-button {
+    color: #666;
+    font-size: 11pt;
+    cursor: pointer;
     background: none;
     border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: #888;
 }
 
 .close-button:hover {
-    color: #e74c3c;
+    color: #5b5b5b;
 }
 
-.modal-input {
+.friend-list-input {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
@@ -274,17 +319,17 @@ const closeModal = () => {
     border-radius: 5px;
 }
 
-.modal-add-button {
-    width: 100%;
-    padding: 8px;
-    background: #009688;
-    color: white;
+.friend-list-select {
     border: none;
-    border-radius: 5px;
+    font-size: 13px;
+    color: #444;
+    border-radius: 10px;
+    padding: 0px 10px;
     cursor: pointer;
+    height: 30px;
 }
 
-.modal-add-button:hover {
-    background-color: #00796b;
+.friend-list-select:hover {
+    background-color: #ececec;
 }
 </style>
