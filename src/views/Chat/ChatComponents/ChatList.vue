@@ -24,9 +24,8 @@
             </li>
         </ul>
 
-        <!-- 구현해야 할 것(모달리스 - 채팅방 추가) -->
+        <!-- 모달리스 - 채팅방 추가 -->
         <div>
-            <!-- 모달 창 -->
             <div v-if="showFriendList" class="friend-list-container">
             <div class="friend-list-header">
                 <h5 class="friend-list-header-text">대화상대 선택</h5>
@@ -39,7 +38,7 @@
                 <li v-for="friend in friends" :key="friend.id" class="friend-list-item">
                     <img :src="friend.imageUrl" class="profile-image" />
                     <span class="friend-name">{{ friend.nickname }}</span>
-                <button @click="selectFriend(friend)" class="friend-list-select">
+                <button @click="addPrivateChat(friend)" class="friend-list-select">
                     추가
                 </button>
                 </li>
@@ -162,6 +161,27 @@ const getFriendListApi = async () => {
         console.error("친구 목록을 가져오는데 실패했습니다.", err);
     }
 };
+
+// 채팅 추가
+const addPrivateChat = async (friend) => {
+    try {
+        const response = await axios.post(
+            `/chat/create?friendId=${friend.id}`,
+            {   name: friend.nickname, },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        const newChatRoom = response.data;
+        chatListApi();
+        showFriendList.value = false;
+        stompClient.value.subscribe(`/sub/chat/${newChatRoom.chatRoomId}`)
+    } catch (err) {
+        console.error("채팅방 추가에 실패했습니다.", err);
+    }
+}
 
 const closeFriendList = () => {
     showFriendList.value = false;
