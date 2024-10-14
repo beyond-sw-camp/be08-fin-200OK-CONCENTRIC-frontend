@@ -42,12 +42,12 @@
             <td v-else @click="startEditing(task, 'title')">{{ task.title }}</td>
 
             <td v-if="editingTask.id === task.id && editingTask.column === 'startDate'">
-              <input type="datetime-local" v-model="task.startDate" @blur="stopEditing" @keyup.enter="stopEditing" />
+              <input type="datetime-local" v-model="task.startDate" @blur="stopEditing" @keyup.enter="stopEditing" @change="validateDates" :max="task.endDate" />
             </td>
             <td v-else @click="startEditing(task, 'startDate')">{{ formatDateTime(task.startDate) }}</td>
 
             <td v-if="editingTask.id === task.id && editingTask.column === 'endDate'">
-              <input type="datetime-local" v-model="task.endDate" @blur="stopEditing" @keyup.enter="stopEditing" />
+              <input type="datetime-local" v-model="task.endDate" @blur="stopEditing" @keyup.enter="stopEditing" @change="validateDates" :min="task.startDate" />
             </td>
             <td v-else @click="startEditing(task, 'endDate')">{{ formatDateTime(task.endDate) }}</td>
 
@@ -70,13 +70,13 @@
                 <div
                     class="progress-bar bg-gradient-success"
                     role="progressbar"
-                    :aria-valuenow="task.progress"
+                    :aria-valuenow="task.progress !== undefined && task.progress !== null ? task.progress : 0"
                     aria-valuemin="0"
                     aria-valuemax="100"
-                    :style="{ width: task.progress + '%' }"
+                    :style="{ width: (task.progress !== undefined && task.progress !== null ? task.progress : 0) + '%' }"
                 ></div>
               </div>
-              <span>{{ task.progress }}%</span>
+              <span>{{ task.progress !== undefined && task.progress !== null ? task.progress + '%' : '0%' }}</span>
             </td>
           </tr>
           <tr>
@@ -146,7 +146,39 @@ export default {
       this.editingTask.id = task.id;
       this.editingTask.column = column;
     },
-    stopEditing() {
+    async stopEditing() {
+      if (this.editingTask.id) {
+        const task = this.tasks.find(t => t.id === this.editingTask.id);
+
+        // 모든 필드를 기존 값으로 구성하고, 수정된 값은 그에 맞게 업데이트
+        const updatedTask = {
+          title: task.title,
+          description: task.description,
+          status: task.status,
+          startDate: task.startDate,
+          endDate: task.endDate,
+          importance: task.importance,
+          startNotification: task.startNotification,
+          endNotification: task.endNotification
+        };
+
+        // 시작일이 종료일보다 늦는 경우 방지
+        if (new Date(updatedTask.startDate) > new Date(updatedTask.endDate)) {
+          console.error('시작일은 종료일보다 늦을 수 없습니다.');
+          return;
+        }
+
+        try {
+          const response = await axios.put(`/schedule/update/${task.id}`, updatedTask);
+          // 업데이트된 데이터로 프론트엔드 상태 업데이트
+          Object.assign(task, response.data);
+          console.log('일정이 성공적으로 수정되었습니다.');
+        } catch (error) {
+          console.error('일정을 수정하는 중 오류가 발생했습니다.', error);
+        }
+      }
+
+      // 수정 상태 초기화
       this.editingTask.id = null;
       this.editingTask.column = null;
     },
@@ -224,6 +256,13 @@ export default {
         this.selectedTasks = [];
       }
     },
+    validateDates() {
+      this.tasks.forEach(task => {
+        if (new Date(task.startDate) > new Date(task.endDate)) {
+          task.endDate = task.startDate;
+        }
+      });
+    },
   },
   created() {
     this.fetchSchedules();
@@ -236,13 +275,16 @@ h1 {
   font-family: 'Consolas', sans-serif;
   color: #8A9BF9;
 }
+
 p {
   font-size: 24px;
 }
+
 .sort-icons {
   display: inline-block;
   margin-left: 5px;
 }
+
 .table-active {
   background-color: #e0f7fa !important;
 }

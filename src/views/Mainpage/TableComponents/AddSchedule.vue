@@ -82,14 +82,20 @@ export default {
   },
   methods: {
     confirm() {
-      // Combine date and time into startDate and endDate
-      if (!this.newTask.allDay) {
+      if (this.newTask.allDay) {
+        // All day 일정인 경우에도 일관된 시간 형식으로 처리
+        this.newTask.startDate = `${this.newTask.startDate}T00:00`;
+        this.newTask.endDate = `${this.newTask.endDate}T23:59`;
+      } else {
+        // 사용자가 입력한 시간으로 처리
         this.newTask.startDate = `${this.newTask.startDate}T${this.newTask.startTime}`;
         this.newTask.endDate = `${this.newTask.endDate}T${this.newTask.endTime}`;
       }
+
       delete this.newTask.startTime;
       delete this.newTask.endTime;
       delete this.newTask.allDay;
+
       this.$emit('confirm', this.newTask);
       this.resetTask(); // 값 초기화
     },
