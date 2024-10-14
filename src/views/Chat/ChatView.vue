@@ -1,4 +1,5 @@
 <template>
+    <!-- <ChatNotification /> -->
     <div class="chat-view">
         <!-- 채팅 목록 (ChatList) -->
         <div class="chat-list-view">

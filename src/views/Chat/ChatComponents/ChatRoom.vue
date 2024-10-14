@@ -109,7 +109,7 @@ watch(
     (newChatRoomId, oldChatRoomId) => {
         if (newChatRoomId !== oldChatRoomId) {
             console.log(`채팅방 ID가 ${oldChatRoomId}에서 ${newChatRoomId}로 변경되었습니다.`);
-            // unsubscribe();
+            unsubscribe();
             chatMessageListApi(); 
             connectToChatRoom();
         }
@@ -121,13 +121,10 @@ const connectToChatRoom = () => {
     const socket = new SockJS('http://localhost:8080/ws');
     stompClient.value = Stomp.over(socket);
 
-    stompClient.value.connect({ Authorization: `${accessToken}` }, (frame) => {
-        console.log('Connected to chat room:', props.chat.chatRoomId);
-
+    stompClient.value.connect({ Authorization: `${accessToken}` }, () => {
         // 채팅방 구독 설정
         stompClient.value.subscribe(`/sub/chat/${props.chat.chatRoomId}`, (message) => {
             const receivedMessage = JSON.parse(message.body);
-            console.log(`Received message from chatRoom ${props.chat.chatRoomId}:`, receivedMessage);
             chatMessages.value = [...chatMessages.value, receivedMessage];
             scrollToBottom();
         });
@@ -135,12 +132,12 @@ const connectToChatRoom = () => {
 };
 
 // 채팅방 구독 해제
-// const unsubscribe = () => {
-//     if (stompClient.value && stompClient.value.connected) {
-//         stompClient.value.disconnect();
-//         console.log(`Unsubscribed from chatRoom ${props.chat.chatRoomId}`);
-//     }
-// };
+const unsubscribe = () => {
+    if (stompClient.value && stompClient.value.connected) {
+        stompClient.value.disconnect();
+        console.log(`Unsubscribed from chatRoom ${props.chat.chatRoomId}`);
+    }
+};
 
 // 메세지 전송
 const sendMessage = async () => {
@@ -369,6 +366,7 @@ const toggleDetails = () => {
     margin-left: 5px;
     margin-top: 8%;
     height: 30px;
+    background-color: #f0f0f0;
 }
 
 .attach-button {

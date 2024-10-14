@@ -15,6 +15,7 @@ import FooterExample from "@/examples/FooterExample.vue";
 import Footer from "@/examples/FooterExample2.vue";
 import FooterExample2 from "@/examples/FooterExample2.vue";
 import Globe from "@/examples/Globe.vue";
+import ChatNotification from "./views/Chat/ChatComponents/ChatNotification.vue";
 
 const store = useStore();
 const isNavFixed = computed(() => store.state.isNavFixed);
@@ -40,6 +41,7 @@ const navClasses = computed(() => {
 });
 </script>
 <template>
+  <ChatNotification />
   <div>
 
   </div>
