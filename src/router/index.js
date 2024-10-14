@@ -10,6 +10,7 @@ import ChatView from "../views/Chat/ChatView.vue";
 import ChatRoomTest from "../views/Chat/ChatComponents/ChatRoomTest.vue";
 import Social from "@/views/PageCustom/Social.vue";
 
+
 const routes = [
   {
     path: "/",
@@ -66,6 +67,7 @@ const routes = [
     name: "Social",
     component: Social,
   },
+
 ];
 
 const router = createRouter({

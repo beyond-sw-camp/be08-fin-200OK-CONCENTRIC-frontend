@@ -3,16 +3,16 @@
         <!-- 상단 헤더 -->
         <div class="file-header">
             <h3 class="file-header-name">파일함</h3>
-            <button @click="closeFileBox" class="header-button close-button">
+            <button @click="closeFileList" class="header-button close-button">
                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
             </button>
         </div>
 
         <!-- 파일 목록 -->
         <ul class="file-list">
-            <li v-for="(file, index) in fileList" :key="index" class="file-item">
-                <span class="file-name">{{ file.name }}</span>
-                <button @click="downloadFile(file.url)" class="download-button">
+            <li v-for="file in files" :key="file.storageFileId" class="file-item">
+                <span class="file-name">{{ file.originalName }}</span>
+                <button @click="downloadFile(file)" class="download-button">
                     <i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i>
                 </button>
             </li>
@@ -20,34 +20,74 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: "ChatFile",
-    props: {
-        fileList: {
-            type: Array,
-            required: true,
-        },
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { useUserStore } from '@/store/user';
+
+const userStore = useUserStore();
+
+const props = defineProps({
+    chat: {
+        type: Object,
+        required: true,
     },
-    methods: {
-        // 파일함 닫기 이벤트
-        closeFileBox() {
-            this.$emit("close-file-box");
-        },
-        // 파일 다운로드 함수
-        downloadFile(fileUrl) {
-            window.open(fileUrl, "_blank");
-        },
-    },
+});
+
+const chatRoomId = props.chat.chatRoomId;
+const files = ref([]);
+
+const emit = defineEmits(['close-file-List']);
+
+// 채팅방 첨부파일 목록
+const findChatStorageApi = async () => {
+    try {
+        const response = await axios.get(
+            `/storage/list?ownerId=${chatRoomId}&storageType=CHAT`, {
+            headers: {
+                "Content-Type": "application/json",
+                // "Authorization": `${accessToken}`,
+            },
+        });
+        files.value = response.data;
+    } catch (err) {
+        console.error("파일함 목록을 가져오는데 실패했습니다.", err);
+    }
 };
+
+onMounted(() => {
+    findChatStorageApi();
+});
+
+//파일 다운로드
+const downloadFile = async (file) => {
+    try {
+        const response = await axios.post(
+            `/storage/download?ownerId=${chatRoomId}&storageType=CHAT&storageFileId=${file.storageFileId}`, {
+            // headers: {
+            //     "Content-Type": "application/json",
+            // },
+            }
+        );
+
+    } catch (err) {
+        console.error("파일 다운로드에 실패했습니다.", err);
+    }
+};
+
+const closeFileList = () => {
+    emit('close-file-List');
+};
+
 </script>
+
 
 <style scoped>
 .file-container {
     display: flex;
     flex-direction: column;
     width: 350px;
-    /* height: 550px; */
+    max-height: 550px;
     border: 1px solid #ddd;
     border-radius: 10px;
     overflow: hidden;
@@ -85,6 +125,7 @@ export default {
     padding: 0;
     list-style-type: none;
     margin: 0;
+    overflow-y: auto;
 }
 
 .file-item {
