@@ -238,7 +238,7 @@
 </template>
 
 <script setup>
-import { ref, onBeforeUnmount, onBeforeMount } from "vue";
+import { ref, onBeforeUnmount, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user.js";
@@ -304,9 +304,9 @@ const loginApi = async () => {
       alert("로그인을 성공했습니다.");
       
       router.push("/tables");
-    }else if(response.status == 404 || response.status == 400){
+    }else if(response.status === 404 || response.status === 400){
           alert("아이디 또는 패스워드가 잘못되었다.");
-    }else if(response.status == 403){
+    }else if(response.status === 403){
       alert("탈퇴한 사용자다.");
     }
   } catch (err) {
@@ -336,9 +336,9 @@ const sendCodeApi = async () => {
       }
     );
 
-    if(response.status == 200){
+    if(response.status === 200){
       isSent.value = true;
-    }else if(response.status == 409){
+    }else if(response.status === 409){
       duplicated.value = true;
     }
   } catch(err){
@@ -368,7 +368,7 @@ const verifyCodeApi = async () => {
       }
     );
 
-    if(response.status == 200 && response.data == 'success'){
+    if(response.status === 200 && response.data === 'success'){
       isVerified.value = true;
     }
     onVerifying.value = true;
@@ -398,7 +398,7 @@ const signupApi = async () => {
         }
     );
     
-    if(response.status == 201){
+    if(response.status === 201){
       alert("회원가입을 성공했습니다.");
       isVerified.value = false;
       onVerifying.value = false;
@@ -420,6 +420,17 @@ const signupApi = async () => {
   }
 };
 
+const checkLogin = () => {
+  if(userStore.isLoggedIn){
+    console.log("login user -> go to main")
+    router.push("/tables");
+  }
+};
+
+onMounted(() => {
+  checkLogin();
+});
+
 // 페이지 마운트 시 설정
 const body = document.getElementsByTagName("body")[0];
 onBeforeMount(() => {
@@ -435,6 +446,7 @@ onBeforeUnmount(() => {
   store.state.showSidenav = true;
   store.state.showFooter = true;
   body.classList.add("bg-gray-100");
+
 });
 </script>
 

@@ -8,6 +8,7 @@ import SidenavProfile from "@/views/Sidenav/SidenavProfile.vue";
 import { useUserStore } from "@/store/user.js";
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { useStateStore } from "@/store/states";
 
 const showMenu = ref(false);
 const store = useStore();
@@ -16,9 +17,13 @@ const isRTL = computed(() => store.state.isRTL);
 const route = useRoute();
 const userStore = useUserStore();
 const router = useRouter();
+const stateStore = useStateStore();
 
 const notifications = ref();
-let numOfNotifications = ref(0);
+const numOfNotifications = ref(0);
+const friendshipRequests = ref();
+const numOfFriendshipRequests = ref(0);
+
 
 const currentRouteName = computed(() => {
   return route.name;
@@ -36,6 +41,10 @@ const closeMenu = () => {
     showMenu.value = false;
   }, 100);
 };
+
+const toggleDropdown = () => {
+  showMenu.value = true;
+}
 
 const logout = async () => {
   try{
@@ -69,8 +78,8 @@ const loadNotifications = async () => {
   const response = await axios.get('/notification/list',
       {validateStatus: false}
   );
+  // if(response.status === 500) return;
   notifications.value = response.data;
-  // numOfNotifications.value = notifications.value.length;
   notifications.value.forEach(notification => {
     notification.createDate = new Date(notification['createDate']).toLocaleString().substring(0, 22);
     if(!notification.isRead) numOfNotifications.value += 1;
@@ -88,8 +97,29 @@ const updateReadApi = async (notification) => {
   const response = await axios.put(`/notification/read/${notification.id}`);
 }
 
+const loadFriendshipRequest = async () => {
+  const response = await axios.get('/friendship/request/list',
+      {validateStatus: false}
+  );
+  friendshipRequests.value = response.data;
+  numOfFriendshipRequests.value = friendshipRequests.value.length;
+
+}
+
+const checkLogin = () => {
+  console.log("checkLogin");
+
+  if(userStore.isLoggedIn === undefined || userStore.isLoggedIn === false) {
+    router.push("/");
+    return false;
+  }
+  return true;
+}
+
 onMounted(() => {
+  if(!checkLogin()) return;
   loadNotifications();
+  loadFriendshipRequest();
 });
 
 </script>
@@ -120,7 +150,7 @@ onMounted(() => {
               class="px-0 nav-link font-weight-bold text-white"
               style="border: none; background-color: transparent;"
             >
-              <i class="fa fa-user" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>
+              <i class="fa fa-door-open" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>
               <span class="d-sm-inline d-none">Logout</span>
             </button>
           </li>
@@ -153,8 +183,7 @@ onMounted(() => {
               id="dropdownMenuButton"
               data-bs-toggle="dropdown"
               aria-expanded="false"
-              @click="showMenu = !showMenu"
-              @blur="closeMenu"
+              @click="toggleDropdown"
             >
               <i class="cursor-pointer fa fa-bell"></i>
               <span class="notification-badge" v-show="numOfNotifications > 0">{{ numOfNotifications }}</span>
@@ -164,8 +193,13 @@ onMounted(() => {
               :class="showMenu ? 'show' : ''"
               aria-labelledby="dropdownMenuButton"
             >
-              <li class="mb-2" v-for="notification in notifications" :key="notification.id" :class="{ 'bg-light': notification.isRead }">
-                <a class="dropdown-item border-radius-md" href="javascript:;">
+              <li class="mb-2" v-for="notification in notifications" :key="notification.id"
+
+                  @blur="closeMenu"
+              >
+                <a class="dropdown-item border-radius-md" href="javascript:;"
+                   :class="{ 'bg-light': notification.isRead }"
+                >
                   <div class="py-1 d-flex">
                     <div class="my-auto">
                       <img
@@ -184,7 +218,7 @@ onMounted(() => {
                       </p>
                     </div>
                     <div class="my-auto ms-auto" >
-                      <button @click="updateRead(notification)"
+                      <button @click.stop="updateRead(notification)"
                               class="btn btn-sm btn-outline-primary"
                               style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
                         {{ notification.isRead ? '읽음' : '안 읽음' }}
@@ -193,8 +227,19 @@ onMounted(() => {
                   </div>
                 </a>
               </li>
-
             </ul>
+          </li>
+          <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
+            <a
+                href="#"
+                class="p-0 nav-link text-white"
+                @click="stateStore.toggleSocial"
+                aria-expanded="false"
+                style="border: none; background-color: transparent;"
+            >
+              <i class="fa fa-users"></i>
+              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
+            </a>
           </li>
 
         </ul>
@@ -234,9 +279,7 @@ onMounted(() => {
   font-size: 0.5em;
 }
 
-  .dropdown-menu {
-    max-height: 300px; /* 원하는 높이 설정 */
-    overflow-y: auto;  /* 스크롤 추가 */
-  }
+
+
 
 </style>

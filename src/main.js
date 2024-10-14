@@ -35,6 +35,7 @@ axios.interceptors.response.use(
     },
     (error) => {
         if(error.response.status === 401){
+            console.log("unauthorized");
             router.push('/');
         }
     }

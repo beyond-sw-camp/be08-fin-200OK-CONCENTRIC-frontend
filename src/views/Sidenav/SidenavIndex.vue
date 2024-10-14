@@ -26,6 +26,7 @@ const darkMode = computed(() => store.state.darkMode);
         layout === 'landing' ? 'bg-transparent shadow-none' : ' '
       } ${sidebarType}`"
     id="sidenav-main"
+    style="width: 20%;"
   >
 <!--    <sidenav-profile/>-->
 <!--    <div class="sidenav-header">-->
