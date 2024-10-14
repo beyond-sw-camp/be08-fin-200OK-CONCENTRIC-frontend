@@ -8,6 +8,7 @@ import Profile from "../views/Profile/Profile.vue";
 import Signin from "../views/Sign/Signin.vue";
 import ChatView from "../views/Chat/ChatView.vue";
 import ChatRoomTest from "../views/Chat/ChatComponents/ChatRoomTest.vue";
+import Social from "@/views/PageCustom/Social.vue";
 
 const routes = [
   {
@@ -59,6 +60,11 @@ const routes = [
     path: "/chat-test",
     name: "Chat Test",
     component: ChatRoomTest,
+  },
+  {
+    path: "/social",
+    name: "Social",
+    component: Social,
   },
 ];
 

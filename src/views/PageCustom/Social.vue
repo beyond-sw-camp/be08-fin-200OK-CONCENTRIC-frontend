@@ -1,70 +1,77 @@
-<script setup>
-import { computed, onMounted, onBeforeMount } from "vue";
-import { useStore } from "vuex";
-import { activateDarkMode, deactivateDarkMode } from "@/assets/js/dark-mode";
-import { useStateStore } from "@/store/states";
-defineProps({
-  icon: {
-    type: [String, Object],
-    required: true,
-    component: {
-      type: String,
-    },
-    background: {
-      type: String,
-    },
-    default: () => ({
-      background: "bg-gradient-success",
-    }),
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    default: "",
-  },
-  value: {
-    type: [String, Number],
-    default: "",
-  },
-});
-const stateStore = useStateStore();
+<template>
+  <div class="friend-list">
+    <h2 class="title">친구 목록</h2>
+    <ul class="friend-items">
+      <li v-for="friend in friends" :key="friend.id" class="friend-item">
+        <img src="../../assets/img/koongya.png" alt="Profile Picture" class="profile-pic" />
+        <span class="friend-name">{{ friend.nickname }}</span>
+      </li>
+    </ul>
+  </div>
+</template>
 
-const handleClickOutside = (event) => {
-  const socialWindow = document.getElementById("social-window");
-  if(socialWindow && !socialWindow.contains(event.target)) {
-    stateStore.toggleSocial();
-  }
+<script setup>
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/store/user";
+import axios from "axios";
+
+const friends = ref();
+
+const loadFriends = async () => {
+  const response = await axios.get('/friendship/list/accept');
+  friends.value = response.data;
+
 };
 
 onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
+  loadFriends();
 });
 
-onBeforeMount(() => {
-  document.removeEventListener("click", handleClickOutside);
-});
 </script>
-<template>
-  <div class="fixed-plugin" id="social-window">
-    <div class="p-3 mx-4 text-center card-header d-flex justify-content-center">
-      <div
-          :class="`icon icon-shape icon-lg shadow text-center border-radius-lg ${icon.background}`"
-      >
-        <i
-            class="opacity-10"
-            :class="typeof icon === 'string' ? icon : icon.component"
-            aria-hidden="true"
-        ></i>
-      </div>
-    </div>
-    <div class="p-3 pt-0 text-center card-body">
-      <h6 class="mb-0 text-center">{{ title }}</h6>
-      <span class="text-xs">{{ description }}</span>
-      <hr class="my-3 horizontal dark" />
-      <h5 class="mb-0">{{ value }}</h5>
-    </div>
-  </div>
-</template>
+
+<style scoped>
+.friend-list {
+  max-width: 400px;
+  margin: 0 auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.friend-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.friend-item:last-child {
+  border-bottom: none;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.friend-name {
+  font-size: 16px;
+}
+</style>

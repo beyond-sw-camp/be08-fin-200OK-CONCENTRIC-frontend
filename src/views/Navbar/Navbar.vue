@@ -78,9 +78,8 @@ const loadNotifications = async () => {
   const response = await axios.get('/notification/list',
       {validateStatus: false}
   );
+  // if(response.status === 500) return;
   notifications.value = response.data;
-  if(!notifications.value) return;
-  // numOfNotifications.value = notifications.value.length;
   notifications.value.forEach(notification => {
     notification.createDate = new Date(notification['createDate']).toLocaleString().substring(0, 22);
     if(!notification.isRead) numOfNotifications.value += 1;
@@ -107,7 +106,18 @@ const loadFriendshipRequest = async () => {
 
 }
 
+const checkLogin = () => {
+  console.log("checkLogin");
+
+  if(userStore.isLoggedIn === undefined || userStore.isLoggedIn === false) {
+    router.push("/");
+    return false;
+  }
+  return true;
+}
+
 onMounted(() => {
+  if(!checkLogin()) return;
   loadNotifications();
   loadFriendshipRequest();
 });
