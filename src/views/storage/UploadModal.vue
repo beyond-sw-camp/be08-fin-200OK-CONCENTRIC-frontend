@@ -5,17 +5,17 @@
       <div class="modal-header"><slot name="header"></slot></div>
       <div class="modal-body">
         <slot name="body"></slot>
-        <div class="drop-zone" @dragover.prevent @drop="handleDrop">
+        <div class="drop-zone" @dragover.prevent @drop.prevent="handleDrop">
           <p>파일을 여기로 드래그 앤 드롭하세요</p>
         </div>
         <input type="file" multiple @change="handleFileSelect" style="display: none;" ref="fileInput" />
         <button class="select-button" @click="selectFiles">파일 선택</button>
-        <ul class="file-list">
+        <ul>
           <li v-for="file in filesToUpload" :key="file.name">{{ file.name }}</li>
         </ul>
       </div>
       <div class="modal-footer">
-        <button class="upload-button" @click="uploadFiles">업로드</button>
+        <button class="upload-button" @click="emitUpload" >업로드</button>
         <button class="cancel-button" @click="$emit('close')">취소</button>
       </div>
     </div>
@@ -36,9 +36,13 @@ const emit = defineEmits(['files-uploaded']);
 const fileInput = ref(null);
 
 const handleDrop = (event) => {
-  event.preventDefault();
+  event.preventDefault(); // 기본 동작 방지
   const files = Array.from(event.dataTransfer.files);
-  emit('files-uploaded', files);
+  // emit('files-uploaded', files);
+  files.forEach((file) => {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.filesToUpload.push(file);
+  });
 };
 
 const selectFiles = () => {
@@ -47,10 +51,16 @@ const selectFiles = () => {
 
 const handleFileSelect = (event) => {
   const files = Array.from(event.target.files);
-  emit('files-uploaded', files);
+  console.log('handleFileSelect: ' +  files);
+  // emit('files-uploaded', files);
+  files.forEach((file) => {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.filesToUpload.push(file);
+  });
 };
 
-const uploadFiles = () => {
+const emitUpload = () => {
+  console.log("Emitting uploaded files:", props.filesToUpload);
   emit('files-uploaded', props.filesToUpload);
 };
 </script>
@@ -115,9 +125,4 @@ button {
   background-color: #86EDDA;
 }
 
-.file-list {
-  display: flex;
-  flex-direction: column;
-  margin-top: 10px;
-}
 </style>

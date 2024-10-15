@@ -18,12 +18,14 @@
           <span class="file-name">{{ file.originalName }}</span>
           <span class="file-size">{{ getSizePresent(file.size) }}</span>
           <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
-          <button class="download-button" @click="downloadFile(file.storageFileId)">
-            <i class="fas fa-arrow-down"></i>
-          </button>
-          <button class="delete-button" @click="deleteFile(file.storageFileId, i)">
-            <i class="fas fa-trash-alt"></i>
-          </button>
+          <div>
+            <button class="download-button" @click="downloadFile(file.storageFileId)">
+              <i class="fas fa-arrow-down"></i>
+            </button>
+            <button class="delete-button" @click="deleteFile(file.storageFileId, i)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
         </div>
       </li>
     </ul>
@@ -36,8 +38,8 @@
         <p>파일을 드래그 앤 드롭하거나 선택하세요.</p>
       </template>
       <template #footer>
-        <button @click="uploadFiles">업로드</button>
-        <button @click="closeUploadModal">취소</button>
+<!--        <button @click="uploadFiles">업로드</button>-->
+<!--        <button @click="closeUploadModal">취소</button>-->
       </template>
     </UploadModal>
   </div>
@@ -70,15 +72,21 @@ const closeUploadModal = () => {
 };
 
 const handleFilesUploaded = (uploadedFiles) => {
+  console.log("Received files in parent:", uploadedFiles);
   uploadedFiles.forEach(file => {
     const exists = filesToUpload.value.some(f => f.name === file.name);
     if (!exists) {
       filesToUpload.value.push(file);
+      console.log("Updated filesToUpload:", filesToUpload.value);
     }
   });
+  console.log(filesToUpload.value);
+  uploadFiles();
 };
 
+
 const uploadFiles = async () => {
+  console.log("uf Received files in parent:", filesToUpload);
   const formData = new FormData();
   formData.append("ownerId", userStore.userInfo['id']);
   formData.append("storageType", "PRIVATE");
@@ -86,15 +94,22 @@ const uploadFiles = async () => {
   filesToUpload.value.forEach(file => {
     formData.append("files", file);
   });
+  console.log("filesToUpload" + filesToUpload.value);
 
-  const response = await axios.post('storage/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+  const response = await axios.post('storage/upload',
+      formData,
+      {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
   });
 
   if (response.status === 200) {
     await getStorage();
     await getStorageFiles();
     closeUploadModal();
+  }else if(response.status === 400){
+    alert("용량 부족");
   }
 };
 
