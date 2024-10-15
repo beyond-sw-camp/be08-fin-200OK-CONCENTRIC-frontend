@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useStore } from "vuex";
 import Sidenav from "./views/Sidenav/SidenavIndex.vue";
-import Configurator from "@/views/PageCustom/Configurator.vue";
+import Configurator from "@/views/Chat/ChatView.vue";
 import Navbar from "@/views/Navbar/Navbar.vue";
 import {VueperSlides, VueperSlide} from "vueperslides";
 import AppFooter from "@/examples/FooterExample.vue";
@@ -15,6 +15,7 @@ import FooterExample from "@/examples/FooterExample.vue";
 import Footer from "@/examples/FooterExample2.vue";
 import FooterExample2 from "@/examples/FooterExample2.vue";
 import Globe from "@/examples/Globe.vue";
+import ChatNotification from "./views/Chat/ChatComponents/ChatNotification.vue";
 
 import { useStateStore } from "@/store/states";
 
@@ -27,8 +28,6 @@ const layout = computed(() => store.state.layout);
 const showNavbar = computed(() => store.state.showNavbar);
 const showFooter = computed(() => store.state.showFooter);
 const showConfig = computed(() => store.state.showConfig);
-const hideConfigButton = computed(() => store.state.hideConfigButton);
-const toggleConfigurator = () => store.commit("toggleConfigurator");
 
 const navClasses = computed(() => {
   return {
@@ -45,6 +44,7 @@ const stateStore = useStateStore();
 
 </script>
 <template>
+  <ChatNotification />
   <div>
 
   </div>
