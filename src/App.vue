@@ -17,7 +17,6 @@ import FooterExample2 from "@/examples/FooterExample2.vue";
 import Globe from "@/examples/Globe.vue";
 
 import { useStateStore } from "@/store/states";
-import Social from "@/views/PageCustom/Social.vue";
 
 const store = useStore();
 const isNavFixed = computed(() => store.state.isNavFixed);

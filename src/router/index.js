@@ -7,8 +7,8 @@ import RTL from "../etc/Rtl.vue";
 import Profile from "../views/Profile/Profile.vue";
 import Signin from "../views/Sign/Signin.vue";
 import ChatView from "../views/Chat/ChatView.vue";
-import ChatRoomTest from "../views/Chat/ChatComponents/ChatRoomTest.vue";
-import Social from "@/views/PageCustom/Social.vue";
+import Social from "@/views/social/Social.vue";
+import PrivateStorage from "@/views/storage/PrivateStorage.vue";
 
 
 const routes = [
@@ -58,16 +58,15 @@ const routes = [
     component: ChatView,
   },
   {
-    path: "/chat-test",
-    name: "Chat Test",
-    component: ChatRoomTest,
-  },
-  {
     path: "/social",
     name: "Social",
     component: Social,
   },
-
+  {
+    path: "/storage/private",
+    name: "PrivateStorage",
+    component: PrivateStorage,
+  },
 ];
 
 const router = createRouter({
