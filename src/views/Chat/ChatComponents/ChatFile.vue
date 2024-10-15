@@ -67,9 +67,20 @@ const downloadFile = async (file) => {
             // headers: {
             //     "Content-Type": "application/json",
             // },
+            responseType: 'blob' 
             }
         );
 
+        const blob = new Blob([response.data], { type: response.headers['content-type'] });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const fileName = file.originalName;
+        link.href = url;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
     } catch (err) {
         console.error("파일 다운로드에 실패했습니다.", err);
     }

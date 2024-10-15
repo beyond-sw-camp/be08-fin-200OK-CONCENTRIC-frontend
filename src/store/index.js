@@ -4,7 +4,7 @@ export default createStore({
   state: {
     hideConfigButton: false,
     isPinned: false,
-    showConfig: false,
+    // showConfig: false,
     sidebarType: "bg-white",
     isRTL: false,
     mcolor: "",
@@ -17,11 +17,12 @@ export default createStore({
     showFooter: true,
     showMain: true,
     layout: "default",
+    showChatView: false,
   },
   mutations: {
-    toggleConfigurator(state) {
-      state.showConfig = !state.showConfig;
-    },
+    // toggleConfigurator(state) {
+    //   state.showChatView = !state.showChatView;
+    // },
     sidebarMinimize(state) {
       let sidenav_show = document.querySelector("#app");
 
