@@ -18,7 +18,6 @@ import Globe from "@/examples/Globe.vue";
 import ChatNotification from "./views/Chat/ChatComponents/ChatNotification.vue";
 
 import { useStateStore } from "@/store/states";
-import Social from "@/views/PageCustom/Social.vue";
 
 const store = useStore();
 const isNavFixed = computed(() => store.state.isNavFixed);

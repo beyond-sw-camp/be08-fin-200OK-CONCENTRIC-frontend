@@ -6,7 +6,11 @@ import VirtualReality from "../etc/VirtualReality.vue";
 import RTL from "../etc/Rtl.vue";
 import Profile from "../views/Profile/Profile.vue";
 import Signin from "../views/Sign/Signin.vue";
+import ChatView from "../views/Chat/ChatView.vue";
+import Social from "@/views/social/Social.vue";
+import PrivateStorage from "@/views/storage/PrivateStorage.vue";
 import Social from "@/views/PageCustom/Social.vue";
+
 
 
 const routes = [
@@ -51,11 +55,20 @@ const routes = [
     component: Signin,
   },
   {
+    path: "/chat",
+    name: "Chat",
+    component: ChatView,
+  },
+  {
     path: "/social",
     name: "Social",
     component: Social,
   },
-
+  {
+    path: "/storage/private",
+    name: "PrivateStorage",
+    component: PrivateStorage,
+  },
 ];
 
 const router = createRouter({

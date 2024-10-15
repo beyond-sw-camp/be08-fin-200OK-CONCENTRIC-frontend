@@ -1,0 +1,299 @@
+<template>
+  <div class="file-storage">
+    <div class="usage-text">{{ currentSizeMB }}MB / {{ capacityMB }}MB ({{ usagePercentage }}%)</div>
+    <div class="usage-bar">
+      <div
+          class="usage-fill"
+          :style="{ width: usagePercentage + '%' }"
+      ></div>
+    </div>
+
+    <div class="upload-section">
+      <input type="file" @change="handleFileUpload" multiple />
+      <button class="upload-button" @click="uploadFiles">업로드</button>
+    </div>
+
+    <ul class="file-list">
+      <li v-for="(file, i) in storageFiles" :key="i" >
+        <div class="file-item" v-if="showFiles[i]">
+        <span class="file-name">{{ file.originalName }}</span>
+        <span class="file-size">{{ getSizePresent(file.size) }}</span>
+        <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
+        <button class="download-button" @click="downloadFile(file.storageFileId)">
+          <i class="fas fa-arrow-down"></i>
+        </button>
+        <button class="delete-button" @click="deleteFile(file.storageFileId, i)">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        </div>
+      </li>
+    </ul>
+
+  </div>
+</template>
+
+
+
+
+<script setup>
+import {ref, onMounted, computed } from "vue";
+import { useUserStore } from "@/store/user";
+import axios from "axios";
+
+const userStore = useUserStore();
+const storage = ref({
+  id: null,
+  currentSize: 0,
+  capacity: 0,
+});
+const storageFiles = ref();
+const currentSizeMB = computed(() => {
+  return (storage.value.currentSize / 1024 / 1024).toFixed(2);
+});
+const capacityMB = computed(() => {
+  return (storage.value.capacity / 1024/ 1024).toFixed(2);
+});
+const usagePercentage = computed(() => {
+  return storage.value.capacity > 0
+  ? Math.round((storage.value.currentSize / storage.value.capacity) * 100)
+      : 0;
+});
+
+const showFiles = ref([]);
+
+const getStorage = async () => {
+  const response = await axios.get('storage/',
+      {
+        params: {
+          ownerId: userStore.userInfo['id'],
+          storageType: 'PRIVATE'
+        },
+      });
+  storage.value = response.data;
+  console.log(storage.value);
+};
+
+const getStorageFiles = async () => {
+  const response = await axios.get('storage/list',
+      {
+    params: {
+      ownerId: userStore.userInfo['id'],
+      storageType: 'PRIVATE'
+    }
+  });
+  storageFiles.value = response.data;
+  console.log(storageFiles.value);
+
+  storageFiles.value.forEach((file) => {
+    showFiles.value.push(true);
+  });
+  console.log(showFiles.value);
+};
+
+
+const getSizePresent = (size) => {
+  let sizePresent = size / 1024 / 1024;
+  if(sizePresent < 1){
+    sizePresent *= 1024;
+    sizePresent = sizePresent.toFixed(2);
+    sizePresent += "KB";
+  }else{
+    sizePresent = sizePresent.toFixed(2);
+    sizePresent += "MB";
+  }
+  return sizePresent;
+};
+
+const getDatePresent = (date) => {
+  return new Date(date).toLocaleString();
+}
+
+const downloadFile = async (id) => {
+  console.log(id);
+  const response = await axios.post(`storage/download`,
+      null,
+      {
+        params: {
+          ownerId: userStore.userInfo['id'],
+          storageType: 'PRIVATE',
+          storageFileId: id,
+        },
+        responseType: 'blob',
+      });
+
+  const blob = new Blob([response.data], { type: response.headers['content-type'] });
+
+  const disposition = response.headers['content-disposition'];
+  let filename = "downloaded_file";
+  if (disposition && disposition.includes('attachment')) {
+    const matches = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+    if (matches != null && matches[1]) {
+      filename = matches[1].replace(/['"]/g, '');
+      filename = decodeURIComponent(filename);
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+const deleteFile = async (id, idx) => {
+  const response = await axios.post(`storage/delete/file`,
+      null,
+      {
+        params: {
+          ownerId: userStore.userInfo['id'],
+          storageType: 'PRIVATE',
+          storageFileId: id,
+        }
+      });
+
+  if (response.status === 200) {
+    showFiles.value[idx] = false;
+  }
+  console.log(showFiles.value);
+};
+
+onMounted(() => {
+  getStorage();
+  getStorageFiles();
+});
+
+</script>
+
+<style scoped>
+.file-storage {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.usage-text {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.usage-bar {
+  width: 100%;
+  height: 30px;
+  background-color: #e0e0e0;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.usage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8A9BF9, #86EDDA);
+  border-radius: 15px 0 0 15px;
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid #e0e0e0;
+  align-items: center;
+  overflow: hidden;
+}
+
+.file-name {
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  flex-grow: 1;
+}
+
+.file-size {
+  font-size: 14px;
+  color: #666;
+  min-width: 80px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.file-date {
+  font-size: 12px;
+  color: #666;
+  min-width: 120px;
+  text-align: right;
+}
+
+.upload-section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 10px 0;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.upload-button {
+  background-color: #8A9BF9;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.upload-button:hover {
+  background-color: #86EDDA;
+}
+
+.download-button {
+  background: none;
+  border: none;
+  color: #8A9BF9;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: color 0.3s;
+}
+
+.download-button:hover {
+  color: #86EDDA;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  color: #8A9BF9;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: color 0.3s;
+}
+
+.delete-button:hover {
+  color: #86EDDA;
+}
+</style>
