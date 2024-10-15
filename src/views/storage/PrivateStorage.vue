@@ -14,16 +14,18 @@
     </div>
 
     <ul class="file-list">
-      <li v-for="file in storageFiles" :key="file.storageFileId" class="file-item">
+      <li v-for="(file, i) in storageFiles" :key="i" >
+        <div class="file-item" v-if="showFiles[i]">
         <span class="file-name">{{ file.originalName }}</span>
         <span class="file-size">{{ getSizePresent(file.size) }}</span>
         <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
         <button class="download-button" @click="downloadFile(file.storageFileId)">
           <i class="fas fa-arrow-down"></i>
         </button>
-        <button class="delete-button" @click="deleteFile(file.storageFileId)">
+        <button class="delete-button" @click="deleteFile(file.storageFileId, i)">
           <i class="fas fa-trash-alt"></i>
         </button>
+        </div>
       </li>
     </ul>
 
@@ -57,6 +59,8 @@ const usagePercentage = computed(() => {
       : 0;
 });
 
+const showFiles = ref([]);
+
 const getStorage = async () => {
   const response = await axios.get('storage/',
       {
@@ -79,7 +83,13 @@ const getStorageFiles = async () => {
   });
   storageFiles.value = response.data;
   console.log(storageFiles.value);
+
+  storageFiles.value.forEach((file) => {
+    showFiles.value.push(true);
+  });
+  console.log(showFiles.value);
 };
+
 
 const getSizePresent = (size) => {
   let sizePresent = size / 1024 / 1024;
@@ -133,6 +143,23 @@ const downloadFile = async (id) => {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+const deleteFile = async (id, idx) => {
+  const response = await axios.post(`storage/delete/file`,
+      null,
+      {
+        params: {
+          ownerId: userStore.userInfo['id'],
+          storageType: 'PRIVATE',
+          storageFileId: id,
+        }
+      });
+
+  if (response.status === 200) {
+    showFiles.value[idx] = false;
+  }
+  console.log(showFiles.value);
+};
 
 onMounted(() => {
   getStorage();
