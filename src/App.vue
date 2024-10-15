@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useStore } from "vuex";
 import Sidenav from "./views/Sidenav/SidenavIndex.vue";
-import Configurator from "@/views/PageCustom/Configurator.vue";
+import Configurator from "@/views/Chat/ChatView.vue";
 import Navbar from "@/views/Navbar/Navbar.vue";
 import {VueperSlides, VueperSlide} from "vueperslides";
 import AppFooter from "@/examples/FooterExample.vue";
@@ -29,8 +29,6 @@ const layout = computed(() => store.state.layout);
 const showNavbar = computed(() => store.state.showNavbar);
 const showFooter = computed(() => store.state.showFooter);
 const showConfig = computed(() => store.state.showConfig);
-const hideConfigButton = computed(() => store.state.hideConfigButton);
-const toggleConfigurator = () => store.commit("toggleConfigurator");
 
 const navClasses = computed(() => {
   return {
