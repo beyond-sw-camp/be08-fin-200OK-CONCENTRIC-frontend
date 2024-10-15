@@ -1,5 +1,5 @@
 <template>
-  <div class="clock-container">
+  <div class="clock-container" :style="clockStyle" @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
     <div class="time">{{ formattedTime }}</div>
     <div class="date-container">
       <div class="date">{{ formattedDate }}</div>
@@ -9,13 +9,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 
 // 상태 변수 선언
 const currentTime = ref(new Date());
 const formattedTime = ref('');
 const formattedDate = ref('');
 const formattedDay = ref('');
+const mouseX = ref(0);
+const mouseY = ref(0);
 
 // 요일 배열 상수로 선언
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -51,6 +53,28 @@ onMounted(() => {
 onUnmounted(() => {
   clearInterval(updateInterval);
 });
+
+// 마우스 움직임에 따라 시계의 기울기를 업데이트
+const handleMouseMove = (event) => {
+  const rect = event.currentTarget.getBoundingClientRect();
+  const offsetX = event.clientX - rect.left;
+  const offsetY = event.clientY - rect.top;
+  mouseX.value = ((offsetX / rect.width) - 0.5) * 60;
+  mouseY.value = ((offsetY / rect.height) - 0.5) * -60;
+};
+
+// 마우스가 시계 위에 없을 때의 처리
+const handleMouseLeave = () => {
+  mouseX.value = 0;
+  mouseY.value = 0;
+};
+
+// computed 스타일
+const clockStyle = computed(() => {
+  return {
+    transform: `rotateX(${mouseY.value}deg) rotateY(${mouseX.value}deg)`
+  };
+});
 </script>
 
 <style scoped>
@@ -64,8 +88,8 @@ onUnmounted(() => {
   padding: 10px;
   border-radius: 12px;
   font-family: 'Consolas', sans-serif;
-  color: #000; /* 검은색 텍스트 */
-  z-index: 10000;
+  color: #ffffff; /* 흰색 텍스트 */
+  z-index: 10;
   text-align: right;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -76,7 +100,7 @@ onUnmounted(() => {
 }
 
 .time {
-  font-size: 80px; /* 시간 폰트 크게 */
+  font-size: 30px; /* 시간 폰트 크게 */
   font-weight: bold;
   line-height: 1;
   margin-right: 10px;

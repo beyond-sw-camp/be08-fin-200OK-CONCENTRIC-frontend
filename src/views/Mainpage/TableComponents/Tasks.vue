@@ -42,12 +42,12 @@
             <td v-else @click="startEditing(task, 'title')">{{ task.title }}</td>
 
             <td v-if="editingTask.id === task.id && editingTask.column === 'startDate'">
-              <input type="datetime-local" v-model="task.startDate" @blur="stopEditing" @keyup.enter="stopEditing" />
+              <input type="datetime-local" v-model="task.startDate" @blur="stopEditing" @keyup.enter="stopEditing" @change="validateDates" :max="task.endDate" />
             </td>
             <td v-else @click="startEditing(task, 'startDate')">{{ formatDateTime(task.startDate) }}</td>
 
             <td v-if="editingTask.id === task.id && editingTask.column === 'endDate'">
-              <input type="datetime-local" v-model="task.endDate" @blur="stopEditing" @keyup.enter="stopEditing" />
+              <input type="datetime-local" v-model="task.endDate" @blur="stopEditing" @keyup.enter="stopEditing" @change="validateDates" :min="task.startDate" />
             </td>
             <td v-else @click="startEditing(task, 'endDate')">{{ formatDateTime(task.endDate) }}</td>
 
@@ -70,13 +70,13 @@
                 <div
                     class="progress-bar bg-gradient-success"
                     role="progressbar"
-                    :aria-valuenow="task.progress"
+                    :aria-valuenow="task.progress !== undefined && task.progress !== null ? task.progress : 0"
                     aria-valuemin="0"
                     aria-valuemax="100"
-                    :style="{ width: task.progress + '%' }"
+                    :style="{ width: (task.progress !== undefined && task.progress !== null ? task.progress : 0) + '%' }"
                 ></div>
               </div>
-              <span>{{ task.progress }}%</span>
+              <span>{{ task.progress !== undefined && task.progress !== null ? task.progress + '%' : '0%' }}</span>
             </td>
           </tr>
           <tr>
@@ -100,6 +100,7 @@
 </template>
 
 <script>
+import { ref, reactive, computed, onMounted } from 'vue';
 import axios from 'axios';
 import AddSchedule from "@/views/Mainpage/TableComponents/AddSchedule.vue";
 
@@ -107,107 +108,127 @@ export default {
   components: {
     AddSchedule,
   },
-  data() {
-    return {
-      columns: [
-        { key: 'title', label: '제목' },
-        { key: 'startDate', label: '시작 날짜' },
-        { key: 'endDate', label: '종료 날짜' },
-        { key: 'status', label: '상태' },
-        { key: 'importance', label: '중요도' },
-        { key: 'progress', label: '완료율' },
-      ],
-      tasks: [],
-      editingTask: {
-        id: null,
-        column: null,
-      },
-      modals: {
-        addTaskModal: false,
-      },
-      selectedTasks: [],
-      selectAll: false,
-      sortOrder: {
-        key: '',
-        order: 'asc',
-      },
-    };
-  },
-  methods: {
-    async fetchSchedules() {
+  setup() {
+    const columns = ref([
+      { key: 'title', label: '제목' },
+      { key: 'startDate', label: '시작 날짜' },
+      { key: 'endDate', label: '종료 날짜' },
+      { key: 'status', label: '상태' },
+      { key: 'importance', label: '중요도' },
+      { key: 'progress', label: '완료율' },
+    ]);
+
+    const tasks = ref([]);
+    const editingTask = reactive({ id: null, column: null });
+    const modals = reactive({ addTaskModal: false });
+    const selectedTasks = ref([]);
+    const selectAll = ref(false);
+    const sortOrder = reactive({ key: '', order: 'asc' });
+
+    const fetchSchedules = async () => {
       try {
         const response = await axios.get('/schedule/list');
-        this.tasks = response.data;
+        tasks.value = response.data;
       } catch (error) {
         console.error('일정을 불러오는 중 오류가 발생했습니다.', error);
       }
-    },
-    startEditing(task, column) {
-      this.editingTask.id = task.id;
-      this.editingTask.column = column;
-    },
-    stopEditing() {
-      this.editingTask.id = null;
-      this.editingTask.column = null;
-    },
-    async deleteTask(taskId) {
-      try {
-        await axios.delete(`/schedule/delete/${taskId}`);
-        this.tasks = this.tasks.filter(task => task.id !== taskId);
-      } catch (error) {
-        console.error('일정 삭제 중 오류가 발생했습니다.', error);
+    };
+
+    const startEditing = (task, column) => {
+      editingTask.id = task.id;
+      editingTask.column = column;
+    };
+
+    const stopEditing = async () => {
+      if (editingTask.id) {
+        const task = tasks.value.find(t => t.id === editingTask.id);
+
+        const updatedTask = {
+          title: task.title,
+          description: task.description,
+          status: task.status,
+          startDate: task.startDate,
+          endDate: task.endDate,
+          importance: task.importance,
+          startNotification: task.startNotification,
+          endNotification: task.endNotification,
+        };
+
+        if (new Date(updatedTask.startDate) > new Date(updatedTask.endDate)) {
+          console.error('시작일은 종료일보다 늦을 수 없습니다.');
+          return;
+        }
+
+        try {
+          const response = await axios.put(`/schedule/update/${task.id}`, updatedTask);
+          Object.assign(task, response.data);
+          console.log('일정이 성공적으로 수정되었습니다.');
+        } catch (error) {
+          console.error('일정을 수정하는 중 오류가 발생했습니다.', error);
+        }
       }
-    },
-    async deleteSelectedTasks() {
+
+      editingTask.id = null;
+      editingTask.column = null;
+    };
+
+    const deleteSelectedTasks = async () => {
       try {
-        for (const taskId of this.selectedTasks) {
+        for (const taskId of selectedTasks.value) {
           await axios.delete(`/schedule/delete/${taskId}`);
         }
-        this.tasks = this.tasks.filter(task => !this.selectedTasks.includes(task.id));
-        this.selectedTasks = [];
-        this.selectAll = false;
+        tasks.value = tasks.value.filter(task => !selectedTasks.value.includes(task.id));
+        selectedTasks.value = [];
+        selectAll.value = false;
       } catch (error) {
         console.error('선택된 일정 삭제 중 오류가 발생했습니다.', error);
       }
-    },
-    showAddTaskModal() {
-      this.modals.addTaskModal = true;
-    },
-    closeAddTaskModal() {
-      this.modals.addTaskModal = false;
-    },
-    async handleAddTaskConfirm(newTask) {
+    };
+
+    const showAddTaskModal = () => {
+      modals.addTaskModal = true;
+    };
+
+    const closeAddTaskModal = () => {
+      modals.addTaskModal = false;
+    };
+
+    const handleAddTaskConfirm = async (newTask) => {
       try {
         const response = await axios.post('/schedule/create', newTask);
-        this.tasks.push(response.data);
+        tasks.value.push(response.data);
       } catch (error) {
         console.error('새 일정을 추가하는 중 오류가 발생했습니다.', error);
       } finally {
-        this.closeAddTaskModal();
+        closeAddTaskModal();
       }
-    },
-    sortTasks() {
-      this.tasks.sort((a, b) => a.importance - b.importance);
-    },
-    toggleSortOrder(columnKey) {
-      if (this.sortOrder.key === columnKey) {
-        this.sortOrder.order = this.sortOrder.order === 'asc' ? 'desc' : 'asc';
+    };
+
+    const sortTasks = () => {
+      tasks.value.sort((a, b) => a.importance - b.importance);
+    };
+
+    const toggleSortOrder = (columnKey) => {
+      if (sortOrder.key === columnKey) {
+        sortOrder.order = sortOrder.order === 'asc' ? 'desc' : 'asc';
       } else {
-        this.sortOrder.key = columnKey;
-        this.sortOrder.order = 'asc';
+        sortOrder.key = columnKey;
+        sortOrder.order = 'asc';
       }
-      this.sortTasksByKey();
-    },
-    sortTasksByKey() {
-      this.tasks.sort((a, b) => {
-        if (this.sortOrder.order === 'asc') {
-          return a[this.sortOrder.key] > b[this.sortOrder.key] ? 1 : -1;
+      sortTasksByKey();
+    };
+
+    const sortTasksByKey = () => {
+      tasks.value.sort((a, b) => {
+        if (sortOrder.order === 'asc') {
+          return a[sortOrder.key] > b[sortOrder.key] ? 1 : -1;
         } else {
-          return a[this.sortOrder.key] < b[this.sortOrder.key] ? 1 : -1;
+          return a[sortOrder.key] < b[sortOrder.key] ? 1 : -1;
         }
       });
-    },
-    formatDateTime(dateTime) {
+    };
+
+    const formatDateTime = (dateTime) => {
       if (!dateTime) return '';
       return new Date(dateTime).toLocaleString('ko-KR', {
         year: 'numeric',
@@ -216,17 +237,47 @@ export default {
         hour: '2-digit',
         minute: '2-digit',
       });
-    },
-    toggleSelectAll() {
-      if (this.selectAll) {
-        this.selectedTasks = this.tasks.map(task => task.id);
+    };
+
+    const toggleSelectAll = () => {
+      if (selectAll.value) {
+        selectedTasks.value = tasks.value.map(task => task.id);
       } else {
-        this.selectedTasks = [];
+        selectedTasks.value = [];
       }
-    },
-  },
-  created() {
-    this.fetchSchedules();
+    };
+
+    const validateDates = () => {
+      tasks.value.forEach(task => {
+        if (new Date(task.startDate) > new Date(task.endDate)) {
+          task.endDate = task.startDate;
+        }
+      });
+    };
+
+    onMounted(fetchSchedules);
+
+    return {
+      columns,
+      tasks,
+      editingTask,
+      modals,
+      selectedTasks,
+      selectAll,
+      sortOrder,
+      startEditing,
+      stopEditing,
+      deleteSelectedTasks,
+      showAddTaskModal,
+      closeAddTaskModal,
+      handleAddTaskConfirm,
+      sortTasks,
+      toggleSortOrder,
+      sortTasksByKey,
+      formatDateTime,
+      toggleSelectAll,
+      validateDates,
+    };
   },
 };
 </script>
@@ -236,13 +287,16 @@ h1 {
   font-family: 'Consolas', sans-serif;
   color: #8A9BF9;
 }
+
 p {
   font-size: 24px;
 }
+
 .sort-icons {
   display: inline-block;
   margin-left: 5px;
 }
+
 .table-active {
   background-color: #e0f7fa !important;
 }

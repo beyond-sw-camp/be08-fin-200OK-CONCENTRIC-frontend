@@ -64,6 +64,8 @@
 </template>
 
 <script>
+import { ref, watch, computed } from 'vue';
+
 export default {
   props: {
     isVisible: {
@@ -75,31 +77,12 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      newTask: this.getInitialTask(),
-    };
-  },
-  methods: {
-    confirm() {
-      // Combine date and time into startDate and endDate
-      if (!this.newTask.allDay) {
-        this.newTask.startDate = `${this.newTask.startDate}T${this.newTask.startTime}`;
-        this.newTask.endDate = `${this.newTask.endDate}T${this.newTask.endTime}`;
-      }
-      delete this.newTask.startTime;
-      delete this.newTask.endTime;
-      delete this.newTask.allDay;
-      this.$emit('confirm', this.newTask);
-      this.resetTask(); // 값 초기화
-    },
-    closeModal() {
-      this.$emit('close');
-      this.resetTask(); // 값 초기화
-    },
-    getInitialTask() {
+  setup(props, { emit }) {
+    const newTask = ref(getInitialTask());
+
+    function getInitialTask() {
       return {
-        userId: this.userId, // 로그인한 유저의 ID를 부모로부터 받아서 설정
+        userId: props.userId, // 로그인한 유저의 ID를 부모로부터 받아서 설정
         title: '',
         description: '',
         status: 'ACTIVE',
@@ -112,46 +95,78 @@ export default {
         endNotification: false,
         allDay: false,
       };
-    },
-    resetTask() {
-      this.newTask = this.getInitialTask();
-    },
-    toggleAllDay() {
-      if (this.newTask.allDay) {
+    }
+
+    function confirm() {
+      if (newTask.value.allDay) {
+        // All day 일정인 경우에도 일관된 시간 형식으로 처리
+        newTask.value.startDate = `${newTask.value.startDate}T00:00`;
+        newTask.value.endDate = `${newTask.value.endDate}T23:59`;
+      } else {
+        // 사용자가 입력한 시간으로 처리
+        newTask.value.startDate = `${newTask.value.startDate}T${newTask.value.startTime}`;
+        newTask.value.endDate = `${newTask.value.endDate}T${newTask.value.endTime}`;
+      }
+
+      delete newTask.value.startTime;
+      delete newTask.value.endTime;
+      delete newTask.value.allDay;
+
+      emit('confirm', newTask.value);
+      resetTask(); // 값 초기화
+    }
+
+    function closeModal() {
+      emit('close');
+      resetTask(); // 값 초기화
+    }
+
+    function resetTask() {
+      newTask.value = getInitialTask();
+    }
+
+    function toggleAllDay() {
+      if (newTask.value.allDay) {
         // All Day 선택 시 시간을 기본값으로 설정하고 입력을 비활성화
-        this.newTask.startTime = '00:00';
-        this.newTask.endTime = '23:59';
+        newTask.value.startTime = '00:00';
+        newTask.value.endTime = '23:59';
       } else {
         // All Day 선택 해제 시 시간을 비우고 입력을 활성화
-        this.newTask.startTime = '';
-        this.newTask.endTime = '';
+        newTask.value.startTime = '';
+        newTask.value.endTime = '';
       }
-    },
-    validateDates() {
-      if (this.newTask.startDate && this.newTask.endDate) {
-        if (this.newTask.startDate > this.newTask.endDate) {
-          this.newTask.endDate = this.newTask.startDate;
+    }
+
+    function validateDates() {
+      if (newTask.value.startDate && newTask.value.endDate) {
+        if (newTask.value.startDate > newTask.value.endDate) {
+          newTask.value.endDate = newTask.value.startDate;
         }
       }
-      if (this.newTask.endDate) {
-        const startInput = document.querySelector('#startDate');
-        startInput.max = this.newTask.endDate;
-      }
-      if (this.newTask.startDate) {
-        const endInput = document.querySelector('#endDate');
-        endInput.min = this.newTask.startDate;
-      }
-    },
-    validateTimes() {
+    }
+
+    function validateTimes() {
       // 시작일과 종료일이 같을 때만 시간 비교
-      if (this.newTask.startDate === this.newTask.endDate) {
-        if (this.newTask.startTime && this.newTask.endTime) {
-          if (this.newTask.startTime > this.newTask.endTime) {
-            this.newTask.endTime = this.newTask.startTime; // 종료 시간을 시작 시간으로 맞춤
+      if (newTask.value.startDate === newTask.value.endDate) {
+        if (newTask.value.startTime && newTask.value.endTime) {
+          if (newTask.value.startTime > newTask.value.endTime) {
+            newTask.value.endTime = newTask.value.startTime; // 종료 시간을 시작 시간으로 맞춤
           }
         }
       }
-    },
+    }
+
+    watch(newTask.value.startDate, validateDates);
+    watch(newTask.value.endDate, validateDates);
+
+    return {
+      newTask,
+      confirm,
+      closeModal,
+      toggleAllDay,
+      validateDates,
+      validateTimes,
+    };
   },
 };
 </script>
