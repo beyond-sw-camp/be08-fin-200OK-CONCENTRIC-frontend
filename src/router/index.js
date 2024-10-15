@@ -9,7 +9,7 @@ import Signin from "../views/Sign/Signin.vue";
 import ChatView from "../views/Chat/ChatView.vue";
 import Social from "@/views/social/Social.vue";
 import PrivateStorage from "@/views/storage/PrivateStorage.vue";
-import Social from "@/views/PageCustom/Social.vue";
+
 
 
 
