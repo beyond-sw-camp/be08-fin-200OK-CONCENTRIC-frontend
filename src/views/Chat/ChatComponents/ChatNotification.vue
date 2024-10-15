@@ -21,7 +21,7 @@ const removeNotification = notificationStore.removeNotification;
 <style scoped>
 .notification-container {
     position: fixed;
-    z-index: 1000;
+    z-index: 9999;
     bottom: 50px;
     right: 10px;
     text-align: right;

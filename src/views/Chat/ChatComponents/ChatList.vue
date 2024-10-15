@@ -268,12 +268,13 @@ const closeFriendList = () => {
     display: flex;
     align-items: center;
     padding: 12px;
-    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    border-bottom: 1px solid #f5f5f5;
     cursor: pointer;
 }
 
 .chat-list-item:hover {
-    background-color: #ffffff;
+    background-color: #f5f5f5;
 }
 
 .profile-image {

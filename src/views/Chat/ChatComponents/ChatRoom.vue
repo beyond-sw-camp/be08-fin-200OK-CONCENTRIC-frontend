@@ -2,7 +2,7 @@
     <div class="chat-room-container">
         <!-- 채팅방 헤더 -->
         <div class="chat-room-header">
-            <img :src="chat.profileImage" class="profile-image" @click="toggleDetails" />
+            <img :src="chat.profileImage" class="profile-image" @click="goToDetails" />
             <div class="profile-info">
                 <h3 class="profile-name">{{ chat.nickname }}</h3>
             </div>
@@ -71,7 +71,7 @@ const props = defineProps({
 const emit = defineEmits([ 
     'close-chat-room', 
     'select-file-list', 
-    'toggle-details'
+    'select-details'
 ]);
 
 // 채팅 내역 불러오기
@@ -226,8 +226,8 @@ const goToFileList = () => {
     emit("select-file-list");
 };
 
-const toggleDetails = () => {
-    emit("toggle-details");
+const goToDetails = () => {
+    emit("select-details");
 };
 
 </script>
