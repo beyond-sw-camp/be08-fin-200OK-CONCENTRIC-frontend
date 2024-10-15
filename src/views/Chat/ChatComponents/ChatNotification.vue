@@ -1,9 +1,10 @@
 <template>
     <div id="notification" class="notification-container">
-        <div v-for="(notification, index) in notifications" :key="index" class="notificationWrap">
+        <div v-for="(notification, index) in notifications" :key="notification.value.id" class="notificationWrap"
+        :class="{ 'fade-out': notification.value.fadeOut }">
             <p class= "notification-remove" @click="removeNotification(index)">x</p>
             <span class="notification-text">
-                {{ notification.message }}
+                {{ notification.value.message }}
             </span>
         </div>
     </div>
@@ -39,6 +40,12 @@ const removeNotification = notificationStore.removeNotification;
     align-items: flex-start;
     justify-content: space-between;
     width: 300px;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
+
+.notificationWrap.fade-out {
+    opacity: 0;
 }
 
 .notification-remove {

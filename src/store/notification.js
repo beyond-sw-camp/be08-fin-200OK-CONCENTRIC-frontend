@@ -7,28 +7,35 @@ export const useNotificationStore = defineStore("notification", () => {
     const userStore = useUserStore();
     const loggedInMemberId = computed(() => userStore.userInfo.id);
 
-    const showNotification = (memberId, msg, timer = 3000) => {
+    const showNotification = (memberId, msg, timer = 1500) => {
         if (memberId === loggedInMemberId.value) {
             return;
         }
 
-        const newNotification = {
+        const newNotification = ref({
+            id: Date.now(),
             message: msg,
             progressWidth: 0,
-        };
+            fadeOut: false,
+        });
         notifications.value.push(newNotification);
 
         const interval = setInterval(() => {
-            newNotification.progressWidth += 100 / (timer / 100);
-            if (newNotification.progressWidth >= 100) {
+            newNotification.value.progressWidth += 100 / (timer / 100);
+            if (newNotification.value.progressWidth >= 100) {
                 clearInterval(interval);
-                removeNotification(0); // 첫 번째 메시지를 삭제
+                newNotification.value.fadeOut = true;
+                setTimeout(() => {
+                    removeNotification(newNotification.value.id); // 첫 번째 메시지를 삭제
+                }, 500);
+                
             }
         }, 100);
     };
 
-    const removeNotification = (index) => {
-        if (index >= 0 && index < notifications.value.length) {
+    const removeNotification = (id) => {
+        const index = notifications.value.findIndex(notification => notification.value.id === id);
+        if (index !== -1) {
             notifications.value.splice(index, 1);
         }
     };

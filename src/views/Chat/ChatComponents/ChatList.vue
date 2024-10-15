@@ -164,7 +164,7 @@ const subscribeChatRoom = (chatRooms) => {
             stompClient.value.subscribe(`/sub/chat/${room.chatRoomId}`, (message) => {
                 const receivedMessage = JSON.parse(message.body);
 
-                notificationStore.showNotification(receivedMessage.memberId, `새 메시지: ${receivedMessage.message}`, 3000);
+                notificationStore.showNotification(receivedMessage.memberId, `새 메시지: ${receivedMessage.message}`, 2000);
             });
 
             subscribedChatRooms.push(room.chatRoomId);
