@@ -44,10 +44,6 @@ const findChatStorageApi = async () => {
     try {
         const response = await axios.get(
             `/storage/list?ownerId=${chatRoomId}&storageType=CHAT`, {
-            headers: {
-                "Content-Type": "application/json",
-                // "Authorization": `${accessToken}`,
-            },
         });
         files.value = response.data;
     } catch (err) {
@@ -64,27 +60,37 @@ const downloadFile = async (file) => {
     try {
         const response = await axios.post(
             `/storage/download?ownerId=${chatRoomId}&storageType=CHAT&storageFileId=${file.storageFileId}`, {
-            // headers: {
-            //     "Content-Type": "application/json",
-            // },
             responseType: 'blob' 
             }
         );
 
         const blob = new Blob([response.data], { type: response.headers['content-type'] });
-        const url = window.URL.createObjectURL(blob);
+
+        const disposition = response.headers['content-disposition'];
+        let filename = "downloaded_file";
+        if (disposition && disposition.includes('attachment')) {
+            const matches = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (matches != null && matches[1]) {
+            filename = matches[1].replace(/['"]/g, '');
+            filename = decodeURIComponent(filename);
+            }
+        }
+
+        const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        const fileName = file.originalName;
+
         link.href = url;
-        link.setAttribute('download', fileName);
+        link.setAttribute('download', filename);
         document.body.appendChild(link);
         link.click();
-
         document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     } catch (err) {
-        console.error("파일 다운로드에 실패했습니다.", err);
+    console.error("파일 다운로드에 실패했습니다.", err);
     }
 };
+
+
 
 const closeFileList = () => {
     emit('close-file-List');

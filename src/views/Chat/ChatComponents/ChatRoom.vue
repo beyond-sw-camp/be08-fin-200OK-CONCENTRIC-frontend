@@ -51,6 +51,7 @@ import Stomp from "stompjs";
 
 const userStore = useUserStore();
 const loggedInMemberId = computed(() => userStore.userInfo.id);
+const loggedInMemberName = computed(() => userStore.userInfo.nickname);
 const accessToken = userStore.accessToken;
 
 const chatMessages = ref([]);
@@ -147,6 +148,7 @@ const sendMessage = async () => {
 
     const message = {
         memberId: loggedInMemberId.value,
+        nickname: loggedInMemberName.value,
         message: newMessage.value,
         fileUrl: null,
     };
@@ -193,6 +195,7 @@ const sendFile = async (event) => {
         const formData = new FormData();
         formData.append("chatRoomId", props.chat.chatRoomId);
         formData.append("memberId", loggedInMemberId.value);
+        formData.append("nickname", loggedInMemberName.value);
 
         for (let i = 0; i < files.value.length; i++) {
             formData.append("files", files.value[i]);
