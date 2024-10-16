@@ -2,7 +2,7 @@
     <div class="file-container">
         <!-- 상단 헤더 -->
         <div class="file-header">
-            <h3 class="file-header-name">파일함</h3>
+            <h3 class="file-header-name">파일</h3>
             <button @click="closeFileList" class="header-button close-button">
                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
             </button>
@@ -59,7 +59,9 @@ onMounted(() => {
 const downloadFile = async (file) => {
     try {
         const response = await axios.post(
-            `/storage/download?ownerId=${chatRoomId}&storageType=CHAT&storageFileId=${file.storageFileId}`, {
+            `/storage/download?ownerId=${chatRoomId}&storageType=CHAT&storageFileId=${file.storageFileId}`, 
+            null,
+            {
             responseType: 'blob' 
             }
         );
