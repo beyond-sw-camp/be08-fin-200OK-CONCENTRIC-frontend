@@ -9,57 +9,109 @@
     </div>
 
     <div class="upload-section">
-      <input type="file" @change="handleFileUpload" multiple />
-      <button class="upload-button" @click="uploadFiles">업로드</button>
+      <button class="upload-button" @click="openUploadModal">업로드</button>
     </div>
 
     <ul class="file-list">
-      <li v-for="(file, i) in storageFiles" :key="i" >
+      <li v-for="(file, i) in storageFiles" :key="i">
         <div class="file-item" v-if="showFiles[i]">
-        <span class="file-name">{{ file.originalName }}</span>
-        <span class="file-size">{{ getSizePresent(file.size) }}</span>
-        <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
-        <button class="download-button" @click="downloadFile(file.storageFileId)">
-          <i class="fas fa-arrow-down"></i>
-        </button>
-        <button class="delete-button" @click="deleteFile(file.storageFileId, i)">
-          <i class="fas fa-trash-alt"></i>
-        </button>
+          <span class="file-name">{{ file.originalName }}</span>
+          <span class="file-size">{{ getSizePresent(file.size) }}</span>
+          <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
+          <div>
+            <button class="download-button" @click="downloadFile(file.storageFileId)">
+              <i class="fas fa-arrow-down"></i>
+            </button>
+            <button class="delete-button" @click="deleteFile(file.storageFileId, i)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
         </div>
       </li>
     </ul>
 
+    <UploadModal v-if="isModalOpen" @close="closeUploadModal" :files-to-upload="filesToUpload" @files-uploaded="handleFilesUploaded">
+      <template #header>
+        <h2>파일 업로드</h2>
+      </template>
+      <template #body>
+        <p>파일을 드래그 앤 드롭하거나 선택하세요.</p>
+      </template>
+      <template #footer>
+<!--        <button @click="uploadFiles">업로드</button>-->
+<!--        <button @click="closeUploadModal">취소</button>-->
+      </template>
+    </UploadModal>
   </div>
 </template>
 
-
-
-
 <script setup>
-import {ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useUserStore } from "@/store/user";
 import axios from "axios";
+import UploadModal from '@/views/storage/UploadModal.vue';
 
 const userStore = useUserStore();
-const storage = ref({
-  id: null,
-  currentSize: 0,
-  capacity: 0,
-});
-const storageFiles = ref();
-const currentSizeMB = computed(() => {
-  return (storage.value.currentSize / 1024 / 1024).toFixed(2);
-});
-const capacityMB = computed(() => {
-  return (storage.value.capacity / 1024/ 1024).toFixed(2);
-});
-const usagePercentage = computed(() => {
-  return storage.value.capacity > 0
-  ? Math.round((storage.value.currentSize / storage.value.capacity) * 100)
-      : 0;
-});
+const storage = ref({ id: null, currentSize: 0, capacity: 0 });
+const storageFiles = ref([]);
+const currentSizeMB = computed(() => (storage.value.currentSize / 1024 / 1024).toFixed(2));
+const capacityMB = computed(() => (storage.value.capacity / 1024 / 1024).toFixed(2));
+const usagePercentage = computed(() => (storage.value.capacity > 0 ? Math.round((storage.value.currentSize / storage.value.capacity) * 100) : 0));
 
 const showFiles = ref([]);
+const isModalOpen = ref(false);
+const filesToUpload = ref([]);
+
+const openUploadModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeUploadModal = () => {
+  isModalOpen.value = false;
+  filesToUpload.value = [];
+};
+
+const handleFilesUploaded = (uploadedFiles) => {
+  console.log("Received files in parent:", uploadedFiles);
+  uploadedFiles.forEach(file => {
+    const exists = filesToUpload.value.some(f => f.name === file.name);
+    if (!exists) {
+      filesToUpload.value.push(file);
+      console.log("Updated filesToUpload:", filesToUpload.value);
+    }
+  });
+  console.log(filesToUpload.value);
+  uploadFiles();
+};
+
+
+const uploadFiles = async () => {
+  console.log("uf Received files in parent:", filesToUpload);
+  const formData = new FormData();
+  formData.append("ownerId", userStore.userInfo['id']);
+  formData.append("storageType", "PRIVATE");
+
+  filesToUpload.value.forEach(file => {
+    formData.append("files", file);
+  });
+  console.log("filesToUpload" + filesToUpload.value);
+
+  const response = await axios.post('storage/upload',
+      formData,
+      {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+  });
+
+  if (response.status === 200) {
+    await getStorage();
+    await getStorageFiles();
+    closeUploadModal();
+  }else if(response.status === 400){
+    alert("용량 부족");
+  }
+};
 
 const getStorage = async () => {
   const response = await axios.get('storage/',
@@ -83,13 +135,12 @@ const getStorageFiles = async () => {
   });
   storageFiles.value = response.data;
   console.log(storageFiles.value);
-
+  showFiles.value = []
   storageFiles.value.forEach((file) => {
     showFiles.value.push(true);
   });
   console.log(showFiles.value);
 };
-
 
 const getSizePresent = (size) => {
   let sizePresent = size / 1024 / 1024;
@@ -170,7 +221,7 @@ onMounted(() => {
 
 <style scoped>
 .file-storage {
-  max-width: 600px;
+  max-width: 80%;
   margin: 20px auto;
   padding: 20px;
   border: 1px solid #e0e0e0;
