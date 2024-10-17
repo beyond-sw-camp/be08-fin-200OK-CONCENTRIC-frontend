@@ -25,11 +25,11 @@
         </div>
       </div>
     </div>
-    <div class="d-flex justify-content-end pe-4" style="font-size: 0.5rem">
-      <router-link to="/profile/edit">
-        <argon-button>Edit Profile</argon-button>
-      </router-link>
-    </div>
+<!--    <div class="d-flex justify-content-end pe-4" style="font-size: 0.5rem">-->
+<!--      <router-link to="/profile/edit">-->
+<!--        <argon-button>Edit Profile</argon-button>-->
+<!--      </router-link>-->
+<!--    </div>-->
 
     <div class="card-body pt-0">
       <div class="text-center mt-4">
