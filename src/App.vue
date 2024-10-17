@@ -62,6 +62,7 @@ const stateStore = useStateStore();
 
 <router-view/>
 
+
     <app-footer v-show="showFooter" />
 
     <configurator

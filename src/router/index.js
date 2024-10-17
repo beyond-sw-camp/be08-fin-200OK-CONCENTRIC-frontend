@@ -7,8 +7,9 @@ import RTL from "../etc/Rtl.vue";
 import Profile from "../views/Profile/Profile.vue";
 import Signin from "../views/Sign/Signin.vue";
 import ChatView from "../views/Chat/ChatView.vue";
-import Social from "@/views/social/Social.vue";
+import Social from "@/views/social/FriendList.vue";
 import PrivateStorage from "@/views/storage/PrivateStorage.vue";
+import ProfileEdit from "@/views/Profile/ProfileEdit.vue";
 
 
 
@@ -68,6 +69,11 @@ const routes = [
     path: "/storage/private",
     name: "PrivateStorage",
     component: PrivateStorage,
+  },
+  {
+    path: "/profile/edit",
+    name: "ProfileEdit",
+    component: ProfileEdit,
   },
 ];
 
