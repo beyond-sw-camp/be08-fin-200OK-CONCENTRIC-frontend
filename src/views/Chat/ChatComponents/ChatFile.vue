@@ -2,7 +2,7 @@
     <div class="file-container">
         <!-- 상단 헤더 -->
         <div class="file-header">
-            <h3 class="file-header-name">파일함</h3>
+            <h3 class="file-header-name">파일</h3>
             <button @click="closeFileList" class="header-button close-button">
                 <i class="fa fa-arrow-right" aria-hidden="true"></i>
             </button>
@@ -44,10 +44,6 @@ const findChatStorageApi = async () => {
     try {
         const response = await axios.get(
             `/storage/list?ownerId=${chatRoomId}&storageType=CHAT`, {
-            headers: {
-                "Content-Type": "application/json",
-                // "Authorization": `${accessToken}`,
-            },
         });
         files.value = response.data;
     } catch (err) {
@@ -63,28 +59,40 @@ onMounted(() => {
 const downloadFile = async (file) => {
     try {
         const response = await axios.post(
-            `/storage/download?ownerId=${chatRoomId}&storageType=CHAT&storageFileId=${file.storageFileId}`, {
-            // headers: {
-            //     "Content-Type": "application/json",
-            // },
+            `/storage/download?ownerId=${chatRoomId}&storageType=CHAT&storageFileId=${file.storageFileId}`, 
+            null,
+            {
             responseType: 'blob' 
             }
         );
 
         const blob = new Blob([response.data], { type: response.headers['content-type'] });
-        const url = window.URL.createObjectURL(blob);
+
+        const disposition = response.headers['content-disposition'];
+        let filename = "downloaded_file";
+        if (disposition && disposition.includes('attachment')) {
+            const matches = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (matches != null && matches[1]) {
+            filename = matches[1].replace(/['"]/g, '');
+            filename = decodeURIComponent(filename);
+            }
+        }
+
+        const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        const fileName = file.originalName;
+
         link.href = url;
-        link.setAttribute('download', fileName);
+        link.setAttribute('download', filename);
         document.body.appendChild(link);
         link.click();
-
         document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     } catch (err) {
-        console.error("파일 다운로드에 실패했습니다.", err);
+    console.error("파일 다운로드에 실패했습니다.", err);
     }
 };
+
+
 
 const closeFileList = () => {
     emit('close-file-List');
