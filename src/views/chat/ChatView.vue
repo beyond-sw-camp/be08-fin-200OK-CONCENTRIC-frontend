@@ -39,10 +39,10 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from "vuex";
 
-import ChatRoom from './ChatComponents/ChatRoom.vue';
-import ChatFile from './ChatComponents/ChatFile.vue';
-import ChatList from './ChatComponents/ChatList.vue';
-import ChatRoomDetails from './ChatComponents/ChatRoomDetails.vue';
+import ChatRoom from './components/ChatRoom.vue';
+import ChatFile from './components/ChatFile.vue';
+import ChatList from './components/ChatList.vue';
+import ChatRoomDetails from './components/ChatRoomDetails.vue';
 
 const selectedChatRoom = ref(null);
 const selectedFileList = ref(false);

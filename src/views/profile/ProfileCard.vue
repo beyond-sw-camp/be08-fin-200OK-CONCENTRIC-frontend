@@ -27,7 +27,7 @@
     </div>
 <!--    <div class="d-flex justify-content-end pe-4" style="font-size: 0.5rem">-->
 <!--      <router-link to="/profile/edit">-->
-<!--        <argon-button>Edit Profile</argon-button>-->
+<!--        <argon-button>Edit profile</argon-button>-->
 <!--      </router-link>-->
 <!--    </div>-->
 
@@ -78,16 +78,20 @@ const onFileChange = (event) => {
 };
 
 const getProfileImage = async (fileUrl) => {
-  const response = await axios.post('storage/image/profile',
-  null,
-      {
-        params: {
-          path: userStore.userInfo['imageUrl'],
+  try {
+    const response = await axios.post('storage/image/profile',
+        null,
+        {
+          params: {
+            path: userStore.userInfo['imageUrl'],
+          },
+          responseType: 'blob',
         },
-        responseType: 'blob',
-      },
-  );
-  imageUrl.value = URL.createObjectURL(response.data);
+    );
+    imageUrl.value = URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 onMounted(() => {
