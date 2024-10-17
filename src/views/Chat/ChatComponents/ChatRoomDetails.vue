@@ -5,14 +5,14 @@
             <div class="chat-room-title">
                 <h6 v-if="!isEditingTitle">
                     {{ chatRoomName }}
-                    <button @click="editTitle" class="edit-button">
+                    <button @click.stop="editTitle" class="edit-button">
                         <i class="fa fa-pencil" aria-hidden="true"></i>
                     </button>
                 </h6>
 
                 <div v-else class="edit-title-container">
                     <input v-model="newChatRoomName" class="edit-title-input" />
-                    <button @click="saveTitle" class="save-button">확인</button>
+                    <button @click.stop="saveTitle" class="save-button">확인</button>
                 </div>
             </div>
         </div>
@@ -20,7 +20,7 @@
         <!-- 참여자 -->
         <ul class="member-list">
             <li v-for="member in members" :key="member.memberId" class="member-item">
-                <img :src="member.imageUrl" class="profile-image" />
+                <img :src="member.profileImage" class="profile-image" />
                 <span class="member-name">{{ member.nickname }}</span>
             </li>
         </ul>
@@ -58,11 +58,37 @@ const findChatParticipantApi = async () => {
                 "Content-Type": "application/json",
             },
         });
-        members.value = response.data;
+
+        const res = response.data.map(member => ({
+            ...member,
+            profileImage: null,
+        }));
+        members.value = res;
+
+        await Promise.all(
+            members.value.map(async (member, index) => {
+                const profileImage = await getProfileImage(member.imageUrl);
+                members.value[index].profileImage = profileImage;
+            })
+        );
     } catch (err) {
         console.error("참여자 목록을 가져오는데 실패했습니다.", err);
     }
 };
+
+const getProfileImage = async (imageUrl) => {
+    const response = await axios.post(`storage/image/profile`,
+        null,
+        {
+            params: {
+                path: imageUrl,
+            },
+            responseType: 'blob',
+        });
+    const imageSrc = URL.createObjectURL(response.data);
+    return imageSrc;
+    // console.log(profileImage.value);
+}
 
 onMounted(() => {
     findChatParticipantApi();
@@ -70,12 +96,14 @@ onMounted(() => {
 
 // 채팅방 이름 수정 모드로 전환
 const editTitle = () => {
+    emit('set-prevent-close');
     isEditingTitle.value = true;
     newChatRoomName.value = chatRoomName.value;
 };
 
 // 채팅방 이름 변경
 const saveTitle = async () => {
+    emit('set-prevent-close');
     if (newChatRoomName.value.trim() === "") {
         alert("채팅방 이름을 입력하세요.");
         return;

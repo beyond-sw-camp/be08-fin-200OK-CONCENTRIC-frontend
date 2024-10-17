@@ -12,7 +12,7 @@
         <ul class="file-list">
             <li v-for="file in files" :key="file.storageFileId" class="file-item">
                 <span class="file-name">{{ file.originalName }}</span>
-                <button @click="downloadFile(file)" class="download-button">
+                <button @click.stop="downloadFile(file)" class="download-button">
                     <i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i>
                 </button>
             </li>
@@ -58,6 +58,7 @@ onMounted(() => {
 //파일 다운로드
 const downloadFile = async (file) => {
     try {
+        emit('set-prevent-close');
         const response = await axios.post(
             `/storage/download?ownerId=${chatRoomId}&storageType=CHAT&storageFileId=${file.storageFileId}`, 
             null,
