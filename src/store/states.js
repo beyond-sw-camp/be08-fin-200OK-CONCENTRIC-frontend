@@ -3,7 +3,8 @@ import { reactive, computed } from 'vue';
 
 export const useStateStore = defineStore('states', () =>{
     const state = reactive({
-       showSocial: false,
+        showSocial: false,
+        showProfileMenu: false,
     });
 
     const toggleSocial = () => {
@@ -11,11 +12,18 @@ export const useStateStore = defineStore('states', () =>{
         console.log(state.showSocial);
     }
 
+    const setShowProfileMenu = (tof) => {
+        state.showProfileMenu = tof;
+    }
+
     const showSocial = computed(() => state.showSocial);
+    const showProfileMenu = computed(() => state.showProfileMenu);
 
     return {
         state,
         toggleSocial,
         showSocial,
+        showProfileMenu,
+        setShowProfileMenu
     }
 });

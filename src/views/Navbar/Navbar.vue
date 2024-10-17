@@ -131,6 +131,10 @@ const getProfileImage = async () => {
   profileImage.value =  URL.createObjectURL(response.data);
 }
 
+const gotoProfile = () => {
+  router.push("/profile");
+}
+
 onMounted(() => {
   if(!checkLogin()) return;
   loadNotifications();
@@ -276,8 +280,7 @@ onMounted(() => {
       <div
           class="pe-md-5 d-flex align-items-center"
       >
-        <a href="javascript:;" @click="triggerFileInput" class="profile-img-container">
-          <!-- 이미지 바인딩 -->
+        <a href="javascript:;" @click="gotoProfile" class="profile-img-container">
           <img
               :src="profileImage"
               class="profile-img rounded-circle img-fluid border border-2 border-white"
@@ -316,8 +319,8 @@ onMounted(() => {
   .profile-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 이미지가 원형 내에 잘 맞도록 */
-    border-radius: 50%; /* 이미지도 원형으로 */
+    object-fit: cover;
+    border-radius: 50%;
   }
 
 </style>

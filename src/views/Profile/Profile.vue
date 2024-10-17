@@ -1,16 +1,24 @@
 <script setup>
-import { onBeforeMount, onMounted, onBeforeUnmount } from "vue";
+import { onBeforeMount, onMounted, onBeforeUnmount, ref } from "vue";
 import { useStore } from "vuex";
 
 import setNavPills from "@/assets/js/nav-pills.js";
 import setTooltip from "@/assets/js/tooltip.js";
-import ProfileCard from "../components/ProfileCard.vue";
+import ProfileCard from "@/views/Profile/ProfileCard.vue";
+import ProfileMenu from "@/views/Profile/ProfileMenu.vue";
+import ProfileEdit from "@/views/Profile/ProfileEdit.vue";
+import PrivateStorage from "@/views/storage/PrivateStorage.vue";
 import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
+import { useStateStore } from "@/store/states";
 
 const body = document.getElementsByTagName("body")[0];
 
 const store = useStore();
+const stateStore = useStateStore();
+const activeTab = ref("");
+
+const setActiveTab = tab => activeTab.value = tab;
 
 onMounted(() => {
   store.state.isAbsolute = true;
@@ -19,10 +27,11 @@ onMounted(() => {
 });
 onBeforeMount(() => {
   store.state.imageLayout = "profile-overview";
-  store.state.showNavbar = false;
+  store.state.showNavbar = true;
   store.state.showFooter = true;
   store.state.hideConfigButton = true;
   body.classList.add("profile-overview");
+  setActiveTab("profile_card");
 });
 onBeforeUnmount(() => {
   store.state.isAbsolute = false;
@@ -34,97 +43,47 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <main>
+  <div class="container-fluid">
     <nav class="navbar navbar-expand-lg bg-body-tertiary" style="box-shadow: none;">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Dropdown
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">SSUELILL</a></li>
-                <li><a class="dropdown-item" href="#">UPGIN</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">HALGUGATUNDE</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <!-- Navbar Content -->
     </nav>
-    <div class="py-4 container-fluid">
-      <div class="row">
-
-        <div class="col-md-4">
-          <profile-card />
-        </div>
-
-        <div class="col-md-8">
-          <div class="card" style="box-shadow: none;">
-            <div class="card-body">
-              <p class="text-uppercase text-sm">User Information</p>
-              <div class="row">
-                <div class="col-12">
-                  <label for="example-text-input" class="form-control-label">Username</label>
-                  <argon-input type="text" value="lucky.jesse" />
-                </div>
-                <div class="col-12">
-                  <label for="example-text-input" class="form-control-label">Email address</label>
-                  <argon-input type="email" value="jesse@example.com" />
-                </div>
-                <div class="col-12">
-                  <label for="example-text-input" class="form-control-label">Phone Number</label>
-                  <argon-input type="email" value="+82-10-0000-0000" />
-                </div>
-              </div>
-              <hr class="horizontal dark" />
-              <p class="text-uppercase text-sm">Contact Information</p>
-              <div class="row">
-                <div class="col-md-12">
-                  <label for="example-text-input" class="form-control-label">Address</label>
-                  <argon-input
-                      type="text"
-                      value="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                  />
-                </div>
-                <div class="col-md-4">
-                  <label for="example-text-input" class="form-control-label">City</label>
-                  <argon-input type="text" value="New York" />
-                </div>
-                <div class="col-md-4">
-                  <label for="example-text-input" class="form-control-label">Country</label>
-                  <argon-input type="text" value="United States" />
-                </div>
-                <div class="col-md-4">
-                  <label for="example-text-input" class="form-control-label">Postal code</label>
-                  <argon-input type="text" value="437300" />
-                </div>
-              </div>
-              <hr class="horizontal dark" />
-              <p class="text-uppercase text-sm">About me</p>
-              <div class="row">
-                <div class="col-md-12">
-                  <label for="example-text-input" class="form-control-label">About me</label>
-                  <argon-input
-                      type="text"
-                      value="A beautiful Dashboard for Bootstrap 5. It is Free and Open Source."
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div class="row" style="margin-top: 10%;">
+      <div class="col-md-2">
+          <ul class="list-group shadow-sm">
+          <li class="list-group-item list-group-item-action" @click="setActiveTab('profile_card')">프로필</li>
+          <li class="list-group-item list-group-item-action" @click="setActiveTab('profile_edit')">정보 수정</li>
+          <li class="list-group-item list-group-item-action" @click="setActiveTab('private_storage')">파일함</li>
+          <li class="list-group-item list-group-item-action" @click="setActiveTab('')">친구</li>
+          <li class="list-group-item list-group-item-action" @click="setActiveTab('')">알림</li>
+          </ul>
       </div>
-
+      <div class="col-md-6" style="margin-left: 10%;">
+          <profile-card v-if="activeTab === 'profile_card'"/>
+          <profile-edit v-if="activeTab === 'profile_edit'"/>
+          <private-storage v-if="activeTab === 'private_storage'"/>
+      </div>
     </div>
-  </main>
+  </div>
 </template>
+
+<style scoped>
+.list-group-item {
+  transition: background-color 0.3s, color 0.3s;
+  margin-bottom: 10px; /* 링크 간의 간격 증가 */
+  border: none; /* 경계선 제거 */
+  border-radius: 5px;
+  background-color: transparent;
+}
+
+.list-group-item:hover {
+  background-color: #007BFF; /* Hover 배경색 */
+  color: white; /* Hover 텍스트 색상 */
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+  overflow: hidden; /* 카드 안의 요소가 경계를 넘지 않도록 */
+}
+</style>
+

@@ -1,9 +1,8 @@
 <template>
-  <div class="card card-profile" style="box-shadow: none;">
+  <div class="card card-profile" style="box-shadow: none; ">
     <img
         src="../../assets/img/bg-profile.jpg"
         alt="Image placeholder"
-        class="card-img"
     />
     <div class="row justify-content-center">
       <div class="col-4 col-lg-4 order-lg-2">
@@ -27,7 +26,9 @@
       </div>
     </div>
     <div class="d-flex justify-content-end pe-4" style="font-size: 0.5rem">
-      <argon-button>Edit Profile</argon-button>
+      <router-link to="/profile/edit">
+        <argon-button>Edit Profile</argon-button>
+      </router-link>
     </div>
 
     <div class="card-body pt-0">
@@ -52,9 +53,13 @@
 
 <script setup>
 import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
+import axios from 'axios';
+import { useUserStore } from "@/store/user";
 
-const imageUrl = ref(require('../../assets/img/team-2.jpg'));
+const userStore = useUserStore();
+// const imageUrl = ref(require('../../assets/img/team-2.jpg'));
+const imageUrl = ref("");
 
 const triggerFileInput = () => {
   document.querySelector('input[type="file"]').click();
@@ -71,6 +76,23 @@ const onFileChange = (event) => {
     reader.readAsDataURL(file); // 파일을 데이터 URL로 변환
   }
 };
+
+const getProfileImage = async (fileUrl) => {
+  const response = await axios.post('storage/image/profile',
+  null,
+      {
+        params: {
+          path: userStore.userInfo['imageUrl'],
+        },
+        responseType: 'blob',
+      },
+  );
+  imageUrl.value = URL.createObjectURL(response.data);
+};
+
+onMounted(() => {
+  getProfileImage();
+});
 </script>
 <style scoped>
 
