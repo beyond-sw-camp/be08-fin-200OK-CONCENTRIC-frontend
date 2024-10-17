@@ -19,11 +19,14 @@
         <div class="chat-room-body" ref="messageContainer">
             <div v-for="(chatMessage, index) in chatMessages" :key="index"
                 :class="['chat-message', chatMessage.memberId === loggedInMemberId || chatMessage.sentByMe ? 'my-message' : 'partner-message']">
+                <a class="chat-message-nickname">{{ chatMessage.nickname }}</a>
                 <div class="message-bubble">
                     <p v-if="chatMessage.message" class="chat-message-text">{{ chatMessage.message }}</p>
-                    <template v-else-if="chatMessage.fileUrl">
-                        <img v-if="isImage(chatMessage.fileUrl)" :src="chatMessage.loadedImageUrl" class="chat-message-file" />
-                        <a v-else :href="chatMessage.fileUrl" target="_blank" class="chat-message-file">{{ getFileName(chatMessage.fileUrl) }}</a>
+                    <template v-else-if="chatMessage.fileName">
+                        <img v-if="isImage(chatMessage.fileName)" :src="chatMessage.chatImage" class="chat-message-image img-fluid border border-2 border-white" />
+                        <a v-else @click.stop="downloadFile(chatMessage.fileId)" href="#" class="chat-message-file">
+                            {{ chatMessage.fileName }}
+                        </a>
                     </template>
                 </div>
             </div>
@@ -83,16 +86,17 @@ const chatMessageListApi = async () => {
                 "Content-Type": "application/json",
             },
         });
-
-        //추가
-        const messages = response.data;
-        await Promise.all(messages.map(async (message) => {
-            if (message.fileUrl && isImage(message.fileUrl)) {
-                message.loadedImageUrl = await getImage(message.fileUrl);
-            }
+        const res = response.data.map(msg => ({
+            ...msg,
+            chatImage: null,
         }));
-        
-        chatMessages.value = response.data;
+        chatMessages.value = res;
+        await Promise.all(
+            chatMessages.value.map(async (chatMessage, index) => {
+                const chatImage = await getImage(chatMessage.fileId);
+                        chatMessages.value[index].chatImage = chatImage;
+            })
+        );
         scrollToBottom();
     } catch (err) {
         console.error("채팅 메세지 내역을 불러오는데 실패했습니다.", err);
@@ -102,6 +106,9 @@ const chatMessageListApi = async () => {
 onMounted(() => {
     chatMessageListApi();
     connectToChatRoom();
+    // if (isImage.value) {
+    //     chatMessages.value.chatImage = getImage(props.chatMessage.fileId);
+    // }
 });
 
 // props.chat이 변경될 때마다 API 호출
@@ -150,7 +157,6 @@ const sendMessage = async () => {
         memberId: loggedInMemberId.value,
         nickname: loggedInMemberName.value,
         message: newMessage.value,
-        fileUrl: null,
     };
 
     stompClient.value.send(`/pub/chat/${props.chat.chatRoomId}`, {}, JSON.stringify(message));
@@ -159,29 +165,65 @@ const sendMessage = async () => {
 };
 
 // 이미지와 일반 파일 분리
-const isImage = (fileUrl) => {
+const isImage = (fileName) => {
     const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
-    const extension = fileUrl.split('.').pop().toLowerCase();
+    const extension = fileName.split('.').pop().toLowerCase();
     return imageExtensions.includes(extension);
 };
 
-// 파일 이름 추출(나중에 api로 original 이름 추출..해야할 듯)
-const getFileName = (fileUrl) => {
-    return fileUrl.split('/').pop();
+// 파일 다운로드(나중에 api로 original 이름 추출..해야할 듯)
+//파일 다운로드
+
+const downloadFile = async (fileId) => {
+    try {
+        emit('set-prevent-close');
+        const response = await axios.post(
+            `/storage/download?ownerId=${props.chat.chatRoomId}&storageType=CHAT&storageFileId=${fileId}`, 
+            null,
+            {
+            responseType: 'blob' 
+            }
+        );
+
+        const blob = new Blob([response.data], { type: response.headers['content-type'] });
+
+        const disposition = response.headers['content-disposition'];
+        let filename = "downloaded_file";
+        if (disposition && disposition.includes('attachment')) {
+            const matches = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (matches != null && matches[1]) {
+            filename = matches[1].replace(/['"]/g, '');
+            filename = decodeURIComponent(filename);
+            }
+        }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    } catch (err) {
+    console.error("파일 다운로드에 실패했습니다.", err);
+    }
 };
 
 // 이미지 로드
-const getImage = async (fileUrl) => {
+const getImage = async (fileId) => {
     try {
         const response = await axios.post(
-            `storage/image/profile?path=${fileUrl}`,
+            `storage/image?storageFileId=${fileId}`,
+            null,
             {
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            responseType: 'blob' 
             }
         );
-        return response.data.imageUrl;        
+        console.log(response.data);
+        imageSrc.value = URL.createObjectURL(response.data);
+        return imageSrc.value
     } catch (err) {
         console.error("이미지를 불러오는데 실패했습니다.", err);
     }
@@ -307,13 +349,22 @@ const goToDetails = () => {
 }
 
 .chat-message {
+    position: relative;
     display: flex;
     margin: 7px;
+    margin-top: 25px;
 }
 
 .chat-message-text {
     display: block;
     margin-bottom: 0px;
+    font-size: 14px;
+}
+
+.chat-message .chat-message-nickname {
+    position: absolute;
+    display: block;
+    margin-top: -25px;
     font-size: 14px;
 }
 
