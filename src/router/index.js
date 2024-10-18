@@ -5,7 +5,7 @@ import Billing from "../etc/Billing.vue";
 import VirtualReality from "../etc/VirtualReality.vue";
 import RTL from "../etc/Rtl.vue";
 import Profile from "../views/profile/Profile.vue";
-import Signin from "../views/sign/Signin.vue";
+import Signin from "../views/Sign/Signin.vue";
 import ChatView from "../views/chat/ChatView.vue";
 import Social from "@/views/social/FriendList.vue";
 import PrivateStorage from "@/views/storage/PrivateStorage.vue";
