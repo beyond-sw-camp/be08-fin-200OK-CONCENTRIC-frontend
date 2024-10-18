@@ -41,12 +41,10 @@
 <script setup>
 import {ref} from 'vue';
 import Tasks from '@/views/mainpage/components/Tasks.vue';
-import RightTopClock from '@/views/navbar/RightTopClock.vue';
 import { Calendar, DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
 import CalenderView from "@/views/calender/CalenderView.vue";
-import 'v-calendar/style.css';
-import WeekCalender from "@/views/Calender/WeekCalender.vue";
+import WeekCalender from "@/views/calender/WeekCalender.vue";
 
 // State variables
 const currentView = ref('tasks');
