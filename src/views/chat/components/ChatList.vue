@@ -27,25 +27,25 @@
         <!-- 모달리스 - 채팅방 추가 -->
         <div>
             <div v-if="showFriendList" class="friend-list-container">
-            <div class="friend-list-header">
-                <h5 class="friend-list-header-text">대화상대 선택</h5>
-                <button @click="closeFriendList" class="close-button">
-                <i class="fa fa-arrow-right" aria-hidden="true"></i>
-                </button>
+                <div class="friend-list-header">
+                    <h5 class="friend-list-header-text">대화상대 선택</h5>
+                    <button @click="closeFriendList" class="close-button">
+                        <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <ul class="friend-list-body">
+                    <li v-for="friend in friends" :key="friend.id" class="friend-list-item">
+                        <img :src="friend.profileImage" class="profile-image" />
+                        <span class="friend-name">{{ friend.nickname }}</span>
+                        <button @click="addPrivateChat(friend)" class="friend-list-select">
+                            추가
+                        </button>
+                    </li>
+                </ul>
             </div>
-            
-            <ul class="friend-list-body">
-                <li v-for="friend in friends" :key="friend.id" class="friend-list-item">
-                    <img :src="friend.imageUrl" class="profile-image" />
-                    <span class="friend-name">{{ friend.nickname }}</span>
-                <button @click="addPrivateChat(friend)" class="friend-list-select">
-                    추가
-                </button>
-                </li>
-            </ul>
         </div>
     </div>
-</div>
 </template>
 
 <script setup>
@@ -63,6 +63,7 @@ const showFriendList = ref(false);
 const stompClient = ref(null);
 const chat = ref([]);
 const friends = ref([]);
+// const profileImage = ref([]);
 
 let subscribedChatRooms = [];
 
@@ -81,8 +82,26 @@ const chatListApi = async () => {
                     "Content-Type": "application/json",
                 },
             });
-        chat.value = response.data;
-        console.log(chat.value)
+        const res = response.data.map(chatroom => ({
+            ...chatroom,
+            profileImage: null,
+        }));
+        chat.value = res;
+
+        await Promise.all(
+            chat.value.map(async (chatRoom, index) => {
+                if (chatRoom.profileImageUrl) {
+                    try {
+                        const profileImage = await getProfileImage(chatRoom.profileImageUrl);
+                        chat.value[index].profileImage = profileImage;
+                    } catch (error) {
+                        console.error("이미지를 불러오는 데 실패했습니다.", error);
+                    }
+                }
+            })
+        );
+
+        console.log(chat.value);
         if (subscribedChatRooms.length === 0) {
             connectChatRoom(chat.value);
         }
@@ -91,9 +110,23 @@ const chatListApi = async () => {
     }
 };
 
+const getProfileImage = async (imageUrl) => {
+    const response = await axios.post(`storage/image/profile`,
+        null,
+        {
+            params: {
+                path: imageUrl,
+            },
+            responseType: 'blob',
+        });
+    const imageSrc = URL.createObjectURL(response.data);
+    return imageSrc;
+    // console.log(profileImage.value);
+}
+
 onMounted(async () => {
     // await websocketStore.connectWebSocket(accessToken);
-    await chatListApi(); 
+    await chatListApi();
 });
 
 // 채팅방 북마크 설정
@@ -164,7 +197,7 @@ const subscribeChatRoom = (chatRooms) => {
             stompClient.value.subscribe(`/sub/chat/${room.chatRoomId}`, (message) => {
                 const receivedMessage = JSON.parse(message.body);
 
-                notificationStore.showNotification(receivedMessage.memberId, `새 메시지: ${receivedMessage.message}`, 2000);
+                notificationStore.showNotification(receivedMessage.memberId, `${receivedMessage.nickname}: ${receivedMessage.message}`, 2000);
             });
 
             subscribedChatRooms.push(room.chatRoomId);
@@ -194,7 +227,24 @@ const getFriendListApi = async () => {
                     "Content-Type": "application/json",
                 },
             });
-        friends.value = response.data;
+        const res = response.data.map(friend => ({
+            ...friend,
+            profileImage: null,
+        }));
+        friends.value = res;
+
+        await Promise.all(
+            friends.value.map(async (friend, index) => {
+                if (friend.imageUrl) {
+                    try {
+                        const profileImage = await getProfileImage(friend.imageUrl);
+                        friends.value[index].profileImage = profileImage;
+                    } catch (error) {
+                        console.error("이미지를 불러오는 데 실패했습니다.", error);
+                    }
+                }
+            })
+        );
     } catch (err) {
         console.error("친구 목록을 가져오는데 실패했습니다.", err);
     }
@@ -205,7 +255,7 @@ const addPrivateChat = async (friend) => {
     try {
         const response = await axios.post(
             `/chat/create?friendId=${friend.id}`,
-            {   name: friend.nickname, },
+            { name: friend.nickname, },
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -283,6 +333,7 @@ const closeFriendList = () => {
     border-radius: 40%;
     margin-right: 12px;
 }
+
 .friend-name {
     flex-grow: 1;
 }

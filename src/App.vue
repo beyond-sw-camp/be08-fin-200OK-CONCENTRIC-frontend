@@ -1,9 +1,9 @@
 <script setup>
 import { computed } from "vue";
 import { useStore } from "vuex";
-import Sidenav from "./views/Sidenav/SidenavIndex.vue";
-import Configurator from "@/views/Chat/ChatView.vue";
-import Navbar from "@/views/Navbar/Navbar.vue";
+import Sidenav from "./views/sidenav/SidenavIndex.vue";
+import Configurator from "@/views/chat/ChatView.vue";
+import Navbar from "@/views/navbar/Navbar.vue";
 import {VueperSlides, VueperSlide} from "vueperslides";
 import AppFooter from "@/examples/FooterExample.vue";
 import ActiveUsersChart from "@/components/Charts/ActiveUsersChart.vue";
@@ -15,7 +15,7 @@ import FooterExample from "@/examples/FooterExample.vue";
 import Footer from "@/examples/FooterExample2.vue";
 import FooterExample2 from "@/examples/FooterExample2.vue";
 import Globe from "@/examples/Globe.vue";
-import ChatNotification from "./views/Chat/ChatComponents/ChatNotification.vue";
+import ChatNotification from "./views/chat/components/ChatNotification.vue";
 
 import { useStateStore } from "@/store/states";
 
@@ -61,6 +61,7 @@ const stateStore = useStateStore();
     <navbar :class="[navClasses]" v-if="showNavbar" />
 
 <router-view/>
+
 
     <app-footer v-show="showFooter" />
 

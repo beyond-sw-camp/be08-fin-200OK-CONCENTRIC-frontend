@@ -57,8 +57,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import Tasks from '@/views/Mainpage/TableComponents/Tasks.vue';
-import RightTopClock from '@/views/Navbar/RightTopClock.vue';
+import Tasks from '@/views/mainpage/components/Tasks.vue';
 import { Calendar, DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
 import WeekCalender from "@/views/Calender/WeekCalender.vue";

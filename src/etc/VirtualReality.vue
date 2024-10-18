@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, onBeforeMount, onBeforeUnmount } from "vue";
 import { useStore } from "vuex";
-import Sidenav from "@/views/Sidenav/SidenavIndex.vue";
+import Sidenav from "@/views/sidenav/SidenavIndex.vue";
 import AppFooter from "@/examples/FooterExample.vue";
-import Navbar from "@/views/Navbar/Navbar.vue";
+import Navbar from "@/views/navbar/Navbar.vue";
 import CardCalendar from "../views/components/CardCalendar.vue";
 import CardEmail from "../views/components/CardEmail.vue";
 import CardToDo from "../views/components/CardToDo.vue";

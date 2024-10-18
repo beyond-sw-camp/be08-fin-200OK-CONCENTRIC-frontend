@@ -3,13 +3,13 @@ import { computed, ref, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import Breadcrumbs from "../../examples/Breadcrumbs.vue";
-import SidenavProfile from "@/views/Sidenav/SidenavProfile.vue";
+import SidenavProfile from "@/views/sidenav/SidenavProfile.vue";
 
 import { useUserStore } from "@/store/user.js";
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useStateStore } from "@/store/states";
-import RightTopClock from "@/views/Navbar/RightTopClock.vue";
+import RightTopClock from "@/views/navbar/RightTopClock.vue";
 
 const showMenu = ref(false);
 const store = useStore();
@@ -24,6 +24,7 @@ const notifications = ref();
 const numOfNotifications = ref(0);
 const friendshipRequests = ref();
 const numOfFriendshipRequests = ref(0);
+const profileImage = ref();
 
 
 const currentRouteName = computed(() => {
@@ -117,10 +118,29 @@ const checkLogin = () => {
   return true;
 }
 
+const getProfileImage = async () => {
+  const path = userStore.userInfo['imageUrl'];
+  const response = await axios.post(`storage/image/profile`,
+      null,
+      {
+        params: {
+          path: path,
+        },
+        responseType: 'blob',
+      });
+  console.log(response.data);
+  profileImage.value =  URL.createObjectURL(response.data);
+}
+
+const gotoProfile = () => {
+  router.push("/profile");
+}
+
 onMounted(() => {
   if(!checkLogin()) return;
   loadNotifications();
   loadFriendshipRequest();
+  getProfileImage();
 });
 
 </script>
@@ -154,10 +174,7 @@ onMounted(() => {
         class="mt-2 collapse navbar-collapse mt-sm-0 me-md-0 me-sm-4"
         id="navbar"
       >
-        <div
-          class="pe-md-5 d-flex align-items-center"
-        >
-        </div>
+
         <ul class="navbar-nav justify-content-end">
           <li class="nav-item d-flex align-items-center">
             <button v-if="userStore.isLoggedIn"
@@ -271,7 +288,8 @@ onMounted(() => {
       <div class="input-group d-flex justify-content-center"
       style="
       padding: 1rem;
-      justify-content: center;"
+      justify-content: center;
+      width: 50%;"
       >
         <span class="input-group-text text-body">
           <i class="fas fa-search" aria-hidden="true"></i>
@@ -284,6 +302,17 @@ onMounted(() => {
       </div>
       <div>
         <right-top-clock/>
+      </div>
+      <div
+          class="pe-md-5 d-flex align-items-center"
+      >
+        <a href="javascript:;" @click="gotoProfile" class="profile-img-container">
+          <img
+              :src="profileImage"
+              class="profile-img rounded-circle img-fluid border border-2 border-white"
+              alt="Profile"
+          />
+        </a>
       </div>
     </div>
   </nav>
@@ -305,7 +334,19 @@ onMounted(() => {
   font-size: 0.5em;
 }
 
-
-
+  .profile-img-container {
+    width: 20%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    overflow: hidden;
+    display: block;
+    position: relative;
+  }
+  .profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
 
 </style>

@@ -14,18 +14,18 @@
         <!-- 채팅방 (ChatRoom) -->
         <div v-if="selectedChatRoom" class="chat-room-view">
             <ChatRoom :chat="selectedChatRoom" @close-chat-room="closeChatRoom" @select-file-list="openFileList"
-                @select-details="openChatRoomDetails" />
+                @select-details="openChatRoomDetails" @set-prevent-close="setPreventClose" />
         </div>
 
         <!-- 채팅방 상세 페이지 (ChatRoomDetails) -->
         <div v-if="selectedChatRoomDetails" class="chat-room-details-view">
             <ChatRoomDetails :chat="selectedChatRoom" @close-details="closeChatRoomDetails"
-                @chat-room-updated="updateChatName" />
+                @chat-room-updated="updateChatName" @set-prevent-close="setPreventClose" />
         </div>
 
         <!-- 파일함 (ChatFile) -->
         <div v-if="selectedFileList" class="file-list-view">
-            <ChatFile :chat="selectedChatRoom" @close-file-list="closeFileList" />
+            <ChatFile :chat="selectedChatRoom" @close-file-list="closeFileList" @set-prevent-close="setPreventClose" />
         </div>
     </div>
     </div>
@@ -39,10 +39,10 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from "vuex";
 
-import ChatRoom from './ChatComponents/ChatRoom.vue';
-import ChatFile from './ChatComponents/ChatFile.vue';
-import ChatList from './ChatComponents/ChatList.vue';
-import ChatRoomDetails from './ChatComponents/ChatRoomDetails.vue';
+import ChatRoom from './components/ChatRoom.vue';
+import ChatFile from './components/ChatFile.vue';
+import ChatList from './components/ChatList.vue';
+import ChatRoomDetails from './components/ChatRoomDetails.vue';
 
 const selectedChatRoom = ref(null);
 const selectedFileList = ref(false);
@@ -68,6 +68,11 @@ const handleClickOutside = (event) => {
     if (showChatView.value && chatViewContainer.value && !chatViewContainer.value.contains(event.target)) {
         closeChatView(); // 외부 클릭 시 창 닫기
     }
+};
+
+// preventClose를 true로 설정하는 함수
+const setPreventClose = () => {
+    preventClose = true;
 };
 
 onMounted(() => {

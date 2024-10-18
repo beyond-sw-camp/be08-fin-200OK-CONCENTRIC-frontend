@@ -91,7 +91,7 @@
         </table>
       </div>
     </div>
-    <AddSchedule
+    <AddTask
         :isVisible="modals.addTaskModal"
         @close="closeAddTaskModal"
         @confirm="handleAddTaskConfirm"
@@ -102,11 +102,11 @@
 <script>
 import { ref, reactive, computed, onMounted } from 'vue';
 import axios from 'axios';
-import AddSchedule from "@/views/Mainpage/TableComponents/AddSchedule.vue";
+import AddTask from "@/views/mainpage/components/AddTask.vue";
 
 export default {
   components: {
-    AddSchedule,
+    AddTask
   },
   setup() {
     const columns = ref([
@@ -125,7 +125,7 @@ export default {
     const selectAll = ref(false);
     const sortOrder = reactive({ key: '', order: 'asc' });
 
-    const fetchSchedules = async () => {
+    const fetchTasks = async () => {
       try {
         const response = await axios.get('/schedule/list');
         tasks.value = response.data;
@@ -255,7 +255,7 @@ export default {
       });
     };
 
-    onMounted(fetchSchedules);
+    onMounted(fetchTasks);
 
     return {
       columns,

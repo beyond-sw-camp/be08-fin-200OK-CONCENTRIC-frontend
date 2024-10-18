@@ -1,5 +1,5 @@
 //
-// Vertical navbar + Sidenav
+// Vertical navbar + sidenav
 //
 
 .navbar-vertical {
@@ -8,9 +8,9 @@
     max-width: 100%;
     max-height: 2rem;
   }
-  // Navbar navigaton
+  // navbar navigaton
   .navbar-nav {
-    // Navbar link
+    // navbar link
     .nav-link {
       padding-left: $navbar-padding-x;
       padding-right: $navbar-padding-x;
@@ -41,13 +41,13 @@
       }
     }
   }
-  // Navbar navigation
+  // navbar navigation
   .navbar-nav .nav-link {
     display: flex;
     align-items: center;
     white-space: nowrap;
   }
-  // Navbar heading
+  // navbar heading
   .navbar-heading {
     padding-top: $nav-link-padding-y;
     padding-bottom: $nav-link-padding-y;
@@ -97,7 +97,7 @@
           &.fixed-end {
             right: 0;
           }
-          // Navbar navigation
+          // navbar navigation
           .navbar-nav .nav-link {
             padding-top: $navbar-vertical-nav-link-padding-y !important;
             padding-bottom: $navbar-vertical-nav-link-padding-y !important;
@@ -188,14 +188,14 @@
     }
   }
 }
-// Sidenav + Main content transition
+// sidenav + Main content transition
 
 .main-content,
 .sidenav {
   transition: $transition-base;
 }
 //
-// Sidenav
+// sidenav
 //
 
 .sidenav {
@@ -249,7 +249,7 @@
     }
   }
 }
-// Sidenav states
+// sidenav states
 
 .g-sidenav-show {
   .sidenav {
@@ -337,7 +337,7 @@
     margin-top: 7.1875rem !important;
   }
 }
-// Navbar Vertical Extend
+// navbar Vertical Extend
 .navbar-vertical {
   .navbar-nav .nav-link[data-bs-toggle="collapse"] {
     &:after {
