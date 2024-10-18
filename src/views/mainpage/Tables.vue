@@ -50,17 +50,13 @@
       <span class="sr-only">Next</span>
     </a>
 
-    <!-- Clock Component -->
-    <div class="mt-5">
-      <RightTopClock />
-    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import Tasks from '@/views/mainpage/components/Tasks.vue';
-import RightTopClock from '@/views/mainpage/RightTopClock.vue';
+import RightTopClock from '@/views/navbar/RightTopClock.vue';
 import { Calendar, DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
 
