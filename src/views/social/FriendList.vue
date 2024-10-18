@@ -49,6 +49,7 @@ const getProfileImage = (imageString) => {
 onMounted(() => {
   getFriends();
 });
+
 </script>
 
 <style scoped>

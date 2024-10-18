@@ -1,7 +1,7 @@
 <template>
   <div class="card card-profile" style="box-shadow: none; ">
     <img
-        src="../../assets/img/bg-profile.jpg"
+        :src="background"
         alt="Image placeholder"
     />
     <div class="row justify-content-center">
@@ -34,17 +34,20 @@
     <div class="card-body pt-0">
       <div class="text-center mt-4">
         <h5>
-          Mark Davis
-          <span class="font-weight-light">, 35</span>
+          {{ userStore.userInfo['nickname'] }}
+<!--          <span class="font-weight-light">, 35</span>-->
         </h5>
-        <div class="h6 font-weight-300">
-          <i class="ni location_pin mr-2"></i>Bucharest, Romania
-        </div>
+<!--        <div class="h6 font-weight-300">-->
+<!--          <i class="ni location_pin mr-2"></i>Bucharest, Romania-->
+<!--        </div>-->
         <div class="h6 mt-4">
-          <i class="ni business_briefcase-24 mr-2"></i>Solution Manager - Creative Tim Officer
+          <i class="ni business_briefcase-24 mr-2"></i>{{ userStore.userInfo['content'] }}
         </div>
-        <div>
-          <i class="ni education_hat mr-2"></i>University of Computer Science
+<!--        <div>-->
+<!--          <i class="ni education_hat mr-2"></i>University of Computer Science-->
+<!--        </div>-->
+        <div class="h6 mt-4">
+          <i class="ni business_briefcase-24 mr-2"></i>가입일 : {{ userStore.userInfo['createDate'] }}
         </div>
       </div>
     </div>
@@ -56,10 +59,12 @@ import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
 import {onMounted, ref} from 'vue';
 import axios from 'axios';
 import { useUserStore } from "@/store/user";
+import backend from "three/src/renderers/common/Backend";
 
 const userStore = useUserStore();
 // const imageUrl = ref(require('../../assets/img/team-2.jpg'));
 const imageUrl = ref("");
+const background = ref("");
 
 const triggerFileInput = () => {
   document.querySelector('input[type="file"]').click();
@@ -94,8 +99,26 @@ const getProfileImage = async (fileUrl) => {
   }
 };
 
+const getBackGroundImage = async (fileUrl) => {
+  try {
+    const response = await axios.post('storage/image/profile',
+        null,
+        {
+          params: {
+            path: userStore.userInfo['background'],
+          },
+          responseType: 'blob',
+        },
+    );
+    background.value = URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 onMounted(() => {
   getProfileImage();
+  getBackGroundImage();
 });
 </script>
 <style scoped>

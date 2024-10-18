@@ -44,7 +44,7 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <div class="container-fluid">
+  <div class="container-fluid" style="height: 150vh">
     <nav class="navbar navbar-expand-lg bg-body-tertiary" style="box-shadow: none;">
       <!-- navbar Content -->
     </nav>
