@@ -27,6 +27,10 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    const updateUser = (user) => {
+        state.userInfo = user;
+    }
+
     const userInfo = computed(() => state.userInfo);
     const isLoggedIn = computed(() => state.isLoggedIn);
     const accessToken = computed(() => state.accessToken);
@@ -36,6 +40,7 @@ export const useUserStore = defineStore('user', () => {
         setUser,
         clearUser, 
         setToken,
+        updateUser,
         userInfo,
         isLoggedIn,
         accessToken,

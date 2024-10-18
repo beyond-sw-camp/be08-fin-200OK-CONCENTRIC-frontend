@@ -54,7 +54,7 @@
           <argon-input
               id="nickname"
               type="text"
-              :model-value="nickname"
+              v-model="nickname"
           />
         </div>
         <div class="col-md-12">
@@ -62,12 +62,12 @@
           <argon-input
               id="introduction"
               type="text"
-              :model-value="introduction"
+              v-model="introduction"
           />
         </div>
         <div class="d-flex justify-content-start" style="margin-top: 20px;">
           <argon-button @click="confirmUpdate">수정 완료</argon-button>
-          <argon-button @click="confirmUpdate" style="margin-left: 50px;">비밀번호 변경</argon-button>
+          <argon-button @click="confirmUpdatePassword" style="margin-left: 50px;">비밀번호 변경</argon-button>
         </div>
 
       </div>
@@ -93,11 +93,14 @@ const imageUrl = ref("");
 const background = ref("");
 const backgroundInput = ref(null);
 const profileInput = ref(null);
-const name = ref();
-const email = ref();
-const createDate = ref();
-const nickname = ref();
-const introduction = ref();
+const name = ref("");
+const email = ref("");
+const createDate = ref("");
+const nickname = ref("");
+const introduction = ref("");
+
+const profileFile = ref(null);
+const backgroundFile = ref(null);
 
 const getProfileImage = async () => {
   try {
@@ -147,30 +150,23 @@ const triggerBackgroundInput = () => {
 
 const onProfileFileChange = (event) => {
   const file = event.target.files[0];
-  console.log(file);
   if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imageUrl.value = e.target.result; // 선택된 이미지로 URL 변경
-    };
-    reader.readAsDataURL(file);
+    imageUrl.value = URL.createObjectURL(file); // 파일 URL로 변경
+    profileFile.value = file; // 파일 객체를 저장
   }
 };
 
 const onBackGroundFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      background.value = e.target.result; // 선택된 이미지로 URL 변경
-    };
-    reader.readAsDataURL(file);
+    background.value = URL.createObjectURL(file); // 파일 URL로 변경
+    backgroundFile.value = file; // 파일 객체를 저장
   }
 };
 
 const confirmUpdate = () => {
   if (confirm("수정 사항을 저장하시겠습니까?")) {
-    // 저장 로직 추가
+    updateUser();
     alert("수정 완료!");
   }
 };
@@ -179,6 +175,33 @@ const confirmWithdrawal = () => {
   if (confirm("정말로 탈퇴하시겠습니까?")) {
     // 탈퇴 로직 추가
     alert("회원 탈퇴가 완료되었습니다.");
+  }
+};
+
+const updateUser = async () => {
+  const formData = new FormData();
+  const user = {
+    nickname: nickname.value,
+    content: introduction.value,
+  };
+  console.log(user);
+  formData.append("user", JSON.stringify(user));
+  formData.append("profile", profileFile.value);
+  formData.append("background", backgroundFile.value);
+  console.log(introduction.value);
+  try {
+    const response = await axios.put('/member/update',
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
+    );
+    console.log(response.data);
+    userStore.updateUser(response.data);
+  } catch (error) {
+    console.error(error);
   }
 };
 
