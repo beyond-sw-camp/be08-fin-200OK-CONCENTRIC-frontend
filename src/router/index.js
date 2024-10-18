@@ -4,7 +4,7 @@ import Tables from "../views/mainpage/Tables.vue";
 import Billing from "../etc/Billing.vue";
 import VirtualReality from "../etc/VirtualReality.vue";
 import RTL from "../etc/Rtl.vue";
-import Profile from "../views/profile/ProfileCard.vue";
+import Profile from "../views/profile/Profile.vue";
 import Signin from "../views/sign/Signin.vue";
 import ChatView from "../views/chat/ChatView.vue";
 import Social from "@/views/social/FriendList.vue";

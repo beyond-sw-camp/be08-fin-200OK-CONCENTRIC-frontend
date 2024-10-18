@@ -10,23 +10,18 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useStateStore } from "@/store/states";
 import RightTopClock from "@/views/navbar/RightTopClock.vue";
-
 const showMenu = ref(false);
 const store = useStore();
 const isRTL = computed(() => store.state.isRTL);
-
 const route = useRoute();
 const userStore = useUserStore();
 const router = useRouter();
 const stateStore = useStateStore();
-
 const notifications = ref();
 const numOfNotifications = ref(0);
 const friendshipRequests = ref();
 const numOfFriendshipRequests = ref(0);
 const profileImage = ref();
-
-
 const currentRouteName = computed(() => {
   return route.name;
 });
@@ -34,20 +29,16 @@ const currentDirectory = computed(() => {
   let dir = route.path.split("/")[1];
   return dir.charAt(0).toUpperCase() + dir.slice(1);
 });
-
 const minimizeSidebar = () => store.commit("sidebarMinimize");
 const toggleConfigurator = () => store.commit("toggleConfigurator");
-
 const closeMenu = () => {
   setTimeout(() => {
     showMenu.value = false;
   }, 100);
 };
-
 const toggleDropdown = () => {
   showMenu.value = true;
 }
-
 const logout = async () => {
   try{
     const response = await axios.post(
@@ -75,7 +66,6 @@ const logout = async () => {
   //   console.log(response.headers.authorization);
   // }
 }
-
 const loadNotifications = async () => {
   const response = await axios.get('/notification/list',
       {validateStatus: false}
@@ -87,18 +77,15 @@ const loadNotifications = async () => {
     if(!notification.isRead) numOfNotifications.value += 1;
   });
 }
-
 const updateRead = (notification) => {
   notification.isRead = !notification.isRead;
   if(notification.isRead) numOfNotifications.value -= 1;
   else numOfNotifications.value += 1;
   updateReadApi(notification);
 }
-
 const updateReadApi = async (notification) => {
   const response = await axios.put(`/notification/read/${notification.id}`);
 }
-
 const loadFriendshipRequest = async () => {
   const response = await axios.get('/friendship/request/list',
       {validateStatus: false}
@@ -107,7 +94,6 @@ const loadFriendshipRequest = async () => {
   numOfFriendshipRequests.value = friendshipRequests.value.length;
 
 }
-
 const checkLogin = () => {
   console.log("checkLogin");
 
@@ -117,7 +103,6 @@ const checkLogin = () => {
   }
   return true;
 }
-
 const getProfileImage = async () => {
   const path = userStore.userInfo['imageUrl'];
   const response = await axios.post(`storage/image/profile`,
@@ -131,7 +116,6 @@ const getProfileImage = async () => {
   console.log(response.data);
   profileImage.value =  URL.createObjectURL(response.data);
 }
-
 const gotoProfile = () => {
   router.push("/profile");
 }
@@ -142,8 +126,8 @@ onMounted(() => {
   loadFriendshipRequest();
   getProfileImage();
 });
-
 </script>
+
 <template>
   <nav
     class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
@@ -300,9 +284,6 @@ onMounted(() => {
             :placeholder="isRTL ? 'أكتب هنا...' : 'Type here...'"
         />
       </div>
-      <div>
-        <right-top-clock/>
-      </div>
       <div
           class="pe-md-5 d-flex align-items-center"
       >
@@ -314,7 +295,12 @@ onMounted(() => {
           />
         </a>
       </div>
+      <div class="d-flex align-items-center">
+            <right-top-clock/>
+      </div>
+
     </div>
+
   </nav>
 </template>
 <style scoped>
@@ -342,11 +328,14 @@ onMounted(() => {
     display: block;
     position: relative;
   }
+
   .profile-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
   }
-
+  .navbar{
+    //background-color: #1a2035;
+  }
 </style>

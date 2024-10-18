@@ -1,7 +1,8 @@
 <template>
-  <div class="clock-container col-2" :style="clockStyle" @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
-    <div class="date col ">{{ formattedDate }}</div>
-    <div class="day col">{{ formattedDay }}</div>
+  <div class="clock-container">
+<!--    <div>{{ formattedTime }}</div>-->
+    <div style="white-space: nowrap">{{ formattedDate }}</div>
+    <div>{{ formattedDay }}</div>
   </div>
 </template>
 
@@ -32,7 +33,7 @@ const updateTime = () => {
 
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  formattedDate.value = `${month}-${day}`;
+  formattedDate.value = `${month}.${day}`;
 
   formattedDay.value = WEEKDAYS[date.getDay()];
 };
@@ -52,14 +53,6 @@ onUnmounted(() => {
   clearInterval(updateInterval);
 });
 
-// 마우스 움직임에 따라 시계의 기울기를 업데이트
-const handleMouseMove = (event) => {
-  const rect = event.currentTarget.getBoundingClientRect();
-  const offsetX = event.clientX - rect.left;
-  const offsetY = event.clientY - rect.top;
-  mouseX.value = ((offsetX / rect.width) - 0.5) * 60;
-  mouseY.value = ((offsetY / rect.height) - 0.5) * -60;
-};
 
 // 마우스가 시계 위에 없을 때의 처리
 const handleMouseLeave = () => {
@@ -67,52 +60,21 @@ const handleMouseLeave = () => {
   mouseY.value = 0;
 };
 
-// computed 스타일
-const clockStyle = computed(() => {
-  return {
-    transform: `rotateX(${mouseY.value}deg) rotateY(${mouseX.value}deg)`
-  };
-});
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .clock-container {
-  position: fixed;
-  top: 20px;
-  right: 40px;
+  font-size: 3rem;
   display: flex;
+  justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0); /* 투명 배경 */
-  padding: 10px;
-  border-radius: 12px;
-  font-family: 'Consolas', sans-serif;
-  color: #ffffff; /* 흰색 텍스트 */
-  z-index: 10;
-  text-align: right;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  gap: 20px;
+  font-family: 'Inter', sans-serif;
 }
 
-.clock-container:hover {
-  transform: scale(1.05);
-  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.5);
-}
-
-.time {
-  font-size: 30px; /* 시간 폰트 크게 */
-  font-weight: bold;
-  line-height: 1;
-  margin-right: 10px;
-}
-
-.date-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.date,
-.day {
-  font-size: 20px; /* 날짜와 요일 폰트 사이즈 동일하게 설정 */
-  font-weight: normal;
+.clock-container div {
+  white-space: nowrap;
 }
 </style>

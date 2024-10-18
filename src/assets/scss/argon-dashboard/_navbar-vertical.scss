@@ -213,14 +213,7 @@
     .sidenav-toggler {
       padding: 1.5rem;
     }
-    //사이드바가 열릴 때 메인콘텐츠 이동 코드 주석 처리
-    //&.fixed-start + .main-content {
-    //  margin-left: $navbar-vertical-open-width + 1.5;
-    //}
-    //
-    //&.fixed-end + .main-content {
-    //  margin-right: $navbar-vertical-open-width + 1.5;
-    //}
+
   }
 
   .navbar-heading .docs-mini {

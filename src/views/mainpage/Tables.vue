@@ -18,20 +18,7 @@
     </div>
     <div v-else-if="currentView === 'calendar'" class="card calendar-container mx-5 mt-0 p-3 shadow-sm" style="min-height: 600px;">
       <div class="card-body">
-        <Calendar
-            ref="calendar"
-            :initial-page="initialPage"
-            :color="selectedColor"
-            :attributes="attrs"
-            transparent
-            borderless
-            expanded
-        />
-        <div class="w-full px-4 pb-3 mt-3">
-          <button class="btn btn-primary w-100" @click="moveToday">
-            Today
-          </button>
-        </div>
+        <CalenderView />
       </div>
       <week-calender/>
     </div>
@@ -48,17 +35,16 @@
       <span class="sr-only">Next</span>
     </a>
 
-    <!-- Clock Component -->
-<!--    <div class="mt-5">-->
-<!--      <RightTopClock />-->
-<!--    </div>-->
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import {ref} from 'vue';
 import Tasks from '@/views/mainpage/components/Tasks.vue';
+import RightTopClock from '@/views/navbar/RightTopClock.vue';
 import { Calendar, DatePicker } from 'v-calendar';
+import 'v-calendar/style.css';
+import CalenderView from "@/views/calender/CalenderView.vue";
 import 'v-calendar/style.css';
 import WeekCalender from "@/views/Calender/WeekCalender.vue";
 
