@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useStore } from "vuex";
 import SidenavList from "./SidenavList.vue";
-import SidenavProfile from "@/views/Sidenav/SidenavProfile.vue";
+import SidenavProfile from "@/views/sidenav/SidenavProfile.vue";
 // import logo from "@/assets/img/logo-ct-dark.png";
 // import logoWhite from "@/assets/img/logo-ct.png";
 

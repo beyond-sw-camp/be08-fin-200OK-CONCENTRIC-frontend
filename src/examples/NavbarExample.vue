@@ -16,7 +16,7 @@ defineProps({
 });
 </script>
 <template>
-  <!-- Navbar -->
+  <!-- navbar -->
   <nav
     class="navbar navbar-expand-lg top-0 z-index-3 position-absolute mt-4"
     :class="isBlur ? isBlur : 'shadow-none my-2 navbar-transparent w-100'"
@@ -103,5 +103,5 @@ defineProps({
       </div>
     </div>
   </nav>
-  <!-- End Navbar -->
+  <!-- End navbar -->
 </template>

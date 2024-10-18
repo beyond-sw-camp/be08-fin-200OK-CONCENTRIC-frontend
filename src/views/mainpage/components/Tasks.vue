@@ -102,7 +102,7 @@
 <script>
 import { ref, reactive, computed, onMounted } from 'vue';
 import axios from 'axios';
-import AddSchedule from "@/views/Mainpage/TableComponents/AddSchedule.vue";
+import AddSchedule from "@/views/mainpage/components/AddSchedule.vue";
 
 export default {
   components: {

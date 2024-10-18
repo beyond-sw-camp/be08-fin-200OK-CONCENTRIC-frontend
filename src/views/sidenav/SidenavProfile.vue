@@ -27,7 +27,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import DropdownItems from "@/views/Sidenav/DropdownItems.vue";
+import DropdownItems from "@/views/sidenav/DropdownItems.vue";
 const toggleMenu = () => {
   showMenu.value = !showMenu.value;
 };

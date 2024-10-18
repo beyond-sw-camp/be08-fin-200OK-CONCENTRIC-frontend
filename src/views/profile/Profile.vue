@@ -4,8 +4,8 @@ import { useStore } from "vuex";
 
 import setNavPills from "@/assets/js/nav-pills.js";
 import setTooltip from "@/assets/js/tooltip.js";
-import ProfileCard from "@/views/Profile/ProfileCard.vue";
-import ProfileEdit from "@/views/Profile/ProfileEdit.vue";
+import ProfileCard from "@/views/profile/ProfileCard.vue";
+import ProfileEdit from "@/views/profile/ProfileEdit.vue";
 import PrivateStorage from "@/views/storage/PrivateStorage.vue";
 import FriendList from "@/views/social/FriendList.vue";
 import NotificationList from "@/views/notification/NotificationList.vue";
@@ -44,9 +44,9 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <div class="container-fluid">
+  <div class="container-fluid" style="height: 150vh">
     <nav class="navbar navbar-expand-lg bg-body-tertiary" style="box-shadow: none;">
-      <!-- Navbar Content -->
+      <!-- navbar Content -->
     </nav>
     <div class="row" style="margin-top: 10%;">
       <div class="col-md-2">

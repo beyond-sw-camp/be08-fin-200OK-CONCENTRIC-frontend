@@ -99,7 +99,7 @@ const darkMode = () => {
             ></span>
           </div>
         </a>
-        <!-- Sidenav Type -->
+        <!-- sidenav Type -->
         <div class="mt-3">
           <h6 class="mb-0">Sidenav Type</h6>
           <p class="text-sm">Choose between 2 different sidenav types.</p>
@@ -133,8 +133,8 @@ const darkMode = () => {
         <p class="mt-2 text-sm d-xl-none d-block">
           You can change the sidenav type just on desktop view.
         </p>
-        <!-- Navbar Fixed -->
-        <!-- Navbar Fixed -->
+        <!-- navbar Fixed -->
+        <!-- navbar Fixed -->
         <div class="mt-3 d-flex">
           <h6 class="mb-0">Navbar Fixed</h6>
           <div class="form-check form-switch ps-0 ms-auto my-auto">

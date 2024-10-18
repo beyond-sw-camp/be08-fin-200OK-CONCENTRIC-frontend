@@ -3,10 +3,10 @@
     <h2 class="friend-list-title">친구 목록</h2>
     <div class="friend-cards">
       <div class="friend-card" v-for="friend in friends" :key="friend.id">
-        <img :src="friend.profileImage" alt="Profile Image" class="friend-image" />
+        <img :src="getProfileImage(friend.profileImage)" alt="Profile Image" class="friend-image"/>
         <div class="friend-info">
-          <h5 class="friend-name">{{ friend.name }}</h5>
-          <p class="friend-status">{{ friend.status }}</p>
+          <h5 class="friend-name">{{ friend.nickname }}</h5>
+<!--          <p class="friend-status">{{ friend.status }}</p>-->
         </div>
       </div>
     </div>
@@ -14,14 +14,42 @@
 </template>
 
 <script setup>
-import {ref} from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
-const friends = ref([
-  {id: 1, name: '홍길동', status: '온라인', profileImage: 'path/to/image1.jpg'},
-  {id: 2, name: '이순신', status: '오프라인', profileImage: 'path/to/image2.jpg'},
-  {id: 3, name: '김유신', status: '온라인', profileImage: 'path/to/image3.jpg'},
-  // 더 많은 친구들 추가...
-]);
+const friends = ref();
+
+const getFriends = async () => {
+  try {
+    const response = await axios.get('friendship/list');
+    friends.value = response.data;
+  }catch(err) {
+    console.log(err);
+  }
+  console.log(friends.value);
+};
+
+const getProfileImage = (imageString) => {
+  if(imageString == null){
+    return require('@/assets/img/애옹.png');
+  }
+  const byteCharacters = atob(imageString);
+  const byteNumbers = new Array(byteCharacters.length);
+
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: 'image' });
+  return URL.createObjectURL(blob);
+};
+
+
+onMounted(() => {
+  getFriends();
+});
+
 </script>
 
 <style scoped>
