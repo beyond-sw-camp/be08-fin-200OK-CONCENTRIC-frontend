@@ -59,8 +59,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import Tasks from '@/views/Mainpage/TableComponents/Tasks.vue';
-import RightTopClock from '@/views/Mainpage/RightTopClock.vue';
+import Tasks from '@/views/mainpage/components/Tasks.vue';
+import RightTopClock from '@/views/mainpage/RightTopClock.vue';
 import { Calendar, DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
 

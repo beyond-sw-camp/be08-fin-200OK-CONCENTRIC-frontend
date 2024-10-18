@@ -3,7 +3,7 @@ import { computed, ref, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import Breadcrumbs from "../../examples/Breadcrumbs.vue";
-import SidenavProfile from "@/views/Sidenav/SidenavProfile.vue";
+import SidenavProfile from "@/views/sidenav/SidenavProfile.vue";
 
 import { useUserStore } from "@/store/user.js";
 import axios from 'axios';
