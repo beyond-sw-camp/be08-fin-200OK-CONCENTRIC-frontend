@@ -13,6 +13,7 @@
             <li v-for="(chat, index) in sortedChatRooms" :key="index" @click="goToChatRoom(chat)"
                 class="chat-list-item">
                 <img :src="chat.profileImage" class="profile-image" />
+                <span v-if="chat.unreadCount > 0" class="notification-badge">{{ chat.unreadCount }}</span>
                 <div class="chat-info">
                     <h4 class="chat-name">{{ chat.nickname }}</h4>
                     <p class="chat-last-message">{{ chat.lastMessage }}</p>
@@ -36,7 +37,7 @@
 
                 <ul class="friend-list-body">
                     <li v-for="friend in friends" :key="friend.id" class="friend-list-item">
-                        <img :src="friend.profileImage" class="profile-image" />
+                        <img :src="getFriendsProfileImage(friend.profileImage)" class="profile-image" />
                         <span class="friend-name">{{ friend.nickname }}</span>
                         <button @click="addPrivateChat(friend)" class="friend-list-select">
                             추가
@@ -53,6 +54,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/store/user';
 const userStore = useUserStore();
+const loggedInMemberId = computed(() => userStore.userInfo.id);
 const accessToken = userStore.accessToken;
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
@@ -85,6 +87,7 @@ const chatListApi = async () => {
         const res = response.data.map(chatroom => ({
             ...chatroom,
             profileImage: null,
+            unreadCount: 0,
         }));
         chat.value = res;
 
@@ -197,6 +200,15 @@ const subscribeChatRoom = (chatRooms) => {
             stompClient.value.subscribe(`/sub/chat/${room.chatRoomId}`, (message) => {
                 const receivedMessage = JSON.parse(message.body);
 
+                // 해당 채팅방의 알림 카운트 증가
+                const chatRoomIndex = chat.value.findIndex(c => c.chatRoomId === room.chatRoomId);
+                if (chatRoomIndex !== -1) {
+                    if (receivedMessage.memberId === loggedInMemberId.value) {
+                        return;
+                    }
+                    chat.value[chatRoomIndex].unreadCount += 1;  // 알림 카운트 증가
+                }
+
                 notificationStore.showNotification(receivedMessage.memberId, `${receivedMessage.nickname}: ${receivedMessage.message}`, 2000);
             });
 
@@ -209,45 +221,42 @@ const subscribeChatRoom = (chatRooms) => {
 };
 
 
-const goToChatRoom = (chat) => {
-    emit("select-chat-room", chat);
+const goToChatRoom = (chatRoom) => {
+    // 선택한 채팅방의 unreadCount 초기화
+    const chatRoomIndex = chat.value.findIndex(c => c.chatRoomId === chatRoom.chatRoomId);
+    if (chatRoomIndex !== -1) {
+        chat.value[chatRoomIndex].unreadCount = 0;  // 알림 카운트 초기화
+    }
+    emit("select-chat-room", chatRoom);
 };
 
 const openFriendList = () => {
-    showFriendList.value = !showFriendList.value;
     getFriendListApi();
+    showFriendList.value = !showFriendList.value;
 };
 
 // 친구 목록 조회
 const getFriendListApi = async () => {
     try {
-        const response = await axios.get("/friendship/list/accept",
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-        const res = response.data.map(friend => ({
-            ...friend,
-            profileImage: null,
-        }));
-        friends.value = res;
-
-        await Promise.all(
-            friends.value.map(async (friend, index) => {
-                if (friend.imageUrl) {
-                    try {
-                        const profileImage = await getProfileImage(friend.imageUrl);
-                        friends.value[index].profileImage = profileImage;
-                    } catch (error) {
-                        console.error("이미지를 불러오는 데 실패했습니다.", error);
-                    }
-                }
-            })
-        );
+        const response = await axios.get("/friendship/list");
+        friends.value = response.data;
+        console.log(friends.value)
     } catch (err) {
         console.error("친구 목록을 가져오는데 실패했습니다.", err);
     }
+};
+
+const getFriendsProfileImage = (imageString) => {
+    const byteCharacters = atob(imageString);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'image' });
+    return URL.createObjectURL(blob);
 };
 
 // 채팅 추가
@@ -274,6 +283,7 @@ const addPrivateChat = async (friend) => {
 const closeFriendList = () => {
     showFriendList.value = false;
 };
+
 
 </script>
 
@@ -332,6 +342,20 @@ const closeFriendList = () => {
     height: 40px;
     border-radius: 40%;
     margin-right: 12px;
+}
+
+.notification-badge {
+    position: relative;
+    top: 0;
+    right: 0;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 5px;
+    font-size: 12px;
+    min-width: 20px;
+    min-height: 20px;
+    text-align: center;
 }
 
 .friend-name {

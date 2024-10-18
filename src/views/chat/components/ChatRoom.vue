@@ -20,6 +20,7 @@
             <div v-for="(chatMessage, index) in chatMessages" :key="index"
                 :class="['chat-message', chatMessage.memberId === loggedInMemberId || chatMessage.sentByMe ? 'my-message' : 'partner-message']">
                 <a class="chat-message-nickname">{{ chatMessage.nickname }}</a>
+                <a class="chat-message-date">{{ formatTime(chatMessage.createAt) }}</a>
                 <div class="message-bubble">
                     <p v-if="chatMessage.message" class="chat-message-text">{{ chatMessage.message }}</p>
                     <template v-else-if="chatMessage.fileName">
@@ -46,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from 'vue';
+import { ref, onMounted, computed, watch, nextTick} from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/store/user';
 import SockJS from "sockjs-client";
@@ -93,8 +94,10 @@ const chatMessageListApi = async () => {
         chatMessages.value = res;
         await Promise.all(
             chatMessages.value.map(async (chatMessage, index) => {
-                const chatImage = await getImage(chatMessage.fileId);
-                        chatMessages.value[index].chatImage = chatImage;
+                if (isImage(chatMessage.fileName)) {
+                    const chatImage = await getImage(chatMessage.fileId);
+                    chatMessages.value[index].chatImage = chatImage;
+                }
             })
         );
         scrollToBottom();
@@ -130,11 +133,19 @@ const connectToChatRoom = () => {
     stompClient.value = Stomp.over(socket);
 
     stompClient.value.connect({ Authorization: `${accessToken}` }, () => {
+        scrollToBottom();
         // 채팅방 구독 설정
         stompClient.value.subscribe(`/sub/chat/${props.chat.chatRoomId}`, (message) => {
             const receivedMessage = JSON.parse(message.body);
             chatMessages.value = [...chatMessages.value, receivedMessage];
-            scrollToBottom();
+            chatMessages.value.map(async (chatMessage, index) => {
+                if (isImage(chatMessage.fileName)) {
+                    const chatImage = await getImage(chatMessage.fileId);
+                    chatMessages.value[index].chatImage = chatImage;
+                    }
+                }
+            );
+            chatMessages.value = [...chatMessages.value, receivedMessage];
         });
     });
 };
@@ -166,9 +177,12 @@ const sendMessage = async () => {
 
 // 이미지와 일반 파일 분리
 const isImage = (fileName) => {
-    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
-    const extension = fileName.split('.').pop().toLowerCase();
-    return imageExtensions.includes(extension);
+    if (fileName && typeof fileName === 'string') {
+        const extension = fileName.split('.').pop().toLowerCase();
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+        return imageExtensions.includes(extension);
+    }
+    return false;  // fileName이 없으면 false 반환
 };
 
 // 파일 다운로드(나중에 api로 original 이름 추출..해야할 듯)
@@ -223,6 +237,7 @@ const getImage = async (fileId) => {
         );
         console.log(response.data);
         imageSrc.value = URL.createObjectURL(response.data);
+        scrollToBottom();
         return imageSrc.value
     } catch (err) {
         console.error("이미지를 불러오는데 실패했습니다.", err);
@@ -261,6 +276,15 @@ const scrollToBottom = async () => {
     if (messageContainer.value) {
         messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
     }
+};
+
+const formatTime = (dateString) => {
+    if (dateString && typeof dateString === 'string') {
+        const timePart = dateString.split('T')[1];
+        const [hours, minutes] = timePart.split(':');
+        return `${hours}:${minutes}`;
+    }
+    return '';
 };
 
 const closeChatRoom = () => {
@@ -366,6 +390,7 @@ const goToDetails = () => {
     display: block;
     margin-top: -25px;
     font-size: 14px;
+    color: #444;
 }
 
 .chat-message-file {
@@ -375,10 +400,31 @@ const goToDetails = () => {
 
 .partner-message {
     justify-content: flex-start;
+    order: 1;
 }
 
 .my-message {
     justify-content: flex-end;
+}
+
+.my-message .chat-message-date {
+    position: relative;
+    display: block;
+    font-size: 10px;
+    margin-right: 2%;
+    margin-top: 4%;
+    color: #666;
+}
+
+.partner-message .chat-message-date {
+    position: relative;
+    display: block;
+    font-size: 10px;
+    text-align: right;
+    margin-left: 2%;
+    margin-top: 4%;
+    order: 2;
+    color: #666;
 }
 
 .message-bubble {
