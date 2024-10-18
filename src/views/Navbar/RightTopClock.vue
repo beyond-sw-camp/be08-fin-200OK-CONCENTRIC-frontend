@@ -1,12 +1,10 @@
 <template>
-  <div class="clock-container" :style="clockStyle" @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
-    <div class="time">{{ formattedTime }}</div>
-    <div class="date-container">
-      <div class="date">{{ formattedDate }}</div>
-      <div class="day">{{ formattedDay }}</div>
-    </div>
+  <div class="clock-container col-2" :style="clockStyle" @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
+    <div class="date col ">{{ formattedDate }}</div>
+    <div class="day col">{{ formattedDay }}</div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';

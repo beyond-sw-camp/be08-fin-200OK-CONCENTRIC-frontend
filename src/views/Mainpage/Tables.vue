@@ -32,10 +32,8 @@
             Today
           </button>
         </div>
-        <div class="mt-3">
-          <DatePicker v-model="date" />
-        </div>
       </div>
+      <week-calender/>
     </div>
 
     <!-- Right arrow (fixed) -->
@@ -51,18 +49,19 @@
     </a>
 
     <!-- Clock Component -->
-    <div class="mt-5">
-      <RightTopClock />
-    </div>
+<!--    <div class="mt-5">-->
+<!--      <RightTopClock />-->
+<!--    </div>-->
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import Tasks from '@/views/Mainpage/TableComponents/Tasks.vue';
-import RightTopClock from '@/views/Mainpage/RightTopClock.vue';
+import RightTopClock from '@/views/Navbar/RightTopClock.vue';
 import { Calendar, DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
+import WeekCalender from "@/views/Calender/WeekCalender.vue";
 
 // State variables
 const currentView = ref('tasks');

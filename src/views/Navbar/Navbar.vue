@@ -9,6 +9,7 @@ import { useUserStore } from "@/store/user.js";
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useStateStore } from "@/store/states";
+import RightTopClock from "@/views/Navbar/RightTopClock.vue";
 
 const showMenu = ref(false);
 const store = useStore();
@@ -133,6 +134,20 @@ onMounted(() => {
   >
     <div class="px-3 py-1 ms-0 d-flex align-items-center justify-content-between" style="padding-left: 0; width: 100%; display: flex">
       <div>
+        <a
+            href="#"
+            @click="minimizeSidebar"
+            class="p-0 nav-link text-white"
+            id="iconNavbarSidenav"
+        >
+          <div class="sidenav-toggler-inner">
+            <i class="sidenav-toggler-line bg-white"></i>
+            <i class="sidenav-toggler-line bg-white"></i>
+            <i class="sidenav-toggler-line bg-white"></i>
+          </div>
+        </a>
+      </div>
+      <div>
         <sidenav-profile/>
       </div>
       <div
@@ -154,20 +169,7 @@ onMounted(() => {
               <span class="d-sm-inline d-none">Logout</span>
             </button>
           </li>
-          <li class="nav-item ps-3 d-flex align-items-center">
-            <a
-              href="#"
-              @click="minimizeSidebar"
-              class="p-0 nav-link text-white"
-              id="iconNavbarSidenav"
-            >
-              <div class="sidenav-toggler-inner">
-                <i class="sidenav-toggler-line bg-white"></i>
-                <i class="sidenav-toggler-line bg-white"></i>
-                <i class="sidenav-toggler-line bg-white"></i>
-              </div>
-            </a>
-          </li>
+
           <li class="px-3 nav-item d-flex align-items-center">
             <a class="p-0 nav-link text-white" @click="toggleConfigurator">
               <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav"></i>
@@ -231,7 +233,18 @@ onMounted(() => {
           </li>
           <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
             <a
-                href="#"
+                href="/profile"
+                class="p-0 nav-link text-white"
+                aria-expanded="false"
+                style="border: none; background-color: transparent;"
+            >
+              <i class="fa fa-user"></i>
+              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
+            </a>
+          </li>
+          <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
+            <a
+                href="/social"
                 class="p-0 nav-link text-white"
                 @click="stateStore.toggleSocial"
                 aria-expanded="false"
@@ -241,7 +254,17 @@ onMounted(() => {
               <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
             </a>
           </li>
-
+          <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
+            <a
+                href="/storage/private"
+                class="p-0 nav-link text-white"
+                aria-expanded="false"
+                style="border: none; background-color: transparent;"
+            >
+              <i class="fa fa-archive"></i>
+              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
+            </a>
+          </li>
         </ul>
 
       </div>
@@ -258,6 +281,9 @@ onMounted(() => {
             class="form-control"
             :placeholder="isRTL ? 'أكتب هنا...' : 'Type here...'"
         />
+      </div>
+      <div>
+        <right-top-clock/>
       </div>
     </div>
   </nav>
