@@ -7,14 +7,14 @@
     <div class="row justify-content-center">
       <div class="col-4 col-lg-4 order-lg-2">
         <div class="mt-n4 mt-lg-4 mb-4 mb-lg-0">
-          <a href="javascript:;" @click="triggerFileInput" class="profile-img-container">
+
             <!-- 이미지 바인딩 -->
             <img
                 :src="imageUrl"
                 class="profile-img rounded-circle img-fluid border border-2 border-white"
                 alt="Profile"
             />
-          </a>
+
           <input
               type="file"
               ref="fileInput"
@@ -59,28 +59,10 @@ import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
 import {onMounted, ref} from 'vue';
 import axios from 'axios';
 import { useUserStore } from "@/store/user";
-import backend from "three/src/renderers/common/Backend";
 
 const userStore = useUserStore();
-// const imageUrl = ref(require('../../assets/img/team-2.jpg'));
 const imageUrl = ref("");
 const background = ref("");
-
-const triggerFileInput = () => {
-  document.querySelector('input[type="file"]').click();
-};
-
-// 파일 변경 핸들러
-const onFileChange = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imageUrl.value = e.target.result; // 선택된 이미지로 URL 변경
-    };
-    reader.readAsDataURL(file); // 파일을 데이터 URL로 변환
-  }
-};
 
 const getProfileImage = async (fileUrl) => {
   try {
