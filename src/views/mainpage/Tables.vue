@@ -18,7 +18,7 @@
     </div>
     <div v-else-if="currentView === 'calendar'" class="card calendar-container mx-5 mt-0 p-3 shadow-sm" style="min-height: 600px;">
       <div class="card-body">
-        <Calender />
+        <CalenderView />
       </div>
     </div>
 
@@ -34,18 +34,16 @@
       <span class="sr-only">Next</span>
     </a>
 
-    <!-- Clock Component -->
-    <div class="mt-5">
-      <RightTopClock />
-    </div>
   </div>
 </template>
 
 <script setup>
 import {ref} from 'vue';
 import Tasks from '@/views/mainpage/components/Tasks.vue';
-import RightTopClock from '@/views/mainpage/RightTopClock.vue';
-import Calender from '@/views/calender/CalenderView.vue';
+import RightTopClock from '@/views/navbar/RightTopClock.vue';
+import { Calendar, DatePicker } from 'v-calendar';
+import 'v-calendar/style.css';
+import CalenderView from "@/views/calender/CalenderView.vue";
 
 // State variables
 const currentView = ref('tasks');
