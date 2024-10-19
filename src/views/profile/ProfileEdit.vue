@@ -56,7 +56,11 @@
               type="text"
               v-model="nickname"
           />
+          <p class="mx-auto mb-4 text-sm" v-if="nicknameDuplicate">
+            중복된 닉네임입니다.
+          </p>
         </div>
+
         <div class="col-md-12">
           <label for="introduction" class="form-control-label">소개</label>
           <argon-input
@@ -65,7 +69,7 @@
               v-model="introduction"
           />
         </div>
-        <div class="d-flex justify-content-start" style="margin-top: 20px;">
+        <div class="d-flex justify-content-between" style="margin-top: 20px;">
           <argon-button @click="confirmUpdate">수정 완료</argon-button>
           <argon-button @click="confirmUpdatePassword" style="margin-left: 50px;">비밀번호 변경</argon-button>
         </div>
@@ -101,6 +105,11 @@ const introduction = ref("");
 
 const profileFile = ref(null);
 const backgroundFile = ref(null);
+
+const nicknameDuplicate = ref(false);
+
+const password = ref("");
+const passwordValid = ref(true);
 
 const getProfileImage = async () => {
   try {
@@ -167,15 +176,25 @@ const onBackGroundFileChange = (event) => {
 const confirmUpdate = () => {
   if (confirm("수정 사항을 저장하시겠습니까?")) {
     updateUser();
-    alert("수정 완료!");
   }
 };
 
 const confirmWithdrawal = () => {
-  if (confirm("정말로 탈퇴하시겠습니까?")) {
+  if (confirm("정말 탈퇴하시겠습니까?")) {
     // 탈퇴 로직 추가
     alert("회원 탈퇴가 완료되었습니다.");
   }
+};
+
+const confirmWithdrawPassword = () => {
+  if (confirm("비밀번호를 변경하시겠습니까?")) {
+    updatePassword();
+  }
+};
+
+const validPassword = () => {
+  const passwordPattern = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_]).{8,}$/;
+  passwordValid.value = passwordPattern.test(password.value);
 };
 
 const updateUser = async () => {
@@ -195,14 +214,25 @@ const updateUser = async () => {
         {
           headers: {
             "Content-Type": "multipart/form-data"
-          }
+          },
+          validateStatus: false
         }
     );
+    if(response.status === 200) {
+      userStore.updateUser(response.data);
+      nicknameDuplicate.value = false;
+      alert("회원 정보가 변경되었습니다.");
+    }else if(response.status === 409){
+      nicknameDuplicate.value = true;
+    }
     console.log(response.data);
-    userStore.updateUser(response.data);
   } catch (error) {
     console.error(error);
   }
+};
+
+const updatePassword = () => {
+
 };
 
 onMounted(() => {
