@@ -45,9 +45,6 @@ const stateStore = useStateStore();
 </script>
 <template>
   <ChatNotification />
-  <div>
-
-  </div>
   <div
     v-show="layout === 'landing'"
     class="landing-bg h-100 bg-gradient-primary position-fixed w-100"
@@ -60,7 +57,7 @@ const stateStore = useStateStore();
 
     <navbar :class="[navClasses]" v-if="showNavbar" />
 
-<router-view/>
+    <router-view/>
 
 
     <app-footer v-show="showFooter" />
