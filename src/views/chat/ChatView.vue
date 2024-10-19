@@ -4,16 +4,18 @@
         <i class="py-2 fa fa-comments-o"></i>
     </a>
         <!-- <ChatNotification /> -->
-    <div v-show="showChatView" class="chat-view" ref="chatViewContainer">
+    <div v-if="showChatView" class="chat-view" ref="chatViewContainer">
         <!-- 채팅 목록 (ChatList) -->
         <div class="chat-list-view">
-            <ChatList :chat="chat" @select-chat-room="selectChatRoom" />
+            <ChatList :chatRooms="chatRooms" :messages="messages" @select-chat-room="selectChatRoom"
+                @add-chat-room="addChatRoom" />
         </div>
 
         <div class="chat-components">
         <!-- 채팅방 (ChatRoom) -->
         <div v-if="selectedChatRoom" class="chat-room-view">
-            <ChatRoom :chat="selectedChatRoom" @close-chat-room="closeChatRoom" @select-file-list="openFileList"
+            <ChatRoom :chat="selectedChatRoom" :messages="messages[selectedChatRoom.chatRoomId]" :stompClient="stompClient"
+                @close-chat-room="closeChatRoom" @select-file-list="openFileList"
                 @select-details="openChatRoomDetails" @set-prevent-close="setPreventClose" />
         </div>
 
@@ -37,7 +39,11 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import axios from 'axios';
 import { useStore } from "vuex";
+
+import SockJS from 'sockjs-client';
+import Stomp from 'stompjs';
 
 import ChatRoom from './components/ChatRoom.vue';
 import ChatFile from './components/ChatFile.vue';
@@ -49,25 +55,94 @@ const selectedFileList = ref(false);
 const selectedChatRoomDetails = ref(false);
 const showChatView = ref(false);
 
-// const store = useStore();
-// const showChatView = computed(() => store.state.showChatView);
-// const showConfigurator = computed(() => store.state.showConfigurator);
-// const toggleConfigurator = () => store.commit("toggleConfigurator");
 
 const chatViewContainer = ref(null);
 
-const chat = ref([]);
+const chatRooms = ref([]);
 let preventClose = false;
+
+const messages = ref([]);
+const stompClient = ref(null);
+let subscribedChatRooms = [];
+
+import { useUserStore } from '@/store/user';
+const userStore = useUserStore();
+const loggedInMemberId = computed(() => userStore.userInfo.id);
+const accessToken = userStore.accessToken;
+
+import { useNotificationStore } from '@/store/notification';
+const notificationStore = useNotificationStore();
+
+// 웹소켓 연결
+const connectWebSocket = (chatRooms) => {
+    if (!stompClient.value || !stompClient.value.connected) {
+        const socket = new SockJS('http://localhost:8080/ws');
+        stompClient.value = Stomp.over(socket);
+
+        stompClient.value.connect({ Authorization: `${accessToken}` }, () => {
+            subscribeChatRoom(chatRooms);
+        }, (error) => {
+            console.error('채팅방을 연결하는 데 실패했습니다.', error);
+        });
+    }
+};
 
 // 외부 클릭 감지 로직
 const handleClickOutside = (event) => {
     if (preventClose) {
-        preventClose = false; // 초기 클릭 이벤트를 무시한 후 초기화
+        preventClose = false;
         return;
     }
     if (showChatView.value && chatViewContainer.value && !chatViewContainer.value.contains(event.target)) {
-        closeChatView(); // 외부 클릭 시 창 닫기
+        closeChatView(); 
     }
+};
+
+const chatListApi = async () => {
+    try {
+        const response = await axios.get("/chat/list");
+        chatRooms.value = response.data;
+        // console.log(chat.value);
+        chatRooms.value.forEach((room) => {
+            messages.value[room.chatRoomId] = [];  // 각 chatRoomId에 빈 배열 생성
+        });
+
+        console.log(messages.value);
+        if (subscribedChatRooms.length === 0) {
+            connectWebSocket(chatRooms.value);
+        }
+    } catch (err) {
+        console.error("채팅방 목록을 가져오는데 실패했습니다.", err);
+    }
+};
+
+const subscribeChatRoom = (chatRooms) => {
+    chatRooms.forEach((room) => {
+        if (!subscribedChatRooms.includes(room.chatRoomId)) {
+            stompClient.value.subscribe(`/sub/chat/${room.chatRoomId}`, (message) => {
+                const receivedMessage = JSON.parse(message.body);
+
+                // 해당 채팅방의 알림 카운트 증가
+                // const chatRoomIndex = chat.value.findIndex(c => c.chatRoomId === room.chatRoomId);
+                // if (chatRoomIndex !== -1) {
+                //     if (receivedMessage.memberId === loggedInMemberId.value) {
+                //         return;
+                //     }
+                //     chat.value[chatRoomIndex].unreadCount += 1;  // 알림 카운트 증가
+                // }
+                // if (!messages.value[room.chatRoomId]) {
+                //     messages.value[room.chatRoomId] = [];
+                // }
+                // messages.value[room.chatRoomId].push(receivedMessage);
+                messages.value[room.chatRoomId] = [receivedMessage];
+                notificationStore.showNotification(receivedMessage.memberId, `${receivedMessage.nickname}: ${receivedMessage.message}`, 2000);
+            });
+
+            subscribedChatRooms.push(room.chatRoomId);
+        } else {
+            console.log(`이미 연결된 채팅방입니다. ${room.chatRoomId}`);
+        }
+    });
 };
 
 // preventClose를 true로 설정하는 함수
@@ -76,26 +151,25 @@ const setPreventClose = () => {
 };
 
 onMounted(() => {
+    chatListApi();
     document.addEventListener('click', handleClickOutside);
 });
 
 onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside); // 클릭 이벤트 제거
+    document.removeEventListener('click', handleClickOutside);
 });
 
 const openChatView = () => {
     preventClose = true; // 처음 클릭 이벤트를 무시
     showChatView.value = true;
-    console.log(`showChatView: ${showChatView.value}`);
 
     setTimeout(() => {
-        preventClose = false; // 약간의 지연 후 클릭 감지 활성화
+        preventClose = false;
     }, 100);
 }
 
 const closeChatView = () => {
     showChatView.value = false;
-    console.log(`showChatView: ${showChatView.value}`);
 }
 
 const selectChatRoom = (chat) => {
@@ -110,6 +184,15 @@ const updateChatName = ({ chatRoomId, newNickname }) => {
     if (selectedChatRoom.value && selectedChatRoom.value.chatRoomId === chatRoomId) {
         selectedChatRoom.value.nickname = newNickname;
     }
+};
+
+const addChatRoom = (ChatRoom) => {
+    const response = axios.get("/chat/list");
+    chatRooms.value = response.data;
+    messages.value[ChatRoom.chatRoomId] = [];
+
+    console.log(chatRooms.value);
+    console.log(messages);
 };
 
 const closeChatRoom = () => {
