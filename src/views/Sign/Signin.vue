@@ -204,7 +204,7 @@
                   Sign In
                 </argon-button>
               </div>
-              <div class="overlay-panel overlay-right" v-if="!isRegistred">
+              <div class="overlay-panel overlay-right" v-if="!isRegisterd">
                 <h1 style="color: #9de0f6">Hi!</h1>
                 <p>Enter your personal details and start your journey with us</p>
                 <argon-button
@@ -216,7 +216,7 @@
                   Sign Up
                 </argon-button>
               </div>
-              <div class="overlay-panel overlay-right" v-if="isRegistred">
+              <div class="overlay-panel overlay-right" v-if="isRegisterd">
                 <h1 style="color: #9de0f6">Registered!</h1>
                 <p>Enter your email and password</p>
                 <argon-button
@@ -260,7 +260,7 @@ const isVerified = ref(false);
 const isSent = ref(false);
 const onVerifying = ref(false);
 const duplicated = ref(false);
-const isRegistred = ref(false);
+const isRegisterd = ref(false);
 
 const verificationCode = ref("");
 const signupEmail = ref("");
@@ -296,7 +296,7 @@ const loginApi = async () => {
           validateStatus: false
         }
     );
-    if(response.status == 200){
+    if(response.status === 200){
 
       userStore.setUser(response.data);
       userStore.setToken(response.headers.authorization);
