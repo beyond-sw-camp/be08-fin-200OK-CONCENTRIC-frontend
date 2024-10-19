@@ -36,6 +36,13 @@ axios.interceptors.response.use(
     (error) => {
         if(error.response.status === 401){
             console.log("unauthorized");
+            const user = JSON.parse(localStorage.getItem('user'));
+            if(user){
+                user['state']['userInfo'] = undefined;
+                user['state']['isLoggedIn'] = false;
+                user['state']['accessToken'] = undefined;
+                localStorage.setItem('user', JSON.stringify(user));
+            }
             router.push('/');
         }
     }

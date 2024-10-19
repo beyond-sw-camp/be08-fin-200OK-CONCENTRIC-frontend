@@ -96,7 +96,7 @@ const loadFriendshipRequest = async () => {
 }
 const checkLogin = () => {
   console.log("checkLogin");
-
+  console.log(userStore.isLoggedIn);
   if(userStore.isLoggedIn === undefined || userStore.isLoggedIn === false) {
     router.push("/");
     return false;
