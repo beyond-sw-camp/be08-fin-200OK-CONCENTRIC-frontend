@@ -54,37 +54,22 @@ import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/store/user';
 const userStore = useUserStore();
-const loggedInMemberId = computed(() => userStore.userInfo.id);
-const accessToken = userStore.accessToken;
-import SockJS from 'sockjs-client';
-import Stomp from 'stompjs';
 
-const emit = defineEmits(["select-chat-room", "select-favorite", "chat-room-updated"]);
+const emit = defineEmits(["select-chat-room", "chat-room-updated", "add-chat-room"]);
 
 const showFriendList = ref(false);
-const stompClient = ref(null);
 const chat = ref([]);
 const friends = ref([]);
-// const profileImage = ref([]);
 
-let subscribedChatRooms = [];
+const props = defineProps({
+    chatRooms: Array,
+    messages: Object
+})
 
-import { useNotificationStore } from '@/store/notification';
-const notificationStore = useNotificationStore();
 
-// import { useWebsocketStore } from '@/store/websocket';
-// const websocketStore = useWebsocketStore();
-
-// 채팅방 리스트 호출
 const chatListApi = async () => {
-    try {
-        const response = await axios.get("/chat/list",
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-        const res = response.data.map(chatroom => ({
+    if (props.chatRooms && Array.isArray(props.chatRooms)) {
+        const res = props.chatRooms.map(chatroom => ({
             ...chatroom,
             profileImage: null,
             unreadCount: 0,
@@ -103,13 +88,9 @@ const chatListApi = async () => {
                 }
             })
         );
-
-        console.log(chat.value);
-        if (subscribedChatRooms.length === 0) {
-            connectChatRoom(chat.value);
-        }
-    } catch (err) {
-        console.error("채팅방 목록을 가져오는데 실패했습니다.", err);
+        return chat.value;
+    } else {
+        console.error("props.chat은 정의되지 않았거나 배열이 아닙니다.");
     }
 };
 
@@ -124,11 +105,9 @@ const getProfileImage = async (imageUrl) => {
         });
     const imageSrc = URL.createObjectURL(response.data);
     return imageSrc;
-    // console.log(profileImage.value);
 }
 
 onMounted(async () => {
-    // await websocketStore.connectWebSocket(accessToken);
     await chatListApi();
 });
 
@@ -144,8 +123,7 @@ const chatBookmarkApi = async (chat) => {
                 },
             });
         if (response.status == 204) {
-            emit("select-favorite", chat);
-            chatListApi();
+            chat.bookmark = !chat.bookmark;
         }
     } catch (err) {
         console.error("즐겨찾기를 지정하는데 실패했습니다.", err);
@@ -157,76 +135,12 @@ const sortedChatRooms = computed(() => {
     return [...chat.value].sort((a, b) => b.bookmark - a.bookmark);
 });
 
-// 리스트에서 채팅방 구독
-// const connectChatRoom = (chatRoom) => {
-//     const socket = new SockJS('http://localhost:8080/ws');
-//     stompClient.value = Stomp.over(socket);
-//     stompClient.value.connect({ Authorization: `${accessToken}` }, (frame) => {
-//         console.log('Connected: ' + frame);
-
-//         // 채팅방 목록의 모든 chatRoomId에 대해 구독 설정
-//         chatRoom.forEach((room) => {
-//             stompClient.value.subscribe(`/sub/chat/${room.chatRoomId}`, (message) => {
-//                 const receivedMessage = JSON.parse(message.body);
-
-//                 notificationStore.showNotification(receivedMessage.memberId,`새 메시지: ${receivedMessage.message}`, 3000);
-
-//                 // 각 채팅방의 최신 메시지를 업데이트
-//                 // updateChatRoomLatestMessage(room.chatRoomId, receivedMessage);
-//             });
-//         });
-//     });
-// };
-
-// 채팅방 연결 및 구독
-const connectChatRoom = (chatRooms) => {
-    if (!stompClient.value || !stompClient.value.connected) {
-        const socket = new SockJS('http://localhost:8080/ws');
-        stompClient.value = Stomp.over(socket);
-
-        stompClient.value.connect({ Authorization: `${accessToken}` }, () => {
-            subscribeChatRoom(chatRooms);
-        }, (error) => {
-            console.error('채팅방을 연결하는 데 실패했습니다.', error);
-        });
-    } else {
-        subscribeChatRoom(chatRooms);
-    }
-};
-
-const subscribeChatRoom = (chatRooms) => {
-    chatRooms.forEach((room) => {
-        if (!subscribedChatRooms.includes(room.chatRoomId)) {
-            stompClient.value.subscribe(`/sub/chat/${room.chatRoomId}`, (message) => {
-                const receivedMessage = JSON.parse(message.body);
-
-                // 해당 채팅방의 알림 카운트 증가
-                const chatRoomIndex = chat.value.findIndex(c => c.chatRoomId === room.chatRoomId);
-                if (chatRoomIndex !== -1) {
-                    if (receivedMessage.memberId === loggedInMemberId.value) {
-                        return;
-                    }
-                    chat.value[chatRoomIndex].unreadCount += 1;  // 알림 카운트 증가
-                }
-
-                notificationStore.showNotification(receivedMessage.memberId, `${receivedMessage.nickname}: ${receivedMessage.message}`, 2000);
-            });
-
-            subscribedChatRooms.push(room.chatRoomId);
-            console.log(subscribedChatRooms);
-        } else {
-            console.log(`이미 연결된 채팅방입니다. ${room.chatRoomId}`);
-        }
-    });
-};
-
-
 const goToChatRoom = (chatRoom) => {
     // 선택한 채팅방의 unreadCount 초기화
-    const chatRoomIndex = chat.value.findIndex(c => c.chatRoomId === chatRoom.chatRoomId);
-    if (chatRoomIndex !== -1) {
-        chat.value[chatRoomIndex].unreadCount = 0;  // 알림 카운트 초기화
-    }
+    // const chatRoomIndex = chat.value.findIndex(c => c.chatRoomId === chatRoom.chatRoomId);
+    // if (chatRoomIndex !== -1) {
+    //     chat.value[chatRoomIndex].unreadCount = 0;  // 알림 카운트 초기화
+    // }
     emit("select-chat-room", chatRoom);
 };
 
@@ -240,7 +154,6 @@ const getFriendListApi = async () => {
     try {
         const response = await axios.get("/friendship/list");
         friends.value = response.data;
-        console.log(friends.value)
     } catch (err) {
         console.error("친구 목록을 가져오는데 실패했습니다.", err);
     }
@@ -271,10 +184,13 @@ const addPrivateChat = async (friend) => {
                 },
             }
         );
+        console.log(response);
         const newChatRoom = response.data;
+        console.log(newChatRoom);
+        emit("add-chat-room", newChatRoom);
         chatListApi();
         showFriendList.value = false;
-        stompClient.value.subscribe(`/sub/chat/${newChatRoom.chatRoomId}`)
+        props.stompClient.subscribe(`/sub/chat/${newChatRoom.chatRoomId}`)
     } catch (err) {
         console.error("채팅방 추가에 실패했습니다.", err);
     }
