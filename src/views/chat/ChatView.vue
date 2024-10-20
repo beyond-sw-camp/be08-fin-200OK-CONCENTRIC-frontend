@@ -7,8 +7,8 @@
     <div v-if="showChatView" class="chat-view" ref="chatViewContainer">
         <!-- 채팅 목록 (ChatList) -->
         <div class="chat-list-view">
-            <ChatList :chatRooms="chatRooms" :messages="messages" @select-chat-room="selectChatRoom"
-                @add-chat-room="addChatRoom" />
+            <ChatList :chatRooms="chatRooms" :messages="messages" :lastPingTime="lastPingTime"
+                @select-chat-room="selectChatRoom" @add-chat-room="addChatRoom" />
         </div>
 
         <div class="chat-components">
@@ -44,6 +44,7 @@ import { useStore } from "vuex";
 
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
+let lastPingTime = null;
 
 import ChatRoom from './components/ChatRoom.vue';
 import ChatFile from './components/ChatFile.vue';
@@ -78,14 +79,25 @@ const connectWebSocket = (chatRooms) => {
     if (!stompClient.value || !stompClient.value.connected) {
         const socket = new SockJS('http://localhost:8080/ws');
         stompClient.value = Stomp.over(socket);
+        stompClient.value.debug = function (string) {
+            if (!(string.includes('ping')) && !(string.includes('pong'))) {
+            console.log(string);
+            }
+        };
+    }
 
         stompClient.value.connect({ Authorization: `${accessToken}` }, () => {
             subscribeChatRoom(chatRooms);
+            setInterval(() => {
+                lastPingTime = new Date();
+                stompClient.value.send("/pub/ping", {}, JSON.stringify({ message: 'ping' }));
+            }, 20000);  
+            
+            stompClient.value.subscribe('/sub/pong');
         }, (error) => {
             console.error('채팅방을 연결하는 데 실패했습니다.', error);
         });
-    }
-};
+    };
 
 // 외부 클릭 감지 로직
 const handleClickOutside = (event) => {
@@ -107,7 +119,7 @@ const chatListApi = async () => {
             messages.value[room.chatRoomId] = [];  // 각 chatRoomId에 빈 배열 생성
         });
 
-        console.log(messages.value);
+        // console.log(messages.value);
         if (subscribedChatRooms.length === 0) {
             connectWebSocket(chatRooms.value);
         }
@@ -136,9 +148,10 @@ const subscribeChatRoom = (chatRooms) => {
                 // messages.value[room.chatRoomId].push(receivedMessage);
                 messages.value[room.chatRoomId] = [receivedMessage];
                 notificationStore.showNotification(receivedMessage.memberId, `${receivedMessage.nickname}: ${receivedMessage.message}`, 2000);
+            
             });
-
             subscribedChatRooms.push(room.chatRoomId);
+            // console.log(subscribedChatRooms);
         } else {
             console.log(`이미 연결된 채팅방입니다. ${room.chatRoomId}`);
         }
@@ -186,13 +199,15 @@ const updateChatName = ({ chatRoomId, newNickname }) => {
     }
 };
 
-const addChatRoom = (ChatRoom) => {
-    const response = axios.get("/chat/list");
-    chatRooms.value = response.data;
-    messages.value[ChatRoom.chatRoomId] = [];
-
-    console.log(chatRooms.value);
-    console.log(messages);
+const addChatRoom = async (newChatRoom) => {
+    await chatListApi();
+    stompClient.value.subscribe(`/sub/chat/${newChatRoom.id}`, (message) => {
+        const receivedMessage = JSON.parse(message.body);
+        messages.value[newChatRoom.id] = [receivedMessage];
+        notificationStore.showNotification(receivedMessage.memberId, `${receivedMessage.nickname}: ${receivedMessage.message}`, 2000);
+    });
+    subscribedChatRooms.push(newChatRoom.id);
+    console.log(subscribedChatRooms);
 };
 
 const closeChatRoom = () => {

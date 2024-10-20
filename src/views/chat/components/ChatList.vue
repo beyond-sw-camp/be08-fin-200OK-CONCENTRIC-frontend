@@ -188,13 +188,21 @@ const addPrivateChat = async (friend) => {
         const newChatRoom = response.data;
         console.log(newChatRoom);
         emit("add-chat-room", newChatRoom);
-        chatListApi();
         showFriendList.value = false;
-        props.stompClient.subscribe(`/sub/chat/${newChatRoom.chatRoomId}`)
     } catch (err) {
         console.error("채팅방 추가에 실패했습니다.", err);
     }
-}
+};
+
+watch(
+    () => props.chatRooms,   
+    (newChatRooms, oldChatRooms) => {
+        if (newChatRooms.length !== oldChatRooms.length) {
+            chatListApi(); 
+        }
+    },
+    { deep: true } 
+);
 
 const closeFriendList = () => {
     showFriendList.value = false;
