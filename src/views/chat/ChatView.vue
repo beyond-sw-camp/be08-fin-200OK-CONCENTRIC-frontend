@@ -7,7 +7,7 @@
     <div v-if="showChatView" class="chat-view" ref="chatViewContainer">
         <!-- 채팅 목록 (ChatList) -->
         <div class="chat-list-view">
-            <ChatList :chatRooms="chatRooms" :messages="messages" :lastPingTime="lastPingTime"
+            <ChatList :chatRooms="chatRooms" :messages="messages" :lastPingTime="lastPingTime" :notificationBadge="notificationBadge"
                 @select-chat-room="selectChatRoom" @add-chat-room="addChatRoom" />
         </div>
 
@@ -44,7 +44,9 @@ import { useStore } from "vuex";
 
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
-let lastPingTime = null;
+let lastPingTime = ref(null);
+let timeoutHandle;
+let lastMessageTime = [];
 
 import ChatRoom from './components/ChatRoom.vue';
 import ChatFile from './components/ChatFile.vue';
@@ -73,6 +75,7 @@ const accessToken = userStore.accessToken;
 
 import { useNotificationStore } from '@/store/notification';
 const notificationStore = useNotificationStore();
+const notificationBadge = ref([]);
 
 // 웹소켓 연결
 const connectWebSocket = (chatRooms) => {
@@ -89,15 +92,29 @@ const connectWebSocket = (chatRooms) => {
         stompClient.value.connect({ Authorization: `${accessToken}` }, () => {
             subscribeChatRoom(chatRooms);
             setInterval(() => {
-                lastPingTime = new Date();
+                lastPingTime.value = new Date();
                 stompClient.value.send("/pub/ping", {}, JSON.stringify({ message: 'ping' }));
+
+                clearTimeout(timeoutHandle);
+                timeoutHandle = setTimeout(() => {
+                    handlePingTimeout();
+                }, 60000);
             }, 20000);  
             
-            stompClient.value.subscribe('/sub/pong');
+            stompClient.value.subscribe('/sub/pong', (message) => {
+                console.log("Pong 받음:", message.body);
+                clearTimeout(timeoutHandle);
+            });
         }, (error) => {
             console.error('채팅방을 연결하는 데 실패했습니다.', error);
         });
     };
+
+// Ping 응답이 없으면 처리
+function handlePingTimeout() {
+    console.log("Ping 메시지 전송이 중단됨");
+    stompClient.value.send("/pub/ping/timeout", {}, JSON.stringify({ loggedInMemberId, lastPingTime }));
+}
 
 // 외부 클릭 감지 로직
 const handleClickOutside = (event) => {
@@ -117,35 +134,75 @@ const chatListApi = async () => {
         // console.log(chat.value);
         chatRooms.value.forEach((room) => {
             messages.value[room.chatRoomId] = [];  // 각 chatRoomId에 빈 배열 생성
+            notificationBadge.value[room.chatRoomId] = false;
         });
 
+        console.log(notificationBadge.value);
         // console.log(messages.value);
         if (subscribedChatRooms.length === 0) {
             connectWebSocket(chatRooms.value);
         }
+
+        findLastWebSocketApi(loggedInMemberId.value);
     } catch (err) {
         console.error("채팅방 목록을 가져오는데 실패했습니다.", err);
     }
 };
+
+const findLastWebSocketApi = async (memberId) => {
+    try {
+        const response = await axios.get(`/chat/last/connect?memberId=${memberId}`);
+        lastPingTime.value = response.data.lastConnect;
+        console.log("lastPingTime: ", lastPingTime.value);
+
+        findLastMessageApi();
+    } catch (err) {
+        console.error("웹소켓 저장 시간을 가져오는데 실패했습니다.", err);
+    }
+}
+
+const findLastMessageApi = async () => {
+    try {
+        const response = await axios.get("/chat/last/message");
+        lastMessageTime = response.data;
+        console.log("lastMessageTime: ", lastMessageTime);
+
+        filterNewMessages(lastMessageTime);
+    } catch (err) {
+        console.error("마지막 메세지 저장 시간을 가져오는데 실패했습니다.", err);
+    }
+}
+
+const filterNewMessages = (lastMessageList) => {
+    const pingTime = new Date(lastPingTime.value);
+
+    lastMessageList.forEach(lastMessage => {
+        const messageTime = new Date(lastMessage.createAt); 
+
+        if (messageTime > pingTime) {
+            if (notificationBadge.value[lastMessage.chatRoomId] !== undefined) {
+                notificationBadge.value[lastMessage.chatRoomId] = true;  // True로 설정
+            } else {
+                console.log(`채팅방 ${lastMessage.chatRoomId}에 해당하는 알림 뱃지가 없습니다.`);
+            }
+        }
+    });
+}
 
 const subscribeChatRoom = (chatRooms) => {
     chatRooms.forEach((room) => {
         if (!subscribedChatRooms.includes(room.chatRoomId)) {
             stompClient.value.subscribe(`/sub/chat/${room.chatRoomId}`, (message) => {
                 const receivedMessage = JSON.parse(message.body);
-
-                // 해당 채팅방의 알림 카운트 증가
-                // const chatRoomIndex = chat.value.findIndex(c => c.chatRoomId === room.chatRoomId);
-                // if (chatRoomIndex !== -1) {
-                //     if (receivedMessage.memberId === loggedInMemberId.value) {
-                //         return;
-                //     }
-                //     chat.value[chatRoomIndex].unreadCount += 1;  // 알림 카운트 증가
-                // }
-                // if (!messages.value[room.chatRoomId]) {
-                //     messages.value[room.chatRoomId] = [];
-                // }
-                // messages.value[room.chatRoomId].push(receivedMessage);
+                // 해당 채팅방의 알림 뱃지 설정
+                if (receivedMessage.memberId === loggedInMemberId.value) {
+                    notificationBadge.value[room.chatRoomId] = false; 
+                } else {
+                    notificationBadge.value[room.chatRoomId] = true;
+                }
+                if (!messages.value[room.chatRoomId]) {
+                    messages.value[room.chatRoomId] = [];
+                }
                 messages.value[room.chatRoomId] = [receivedMessage];
                 notificationStore.showNotification(receivedMessage.memberId, `${receivedMessage.nickname}: ${receivedMessage.message}`, 2000);
             
@@ -165,6 +222,8 @@ const setPreventClose = () => {
 
 onMounted(() => {
     chatListApi();
+    // findLastWebSocketApi(loggedInMemberId.value);
+    // findLastMessageApi(loggedInMemberId.value);
     document.addEventListener('click', handleClickOutside);
 });
 
@@ -190,6 +249,7 @@ const selectChatRoom = (chat) => {
     console.log("선택된 채팅방:", selectedChatRoom.value);
     selectedFileList.value = false; // 파일함 초기화
     selectedChatRoomDetails.value = false;
+    notificationBadge.value[chat.chatRoomId] = false; // 알림 뱃지 초기화
 };
 
 // 채팅방 이름 전역 업데이트
