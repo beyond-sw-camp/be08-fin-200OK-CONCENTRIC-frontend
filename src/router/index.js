@@ -83,4 +83,15 @@ const router = createRouter({
   linkActiveClass: "active",
 });
 
+router.beforeEach((to, from, next) => {
+  const user = JSON.parse(localStorage.getItem("user")) || false;
+  const isLoggedIn = user["state"]["isLoggedIn"];
+
+  if(to.path !== "/signin" && !isLoggedIn){
+    next("/signin");
+  }else{
+    next();
+  }
+});
+
 export default router;

@@ -69,10 +69,6 @@
               v-model="introduction"
           />
         </div>
-        <div class="d-flex justify-content-between" style="margin-top: 20px;">
-          <argon-button @click="confirmUpdate">수정 완료</argon-button>
-          <argon-button @click="confirmUpdatePassword" style="margin-left: 50px;">비밀번호 변경</argon-button>
-        </div>
 
       </div>
       <hr class="horizontal dark" />
@@ -107,9 +103,6 @@ const profileFile = ref(null);
 const backgroundFile = ref(null);
 
 const nicknameDuplicate = ref(false);
-
-const password = ref("");
-const passwordValid = ref(true);
 
 const getProfileImage = async () => {
   try {
@@ -186,17 +179,6 @@ const confirmWithdrawal = () => {
   }
 };
 
-const confirmWithdrawPassword = () => {
-  if (confirm("비밀번호를 변경하시겠습니까?")) {
-    updatePassword();
-  }
-};
-
-const validPassword = () => {
-  const passwordPattern = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_]).{8,}$/;
-  passwordValid.value = passwordPattern.test(password.value);
-};
-
 const updateUser = async () => {
   const formData = new FormData();
   const user = {
@@ -229,10 +211,6 @@ const updateUser = async () => {
   } catch (error) {
     console.error(error);
   }
-};
-
-const updatePassword = () => {
-
 };
 
 onMounted(() => {

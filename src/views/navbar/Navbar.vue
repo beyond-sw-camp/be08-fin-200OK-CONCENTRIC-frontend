@@ -67,15 +67,18 @@ const logout = async () => {
   // }
 }
 const loadNotifications = async () => {
-  const response = await axios.get('/notification/list',
-      {validateStatus: false}
-  );
-  // if(response.status === 500) return;
-  notifications.value = response.data;
-  notifications.value.forEach(notification => {
-    notification.createDate = new Date(notification['createDate']).toLocaleString().substring(0, 22);
-    if(!notification.isRead) numOfNotifications.value += 1;
-  });
+  try {
+    const response = await axios.get('/notification/list',
+        {validateStatus: false}
+    );
+    notifications.value = response.data;
+    notifications.value.forEach(notification => {
+      notification.createDate = new Date(notification['createDate']).toLocaleString().substring(0, 22);
+      if (!notification.isRead) numOfNotifications.value += 1;
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
 const updateRead = (notification) => {
   notification.isRead = !notification.isRead;
@@ -84,15 +87,22 @@ const updateRead = (notification) => {
   updateReadApi(notification);
 }
 const updateReadApi = async (notification) => {
-  const response = await axios.put(`/notification/read/${notification.id}`);
+  try {
+    const response = await axios.put(`/notification/read/${notification.id}`);
+  } catch(err){
+    console.log(err);
+  }
 }
 const loadFriendshipRequest = async () => {
-  const response = await axios.get('/friendship/request/list',
-      {validateStatus: false}
-  );
-  friendshipRequests.value = response.data;
-  numOfFriendshipRequests.value = friendshipRequests.value.length;
-
+  try {
+    const response = await axios.get('/friendship/request/list',
+        {validateStatus: false}
+    );
+    friendshipRequests.value = response.data;
+    numOfFriendshipRequests.value = friendshipRequests.value.length;
+  } catch (error) {
+    console.log(error);
+  }
 }
 const checkLogin = () => {
   console.log("checkLogin");
@@ -104,17 +114,21 @@ const checkLogin = () => {
   return true;
 }
 const getProfileImage = async () => {
-  const path = userStore.userInfo['imageUrl'];
-  const response = await axios.post(`storage/image/profile`,
-      null,
-      {
-        params: {
-          path: path,
-        },
-        responseType: 'blob',
-      });
-  console.log(response.data);
-  profileImage.value =  URL.createObjectURL(response.data);
+  try {
+    const path = userStore.userInfo['imageUrl'];
+    const response = await axios.post(`storage/image/profile`,
+        null,
+        {
+          params: {
+            path: path,
+          },
+          responseType: 'blob',
+        });
+    console.log(response.data);
+    profileImage.value = URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error(error);
+  }
 }
 const gotoProfile = () => {
   router.push("/profile");
