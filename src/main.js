@@ -43,7 +43,6 @@ axios.interceptors.response.use(
                 user['state']['accessToken'] = undefined;
                 localStorage.setItem('user', JSON.stringify(user));
             }
-            router.push('/');
         }
         return error.response;
     }
