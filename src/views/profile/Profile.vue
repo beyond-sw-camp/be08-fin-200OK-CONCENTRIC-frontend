@@ -9,8 +9,8 @@ import ProfileEdit from "@/views/profile/ProfileEdit.vue";
 import PrivateStorage from "@/views/storage/PrivateStorage.vue";
 import FriendList from "@/views/social/FriendList.vue";
 import NotificationList from "@/views/notification/NotificationList.vue";
-import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
-import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
+import PasswordEdit from "@/views/profile/PasswordEdit.vue";
+import ProfileDeactivation from "@/views/profile/ProfileDeactivation.vue";
 import { useStateStore } from "@/store/states";
 
 const body = document.getElementsByTagName("body")[0];
@@ -63,11 +63,21 @@ onBeforeUnmount(() => {
             ">
               마이페이지
             </li>
-            <li class="list-group-item list-group-item-action" @click="setActiveTab('profile_card')">프로필</li>
-            <li class="list-group-item list-group-item-action" @click="setActiveTab('profile_edit')">정보 수정</li>
-            <li class="list-group-item list-group-item-action" @click="setActiveTab('private_storage')">파일함</li>
-            <li class="list-group-item list-group-item-action" @click="setActiveTab('friend_list')">친구</li>
-            <li class="list-group-item list-group-item-action" @click="setActiveTab('notification_list')">알림</li>
+            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'profile_card' }]"
+                @click="setActiveTab('profile_card')">프로필</li>
+            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'profile_edit' }]"
+                @click="setActiveTab('profile_edit')">정보 수정</li>
+            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'private_storage' }]"
+                @click="setActiveTab('private_storage')">파일함</li>
+            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'friend_list' }]"
+                @click="setActiveTab('friend_list')">친구</li>
+            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'notification_list' }]"
+                @click="setActiveTab('notification_list')">알림</li>
+            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'password_edit' }]"
+                @click="setActiveTab('password_edit')">비밀번호 변경</li>
+            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'profile_deactivation' }]"
+                @click="setActiveTab('profile_deactivation')">회원 탈퇴</li>
+
           </ul>
       </div>
       <div class="col-md-6" style="margin-left: 10%;">
@@ -76,6 +86,8 @@ onBeforeUnmount(() => {
           <private-storage v-if="activeTab === 'private_storage'"/>
           <friend-list v-if="activeTab === 'friend_list'"/>
           <notification-list v-if="activeTab === 'notification_list'"/>
+          <password-edit v-if="activeTab === 'password_edit'"/>
+          <profile-deactivation v-if="activeTab === 'profile_deactivation'"/>
       </div>
     </div>
   </div>
@@ -93,6 +105,11 @@ onBeforeUnmount(() => {
 .list-group-item:hover {
   background-color: #007BFF; /* Hover 배경색 */
   color: white; /* Hover 텍스트 색상 */
+}
+
+.list-group-item.active {
+  background-color: #66a3ff; /* 선택된 항목의 배경색 */
+  color: white; /* 선택된 항목의 텍스트 색상 */
 }
 
 .sticky-menu {
