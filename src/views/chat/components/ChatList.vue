@@ -13,7 +13,8 @@
             <li v-for="(chat, index) in sortedChatRooms" :key="index" @click="goToChatRoom(chat)"
                 class="chat-list-item">
                 <img :src="chat.profileImage" class="profile-image" />
-                <span v-if="chat.unreadCount > 0" class="notification-badge">{{ chat.unreadCount }}</span>
+                <span v-if="notificationBadge[chat.chatRoomId]" class="notification-badge"></span>
+                <!-- <span v-if="chat.unreadCount > 0" class="notification-badge">{{ chat.unreadCount }}</span> -->
                 <div class="chat-info">
                     <h4 class="chat-name">{{ chat.nickname }}</h4>
                     <p class="chat-last-message">{{ chat.lastMessage }}</p>
@@ -63,7 +64,8 @@ const friends = ref([]);
 
 const props = defineProps({
     chatRooms: Array,
-    messages: Object
+    messages: Object,
+    notificationBadge: Array
 })
 
 
@@ -72,7 +74,6 @@ const chatListApi = async () => {
         const res = props.chatRooms.map(chatroom => ({
             ...chatroom,
             profileImage: null,
-            unreadCount: 0,
         }));
         chat.value = res;
 
@@ -188,13 +189,21 @@ const addPrivateChat = async (friend) => {
         const newChatRoom = response.data;
         console.log(newChatRoom);
         emit("add-chat-room", newChatRoom);
-        chatListApi();
         showFriendList.value = false;
-        props.stompClient.subscribe(`/sub/chat/${newChatRoom.chatRoomId}`)
     } catch (err) {
         console.error("채팅방 추가에 실패했습니다.", err);
     }
-}
+};
+
+watch(
+    () => props.chatRooms,   
+    (newChatRooms, oldChatRooms) => {
+        if (newChatRooms.length !== oldChatRooms.length) {
+            chatListApi(); 
+        }
+    },
+    { deep: true } 
+);
 
 const closeFriendList = () => {
     showFriendList.value = false;
@@ -261,17 +270,14 @@ const closeFriendList = () => {
 }
 
 .notification-badge {
-    position: relative;
-    top: 0;
-    right: 0;
-    background-color: red;
-    color: white;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #8a9bf9;
     border-radius: 50%;
-    padding: 5px;
-    font-size: 12px;
-    min-width: 20px;
-    min-height: 20px;
-    text-align: center;
+    display: inline-block;
+    margin-left: 30px;
+    margin-bottom: 30px;
 }
 
 .friend-name {
