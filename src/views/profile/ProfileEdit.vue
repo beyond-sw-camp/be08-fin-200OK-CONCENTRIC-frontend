@@ -1,66 +1,254 @@
-<script setup>
-
-import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
-</script>
-
 <template>
-  <div class="col-md-12">
-    <div class="card" style="box-shadow: none;">
-      <div class="card-body">
-        <p class="text-uppercase text-sm">User Information</p>
-        <div class="row">
-          <div class="col-12">
-            <label for="example-text-input" class="form-control-label">Username</label>
-            <argon-input type="text" value="lucky.jesse" />
-          </div>
-          <div class="col-12">
-            <label for="example-text-input" class="form-control-label">Email address</label>
-            <argon-input type="email" value="jesse@example.com" />
-          </div>
-          <div class="col-12">
-            <label for="example-text-input" class="form-control-label">Phone Number</label>
-            <argon-input type="email" value="+82-10-0000-0000" />
-          </div>
-        </div>
-        <hr class="horizontal dark" />
-        <p class="text-uppercase text-sm">Contact Information</p>
-        <div class="row">
-          <div class="col-md-12">
-            <label for="example-text-input" class="form-control-label">Address</label>
-            <argon-input
-                type="text"
-                value="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
+  <div class="card card-profile" style="box-shadow: none;">
+    <a href="javascript:;" @click="triggerBackgroundInput">
+      <div class="background-img-container">
+        <img :src="background" class="background-img" alt="Background Image" />
+      </div>
+    </a>
+    <input
+        type="file"
+        ref="backgroundInput"
+        @change="onBackGroundFileChange"
+        accept="image/*"
+        style="display: none;"
+    />
+    <div class="row justify-content-center">
+      <div class="col-4 col-lg-4 order-lg-2">
+        <div class="mt-n4 mt-lg-4 mb-4 mb-lg-0">
+          <a href="javascript:;" @click="triggerProfileInput" class="profile-img-container">
+            <img
+                :src="imageUrl"
+                class="profile-img rounded-circle img-fluid border border-2 border-white"
+                alt="Profile"
             />
-          </div>
-          <div class="col-md-4">
-            <label for="example-text-input" class="form-control-label">City</label>
-            <argon-input type="text" value="New York" />
-          </div>
-          <div class="col-md-4">
-            <label for="example-text-input" class="form-control-label">Country</label>
-            <argon-input type="text" value="United States" />
-          </div>
-          <div class="col-md-4">
-            <label for="example-text-input" class="form-control-label">Postal code</label>
-            <argon-input type="text" value="437300" />
-          </div>
+          </a>
+          <input
+              type="file"
+              ref="profileInput"
+              @change="onProfileFileChange"
+              accept="image/*"
+              style="display: none;"
+          />
         </div>
-        <hr class="horizontal dark" />
-        <p class="text-uppercase text-sm">About me</p>
-        <div class="row">
-          <div class="col-md-12">
-            <label for="example-text-input" class="form-control-label">About me</label>
-            <argon-input
-                type="text"
-                value="A beautiful Dashboard for Bootstrap 5. It is Free and Open Source."
-            />
-          </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12">
+          <label for="username" class="form-control-label">이름</label>
+          <argon-input id="username" type="text" :model-value="name" disabled />
+        </div>
+        <div class="col-12">
+          <label for="email" class="form-control-label">이메일</label>
+          <argon-input id="email" type="text" :model-value="email" disabled />
+        </div>
+        <div class="col-12">
+          <label for="joinDate" class="form-control-label">가입일</label>
+          <argon-input id="joinDate" type="text" :model-value="createDate" disabled />
+        </div>
+      </div>
+      <hr class="horizontal dark" />
+      <div class="row">
+        <div class="col-md-12">
+          <label for="nickname" class="form-control-label">닉네임</label>
+          <argon-input
+              id="nickname"
+              type="text"
+              v-model="nickname"
+          />
+          <p class="mx-auto mb-4 text-sm" v-if="nicknameDuplicate">
+            중복된 닉네임입니다.
+          </p>
+        </div>
+
+        <div class="col-md-12">
+          <label for="introduction" class="form-control-label">소개</label>
+          <argon-input
+              id="introduction"
+              type="text"
+              v-model="introduction"
+          />
+        </div>
+
+      </div>
+      <hr class="horizontal dark" />
+      <div class="row">
+        <div class="d-flex justify-content-end" style="margin-top: 20px;">
+          <argon-button class="btn-danger" @click="confirmWithdrawal">회원 탈퇴</argon-button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
+<script setup>
+import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { useUserStore } from "@/store/user";
+import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
 
+const userStore = useUserStore();
+const imageUrl = ref("");
+const background = ref("");
+const backgroundInput = ref(null);
+const profileInput = ref(null);
+const name = ref("");
+const email = ref("");
+const createDate = ref("");
+const nickname = ref("");
+const introduction = ref("");
+
+const profileFile = ref(null);
+const backgroundFile = ref(null);
+
+const nicknameDuplicate = ref(false);
+
+const getProfileImage = async () => {
+  try {
+    const response = await axios.post('storage/image/profile', null, {
+      params: { path: userStore.userInfo['imageUrl'] },
+      responseType: 'blob',
+    });
+    imageUrl.value = URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const getUser = async () => {
+  try {
+    const response = await axios.get(`member/${userStore.userInfo['id']}`);
+    name.value = response.data.name;
+    email.value = response.data.email;
+    createDate.value = response.data.createDate;
+    nickname.value = response.data.nickname;
+    introduction.value = response.data.content;
+
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const getBackGroundImage = async () => {
+  try {
+    const response = await axios.post('storage/image/profile', null, {
+      params: { path: userStore.userInfo['background'] },
+      responseType: 'blob',
+    });
+    background.value = URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const triggerProfileInput = () => {
+  profileInput.value.click();
+};
+
+const triggerBackgroundInput = () => {
+  backgroundInput.value.click();
+};
+
+const onProfileFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    imageUrl.value = URL.createObjectURL(file); // 파일 URL로 변경
+    profileFile.value = file; // 파일 객체를 저장
+  }
+};
+
+const onBackGroundFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    background.value = URL.createObjectURL(file); // 파일 URL로 변경
+    backgroundFile.value = file; // 파일 객체를 저장
+  }
+};
+
+const confirmUpdate = () => {
+  if (confirm("수정 사항을 저장하시겠습니까?")) {
+    updateUser();
+  }
+};
+
+const confirmWithdrawal = () => {
+  if (confirm("정말 탈퇴하시겠습니까?")) {
+    // 탈퇴 로직 추가
+    alert("회원 탈퇴가 완료되었습니다.");
+  }
+};
+
+const updateUser = async () => {
+  const formData = new FormData();
+  const user = {
+    nickname: nickname.value,
+    content: introduction.value,
+  };
+  console.log(user);
+  formData.append("user", JSON.stringify(user));
+  formData.append("profile", profileFile.value);
+  formData.append("background", backgroundFile.value);
+  console.log(introduction.value);
+  try {
+    const response = await axios.put('/member/update',
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          },
+          validateStatus: false
+        }
+    );
+    if(response.status === 200) {
+      userStore.updateUser(response.data);
+      nicknameDuplicate.value = false;
+      alert("회원 정보가 변경되었습니다.");
+    }else if(response.status === 409){
+      nicknameDuplicate.value = true;
+    }
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+onMounted(() => {
+  getUser();
+  getProfileImage();
+  getBackGroundImage();
+});
+</script>
+
+<style scoped>
+.background-img-container {
+  width: 100%;
+  height: 300px; /* 원하는 고정 높이 설정 */
+  border-radius: 10px; /* 필요에 따라 모서리 반경 조정 */
+  overflow: hidden;
+  display: block;
+  position: relative;
+}
+
+.background-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지가 컨테이너에 맞도록 조정 */
+}
+
+.profile-img-container {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  display: block;
+  position: relative;
+}
+
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지가 원형 내에 잘 맞도록 */
+  border-radius: 50%; /* 이미지도 원형으로 */
+}
 </style>
