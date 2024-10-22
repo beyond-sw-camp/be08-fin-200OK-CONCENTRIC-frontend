@@ -263,6 +263,8 @@ const openChatView = () => {
 const closeChatView = () => {
     showChatView.value = false;
     selectedChatRoom.value = null;
+    selectedChatRoomDetails.value = false;
+    selectedFileList.value = false;
 }
 
 const selectChatRoom = (chat) => {
