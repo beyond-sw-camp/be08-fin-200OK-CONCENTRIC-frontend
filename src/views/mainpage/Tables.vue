@@ -1,6 +1,5 @@
 <template>
   <div class="py-4 container-fluid">
-
     <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="false">
       <!-- Indicators -->
       <ol class="carousel-indicators">
@@ -28,16 +27,28 @@
           class="carousel-control-prev"
           href="#carouselExampleIndicators"
           role="button"
-          data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
+          data-bs-slide="prev"
+          @click="toggleView"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"
+        ></span>
+        <span class="sr-only"
+        >Previous</span>
       </a>
       <a
           class="carousel-control-next"
           href="#carouselExampleIndicators"
           role="button"
-          data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          data-bs-slide="next"
+          @click="toggleView"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"></span>
         <span class="sr-only">Next</span>
       </a>
     </div>
@@ -46,15 +57,51 @@
 </template>
 
 <script setup>
-import {ref} from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
+import { Popover } from 'bootstrap';
 import Tasks from '@/views/mainpage/components/Tasks.vue';
 import { Calendar, DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
 import CalenderView from "@/views/calender/CalenderView.vue";
 import WeekCalender from "@/views/calender/WeekCalender.vue";
 
+const currentView = ref('Tasks');
+let popovers = [];
+
+const initializePopovers = () => {
+  // 기존 팝오버 인스턴스 제거
+  popovers.forEach((popover) => popover.dispose());
+  popovers = []; // 인스턴스 목록 초기화
+
+  // 새로운 팝오버 인스턴스 생성
+  const popoverTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="popover"]')
+  );
+
+  popovers = popoverTriggerList.map((popoverTriggerEl) => {
+    return new Popover(popoverTriggerEl, {
+      trigger: 'hover',
+      placement: 'top',
+      content: popoverTriggerEl.getAttribute('data-bs-content'),
+    });
+  });
+};
+
+onMounted(() => {
+  const popoverTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="popover"]')
+  );
+
+  popoverTriggerList.forEach((popoverTriggerEl) => {
+    new Popover(popoverTriggerEl, {
+      trigger: 'hover',
+      placement: 'top',
+    });
+  });
+});
+
 // State variables
-const currentView = ref('tasks');
+
 const selectedColor = ref('teal');
 const attrs = ref([
   {
@@ -75,16 +122,19 @@ const initialPage = ref({
 // Calendar reference
 const calendar = ref(null);
 
-// Methods
-const toggleView = () => {
-  currentView.value = currentView.value === 'tasks' ? 'calendar' : 'tasks';
+const toggleView = async () => {
+  currentView.value = currentView.value === 'Tasks' ? 'Calendar' : 'Tasks';
+
+  await nextTick();
+  initializePopovers();
 };
 
-const moveToday = () => {
-  if (calendar.value) {
-    calendar.value.move(new Date());
-  }
+onMounted(initializePopovers);
+
+const updateView = (view) => {
+  currentView.value = view;
 };
+
 </script>
 
 <style scoped>
@@ -95,10 +145,18 @@ const moveToday = () => {
 }
 
 .carousel-control-prev {
+  width: 3%;
   justify-content: left;
 }
 
 .carousel-control-next {
+  width: 3%;
   justify-content: right;
+}
+
+.popover-body {
+  max-height: 50px;
+  opacity: 0.4;
+  background-color: rgba(0, 0, 0, 0.75); /* 반투명한 배경색 */
 }
 </style>
