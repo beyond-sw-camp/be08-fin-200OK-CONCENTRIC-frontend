@@ -31,6 +31,17 @@ axios.interceptors.response.use(
                 localStorage.setItem('user', JSON.stringify(user));
             }
         }
+        if(response.status === 401){
+            console.log("unauthorized");
+            const user = JSON.parse(localStorage.getItem('user'));
+            if(user){
+                user['state']['userInfo'] = undefined;
+                user['state']['isLoggedIn'] = false;
+                user['state']['accessToken'] = undefined;
+                localStorage.setItem('user', JSON.stringify(user));
+            }
+            router.push("/");
+        }
         return response;
     },
     (error) => {
@@ -42,6 +53,7 @@ axios.interceptors.response.use(
                 user['state']['isLoggedIn'] = false;
                 user['state']['accessToken'] = undefined;
                 localStorage.setItem('user', JSON.stringify(user));
+                router.push("/");
             }
         }
         return error.response;

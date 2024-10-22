@@ -51,8 +51,8 @@ const logout = async () => {
 
     if(response.status === 200 || response.status === 400 || response.status === 401){
       userStore.clearUser();
-      axios.defaults.headers.common['Authorization'] = null;
-
+      // axios.defaults.headers.common['Authorization'] = null;
+      localStorage.removeItem("user");
       router.push("/");
     }
 
