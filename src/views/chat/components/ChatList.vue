@@ -28,7 +28,7 @@
 
         <!-- 모달리스 - 채팅방 추가 -->
         <div>
-            <div v-if="showFriendList" class="friend-list-container">
+            <div :class="['friend-list-container', showFriendList ? 'show' : '']">
                 <div class="friend-list-header">
                     <h5 class="friend-list-header-text">대화상대 선택</h5>
                     <button @click="closeFriendList" class="close-button">
@@ -319,11 +319,25 @@ const closeFriendList = () => {
     top: 50px;
     left: 20px;
     width: 300px;
+    max-height: 400px;
     border: 1px solid #ddd;
     background: white;
-    border-radius: 8px;
+    border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 999;
+    opacity: 0; 
+    transform: translateY(15px); 
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.friend-list-container.show {
+    opacity: 1; 
+    transform: translateY(0); 
+    pointer-events: auto;
+    visibility: visible;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .friend-list-header {
@@ -332,6 +346,7 @@ const closeFriendList = () => {
     align-items: center;
     padding: 15px;
     border-bottom: 1px solid #ddd;
+    border-radius: 20px 20px 0 0;
     background-color: #f5f5f5;
 }
 
@@ -352,7 +367,8 @@ const closeFriendList = () => {
     justify-content: space-between;
     align-items: center;
     padding: 15px 13px 15px 20px;
-    border-bottom: 1px solid #ddd;
+    height: 60px;
+    border-bottom: 1px solid #f5f5f5;
 }
 
 .close-button {
@@ -388,4 +404,5 @@ const closeFriendList = () => {
 .friend-list-select:hover {
     background-color: #ececec;
 }
+
 </style>

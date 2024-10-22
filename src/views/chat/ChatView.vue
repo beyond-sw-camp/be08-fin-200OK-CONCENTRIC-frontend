@@ -4,7 +4,7 @@
         <i class="py-2 fa fa-comments-o"></i>
     </a>
         <!-- <ChatNotification /> -->
-    <div v-if="showChatView" class="chat-view" ref="chatViewContainer">
+    <div :class="['chat-view', showChatView ? 'show' : '']" ref="chatViewContainer">
         <!-- 채팅 목록 (ChatList) -->
         <div class="chat-list-view">
             <ChatList :chatRooms="chatRooms" :messages="messages" :lastPingTime="lastPingTime" :notificationBadge="notificationBadge"
@@ -21,8 +21,8 @@
 
         <!-- 채팅방 상세 페이지 (ChatRoomDetails) -->
         <div v-if="selectedChatRoomDetails" class="chat-room-details-view">
-            <ChatRoomDetails :chat="selectedChatRoom" @close-details="closeChatRoomDetails"
-                @chat-room-updated="updateChatName" @set-prevent-close="setPreventClose" />
+            <ChatRoomDetails :chat="selectedChatRoom" :showChatRoomDetails="selectedChatRoomDetails"
+                @close-details="closeChatRoomDetails" @chat-room-updated="updateChatName" @set-prevent-close="setPreventClose" />
         </div>
 
         <!-- 파일함 (ChatFile) -->
@@ -110,13 +110,27 @@ const connectWebSocket = (chatRooms) => {
         });
     };
 
+// WebSocket 연결 해제
+const disconnectWebSocket = () => {
+    if (stompClient.value && stompClient.value.connected) {
+        stompClient.value.disconnect();
+    }
+};
+
+watch(() => userStore.isLoggedIn, (isLoggedIn) => {
+    if (!isLoggedIn) {
+        // 로그아웃 상태일 때 WebSocket 연결 해제
+        disconnectWebSocket();
+    }
+});
+
 // Ping 응답이 없으면 처리
 function handlePingTimeout() {
     console.log("Ping 메시지 전송이 중단됨");
     stompClient.value.send("/pub/ping/timeout", {}, JSON.stringify({ loggedInMemberId, lastPingTime }));
 }
 
-// 외부 클릭 감지 로직
+// 외부 클릭 감지
 const handleClickOutside = (event) => {
     if (preventClose) {
         preventClose = false;
@@ -144,6 +158,7 @@ const chatListApi = async () => {
         }
 
         findLastWebSocketApi(loggedInMemberId.value);
+        userStore.setToken(response.headers.authorization);
     } catch (err) {
         console.error("채팅방 목록을 가져오는데 실패했습니다.", err);
     }
@@ -189,6 +204,7 @@ const filterNewMessages = (lastMessageList) => {
     });
 }
 
+// 채팅방 구독
 const subscribeChatRoom = (chatRooms) => {
     chatRooms.forEach((room) => {
         if (!subscribedChatRooms.includes(room.chatRoomId)) {
@@ -215,15 +231,17 @@ const subscribeChatRoom = (chatRooms) => {
     });
 };
 
-// preventClose를 true로 설정하는 함수
+// preventClose를 true로 설정
 const setPreventClose = () => {
     preventClose = true;
 };
 
 onMounted(() => {
-    chatListApi();
-    // findLastWebSocketApi(loggedInMemberId.value);
-    // findLastMessageApi(loggedInMemberId.value);
+    if (userStore.isLoggedIn === undefined || userStore.isLoggedIn === false) {
+        return;
+    } else {
+        chatListApi();
+    }
     document.addEventListener('click', handleClickOutside);
 });
 
@@ -242,6 +260,7 @@ const openChatView = () => {
 
 const closeChatView = () => {
     showChatView.value = false;
+    selectedChatRoom.value = null;
 }
 
 const selectChatRoom = (chat) => {
@@ -274,24 +293,27 @@ const closeChatRoom = () => {
     selectedChatRoom.value = null;
     selectedFileList.value = false;
     selectedChatRoomDetails.value = false;
+    preventClose = true;
 };
 
 const openFileList = () => {
     selectedChatRoomDetails.value = false;
-    selectedFileList.value = true;
+    selectedFileList.value = !selectedFileList.value;
 };
 
 const closeFileList = () => {
     selectedFileList.value = false;
+    preventClose = true;
 };
 
 const openChatRoomDetails = () => {
     selectedFileList.value = false;
-    selectedChatRoomDetails.value = true;
+    selectedChatRoomDetails.value = !selectedChatRoomDetails.value;
 }
 
 const closeChatRoomDetails = () => {
     selectedChatRoomDetails.value = false;
+    preventClose = true;
 }
 
 </script>
@@ -300,7 +322,7 @@ const closeChatRoomDetails = () => {
 .chat-view {
     position: fixed;
     top: 0;
-    right: 0;
+    right: -400px;
     height: 100vh; 
     background-color: white;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
@@ -308,6 +330,11 @@ const closeChatRoomDetails = () => {
     display: flex;
     flex-direction: row;
     outline: none;
+    transition: right 0.4s ease;
+}
+
+.chat-view.show {
+    right: 0; /* 애니메이션 후 화면 안으로 슬라이드 */
 }
 
 .chat-components {

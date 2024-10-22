@@ -2,7 +2,7 @@
     <div class="chat-room-container">
         <!-- 채팅방 헤더 -->
         <div class="chat-room-header">
-            <img :src="chat.profileImage" class="profile-image" @click="goToDetails" />
+            <img :src="chat.profileImage" class="profile-image" @click="goToDetails"/>
             <div class="profile-info">
                 <h3 class="profile-name">{{ chat.nickname }}</h3>
             </div>
@@ -100,6 +100,7 @@ const chatMessageListApi = async () => {
             })
         );
         scrollToBottom();
+        userStore.setToken(response.headers.authorization);
     } catch (err) {
         console.error("채팅 메세지 내역을 불러오는데 실패했습니다.", err);
     }
@@ -415,12 +416,13 @@ const goToDetails = () => {
 .message-bubble {
     max-width: 80%;
     padding: 8px 12px;
-    border-radius: 25px;
+    border-radius: 0px 25px 25px 25px;
     background-color: #e6e6e6;
 }
 
 .my-message .message-bubble {
     background-color: #7ea7ea;
+    border-radius: 25px 0px 25px 25px;
     color: #fff;
 }
 

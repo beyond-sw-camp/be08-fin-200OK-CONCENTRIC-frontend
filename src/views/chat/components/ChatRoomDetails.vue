@@ -1,30 +1,35 @@
 <template>
-    <div class="chat-room-detail-container">
+    <transition name="fade-slide">
+        <div v-if="showChatRoomDetails" class="chat-room-detail-container">
         <!-- 채팅방 헤더 -->
-        <div class="chat-title-header">
-            <div class="chat-room-title">
-                <h6 v-if="!isEditingTitle">
-                    {{ chatRoomName }}
-                    <button @click.stop="editTitle" class="edit-button">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </button>
-                </h6>
+            <div class="chat-title-header">
+                <div class="chat-room-title">
+                    <h6 v-if="!isEditingTitle">
+                        {{ chatRoomName }}
+                        <button @click.stop="editTitle" class="edit-button">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </button>
+                    </h6>
 
-                <div v-else class="edit-title-container">
-                    <input v-model="newChatRoomName" class="edit-title-input" />
-                    <button @click.stop="saveTitle" class="save-button">확인</button>
+                    <div v-else class="edit-title-container">
+                        <input v-model="newChatRoomName" class="edit-title-input" />
+                        <button @click.stop="saveTitle" class="save-button">확인</button>
+                    </div>
                 </div>
+                <button @click="closeChatRoomDetails" class="close-button">
+                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                </button>
             </div>
-        </div>
 
-        <!-- 참여자 -->
-        <ul class="member-list">
-            <li v-for="member in members" :key="member.memberId" class="member-item">
-                <img :src="member.profileImage" class="profile-image" />
-                <span class="member-name">{{ member.nickname }}</span>
-            </li>
-        </ul>
-    </div>
+            <!-- 참여자 -->
+            <ul class="member-list">
+                <li v-for="member in members" :key="member.memberId" class="member-item">
+                    <img :src="member.profileImage" class="profile-image" />
+                    <span class="member-name">{{ member.nickname }}</span>
+                </li>
+            </ul>
+        </div>
+    </transition>
 </template>
 
 <script setup>
@@ -39,6 +44,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    showChatRoomDetails: {
+        type: Boolean,
+        required: true
+    }
 });
 
 const isEditingTitle = ref(false);
@@ -47,7 +56,7 @@ const newChatRoomName = ref(props.chat.nickname); // 수정 채팅방 이름
 const chatRoomId = props.chat.chatRoomId;
 
 const members = ref([]); // 참여자 목록
-const emit = defineEmits(['chat-room-updated'])
+const emit = defineEmits(['chat-room-updated', 'close-details'])
 
 // 채팅방 참여자 목록
 const findChatParticipantApi = async () => {
@@ -129,15 +138,35 @@ const saveTitle = async () => {
     }
 };
 
+const closeChatRoomDetails = () => {
+    emit("close-details");
+};
+
+
 </script>
 
 <style scoped>
+/* 애니메이션 정의 */
+.fade-slide-enter-active, .fade-slide-leave-active {
+    transition: all 0.5s ease;
+}
+
+.fade-slide-enter, .fade-slide-leave-to {
+    opacity: 0;
+    transform: translateX(50px);
+}
+/* 컴포넌트 초기 상태 */
 .chat-room-detail-container {
     width: 350px;
+    max-height: 300px;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #fff;
+    opacity: 0.2; /* 초기 상태를 숨김 */
+    transform: translateX(50px); /* 처음엔 오른쪽으로 치우침 */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* 애니메이션 시간과 전환 효과 */
 }
+
 
 .chat-title-header {
     display: flex;
@@ -214,18 +243,17 @@ const saveTitle = async () => {
     align-items: end;
 }
 
-.leave-button {
+.close-button {
+    background: none;
     border: none;
-    font-size: 13px;
-    color: #444;
-    border-radius: 10px;
-    padding: 0px 10px;
     cursor: pointer;
-    height: 30px;
-    margin: 10px;
+    color: #666;
+    font-size: 11pt;
+    margin-right: 10px;
 }
 
-.leave-button:hover {
-    background-color: #ececec;
+.close-button:hover {
+    color: #5b5b5b;
 }
+
 </style>
