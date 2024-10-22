@@ -281,6 +281,7 @@ const login = (event) => {
   loginApi();
 };
 const loginApi = async () => {
+  JSON.parse(localStorage.getItem('user'))['state']['accessToken'];
   try {
     const response = await axios.post(
         "/member/login",

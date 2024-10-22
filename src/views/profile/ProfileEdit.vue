@@ -74,7 +74,7 @@
       <hr class="horizontal dark" />
       <div class="row">
         <div class="d-flex justify-content-end" style="margin-top: 20px;">
-          <argon-button class="btn-danger" @click="confirmWithdrawal">회원 탈퇴</argon-button>
+          <argon-button @click="confirmUpdate">수정 완료</argon-button>
         </div>
       </div>
     </div>
@@ -105,6 +105,10 @@ const backgroundFile = ref(null);
 const nicknameDuplicate = ref(false);
 
 const getProfileImage = async () => {
+  if (userStore.userInfo.imageUrl == null) {
+    imageUrl.value = require('@/assets/img/애옹.png');
+    return;
+  }
   try {
     const response = await axios.post('storage/image/profile', null, {
       params: { path: userStore.userInfo['imageUrl'] },
@@ -131,6 +135,10 @@ const getUser = async () => {
 };
 
 const getBackGroundImage = async () => {
+  if (userStore.userInfo.background == null) {
+    background.value = require('@/assets/img/애옹.png');
+    return;
+  }
   try {
     const response = await axios.post('storage/image/profile', null, {
       params: { path: userStore.userInfo['background'] },
@@ -169,13 +177,6 @@ const onBackGroundFileChange = (event) => {
 const confirmUpdate = () => {
   if (confirm("수정 사항을 저장하시겠습니까?")) {
     updateUser();
-  }
-};
-
-const confirmWithdrawal = () => {
-  if (confirm("정말 탈퇴하시겠습니까?")) {
-    // 탈퇴 로직 추가
-    alert("회원 탈퇴가 완료되었습니다.");
   }
 };
 

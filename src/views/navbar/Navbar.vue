@@ -68,7 +68,7 @@ const logout = async () => {
 }
 const loadNotifications = async () => {
   try {
-    const response = await axios.get('/notification/list',
+    const response = await axios.get('/notification/list/read',
         {validateStatus: false}
     );
     notifications.value = response.data;

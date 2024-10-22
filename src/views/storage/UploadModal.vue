@@ -9,7 +9,7 @@
           <p>파일을 여기로 드래그 앤 드롭하세요</p>
         </div>
         <input type="file" multiple @change="handleFileSelect" style="display: none;" ref="fileInput" />
-        <button class="select-button" @click="selectFiles">파일 선택</button>
+        <button class="select-button" @click="selectFiles" style="margin-bottom: 20px">파일 선택</button>
         <ul>
           <li v-for="file in filesToUpload" :key="file.name">{{ file.name }}</li>
         </ul>
