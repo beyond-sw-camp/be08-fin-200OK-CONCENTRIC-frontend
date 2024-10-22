@@ -1,22 +1,25 @@
 <template>
-    <div class="file-container">
-        <!-- 상단 헤더 -->
-        <div class="file-header">
-            <h3 class="file-header-name">파일</h3>
-            <button @click="closeFileList" class="header-button close-button">
-                <i class="fa fa-arrow-right" aria-hidden="true"></i>
-            </button>
-        </div>
-
-        <!-- 파일 목록 -->
-        <ul class="file-list">
-            <li v-for="file in files" :key="file.storageFileId" class="file-item">
-                <span class="file-name">{{ file.originalName }}</span>
-                <button @click.stop="downloadFile(file)" class="download-button">
-                    <i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i>
+    <div v-if="showFileList">
+        <div :class="['file-container', isVisible ? 'show' : '']">
+        <!-- <div class="file-container"> -->
+            <!-- 상단 헤더 -->
+            <div class="file-header">
+                <h3 class="file-header-name">파일</h3>
+                <button @click="closeFileList" class="header-button close-button">
+                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
                 </button>
-            </li>
-        </ul>
+            </div>
+
+            <!-- 파일 목록 -->
+            <ul class="file-list">
+                <li v-for="file in files" :key="file.storageFileId" class="file-item">
+                    <span class="file-name">{{ file.originalName }}</span>
+                    <button @click.stop="downloadFile(file)" class="download-button">
+                        <i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
@@ -32,6 +35,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    showFileList: {
+        type: Boolean,
+        required: true
+    }
 });
 
 const chatRoomId = props.chat.chatRoomId;
@@ -51,8 +58,12 @@ const findChatStorageApi = async () => {
     }
 };
 
+const isVisible = ref(false);
 onMounted(() => {
     findChatStorageApi();
+    setTimeout(() => {
+        isVisible.value = true;
+    }, 50);
 });
 
 //파일 다운로드
@@ -93,10 +104,11 @@ const downloadFile = async (file) => {
     }
 };
 
-
-
 const closeFileList = () => {
-    emit('close-file-List');
+    isVisible.value = false
+    setTimeout(() => {
+        emit('close-file-List');
+    }, 300);
 };
 
 </script>
@@ -112,7 +124,18 @@ const closeFileList = () => {
     border-radius: 10px;
     overflow: hidden;
     background-color: #fff;
+    opacity: 0;
+    transform: translateX(50px) scale(0.9);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
 }
+
+.file-container.show {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+}
+
 
 .file-header {
     display: flex;

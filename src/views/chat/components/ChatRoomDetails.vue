@@ -1,7 +1,7 @@
 <template>
-    <transition name="fade-slide">
-        <div v-if="showChatRoomDetails" class="chat-room-detail-container">
-        <!-- 채팅방 헤더 -->
+    <div v-if="showChatRoomDetails">
+        <div :class="['chat-room-detail-container', isVisible ? 'show' : '']">
+            <!-- 채팅방 헤더 -->
             <div class="chat-title-header">
                 <div class="chat-room-title">
                     <h6 v-if="!isEditingTitle">
@@ -20,7 +20,6 @@
                     <i class="fa fa-arrow-right" aria-hidden="true"></i>
                 </button>
             </div>
-
             <!-- 참여자 -->
             <ul class="member-list">
                 <li v-for="member in members" :key="member.memberId" class="member-item">
@@ -29,7 +28,7 @@
                 </li>
             </ul>
         </div>
-    </transition>
+    </div>
 </template>
 
 <script setup>
@@ -99,8 +98,12 @@ const getProfileImage = async (imageUrl) => {
     // console.log(profileImage.value);
 }
 
+const isVisible = ref(false);
 onMounted(() => {
     findChatParticipantApi();
+    setTimeout(() => {
+        isVisible.value = true;
+    }, 50);
 });
 
 // 채팅방 이름 수정 모드로 전환
@@ -121,8 +124,10 @@ const saveTitle = async () => {
     try {
         const response = await axios.put(
             "/chat/rename",
-            {   chatRoomId: chatRoomId,
-                nickname: newChatRoomName.value },
+            {
+                chatRoomId: chatRoomId,
+                nickname: newChatRoomName.value
+            },
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -139,34 +144,33 @@ const saveTitle = async () => {
 };
 
 const closeChatRoomDetails = () => {
-    emit("close-details");
+    isVisible.value = false
+    setTimeout(() => {
+        emit('close-details');
+    }, 300);
 };
 
 
 </script>
 
 <style scoped>
-/* 애니메이션 정의 */
-.fade-slide-enter-active, .fade-slide-leave-active {
-    transition: all 0.5s ease;
-}
-
-.fade-slide-enter, .fade-slide-leave-to {
-    opacity: 0;
-    transform: translateX(50px);
-}
-/* 컴포넌트 초기 상태 */
 .chat-room-detail-container {
     width: 350px;
     max-height: 300px;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #fff;
-    opacity: 0.2; /* 초기 상태를 숨김 */
-    transform: translateX(50px); /* 처음엔 오른쪽으로 치우침 */
-    transition: opacity 0.5s ease, transform 0.5s ease; /* 애니메이션 시간과 전환 효과 */
+    opacity: 0;
+    transform: translateX(50px) scale(0.9);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
 }
 
+.chat-room-detail-container.show {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+}
 
 .chat-title-header {
     display: flex;
@@ -255,5 +259,4 @@ const closeChatRoomDetails = () => {
 .close-button:hover {
     color: #5b5b5b;
 }
-
 </style>

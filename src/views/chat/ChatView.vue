@@ -14,7 +14,7 @@
         <div class="chat-components">
         <!-- 채팅방 (ChatRoom) -->
         <div v-if="selectedChatRoom" class="chat-room-view">
-            <ChatRoom :chat="selectedChatRoom" :messages="messages[selectedChatRoom.chatRoomId]" :stompClient="stompClient"
+            <ChatRoom :chat="selectedChatRoom" :messages="messages[selectedChatRoom.chatRoomId]" :stompClient="stompClient" :showChatRoom="showChatRoom"
                 @close-chat-room="closeChatRoom" @select-file-list="openFileList"
                 @select-details="openChatRoomDetails" @set-prevent-close="setPreventClose" />
         </div>
@@ -27,7 +27,8 @@
 
         <!-- 파일함 (ChatFile) -->
         <div v-if="selectedFileList" class="file-list-view">
-            <ChatFile :chat="selectedChatRoom" @close-file-list="closeFileList" @set-prevent-close="setPreventClose" />
+            <ChatFile :chat="selectedChatRoom" :showFileList="selectedFileList"
+                @close-file-list="closeFileList" @set-prevent-close="setPreventClose" />
         </div>
     </div>
     </div>
@@ -56,6 +57,7 @@ import ChatRoomDetails from './components/ChatRoomDetails.vue';
 const selectedChatRoom = ref(null);
 const selectedFileList = ref(false);
 const selectedChatRoomDetails = ref(false);
+const showChatRoom = ref(false);
 const showChatView = ref(false);
 
 
@@ -269,6 +271,7 @@ const selectChatRoom = (chat) => {
     selectedFileList.value = false; // 파일함 초기화
     selectedChatRoomDetails.value = false;
     notificationBadge.value[chat.chatRoomId] = false; // 알림 뱃지 초기화
+    showChatRoom.value = true;
 };
 
 // 채팅방 이름 전역 업데이트

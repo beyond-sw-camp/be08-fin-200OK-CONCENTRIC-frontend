@@ -1,48 +1,50 @@
 <template>
-    <div class="chat-room-container">
+    <div v-if="showChatRoom">
+        <div :class="['chat-room-container', isVisible ? 'show' : '']">
         <!-- 채팅방 헤더 -->
-        <div class="chat-room-header">
-            <img :src="chat.profileImage" class="profile-image" @click="goToDetails"/>
-            <div class="profile-info">
-                <h3 class="profile-name">{{ chat.nickname }}</h3>
+            <div class="chat-room-header">
+                <img :src="chat.profileImage" class="profile-image" @click="goToDetails"/>
+                <div class="profile-info">
+                    <h3 class="profile-name">{{ chat.nickname }}</h3>
+                </div>
+                <!-- 닫기 및 파일함 버튼 -->
+                <button @click="goToFileList" class="header-button file-button">
+                    <i class="fa fa-folder-open" aria-hidden="true"></i>
+                </button>
+                <button @click="closeChatRoom" class="header-button close-button">
+                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                </button>
             </div>
-            <!-- 닫기 및 파일함 버튼 -->
-            <button @click="goToFileList" class="header-button file-button">
-                <i class="fa fa-folder-open" aria-hidden="true"></i>
-            </button>
-            <button @click="closeChatRoom" class="header-button close-button">
-                <i class="fa fa-arrow-right" aria-hidden="true"></i>
-            </button>
-        </div>
 
-        <!-- 채팅 메시지 목록 -->
-        <div class="chat-room-body" ref="messageContainer">
-            <div v-for="(chatMessage, index) in chatMessages" :key="index"
-                :class="['chat-message', chatMessage.memberId === loggedInMemberId || chatMessage.sentByMe ? 'my-message' : 'partner-message']">
-                <a class="chat-message-nickname">{{ chatMessage.nickname }}</a>
-                <a class="chat-message-date">{{ formatTime(chatMessage.createAt) }}</a>
-                <div class="message-bubble">
-                    <p v-if="chatMessage.message" class="chat-message-text">{{ chatMessage.message }}</p>
-                    <template v-else-if="chatMessage.fileName">
-                        <img v-if="isImage(chatMessage.fileName)" :src="chatMessage.chatImage"
-                            class="chat-message-image img-fluid border border-2 border-white" />
-                        <a v-else @click.stop="downloadFile(chatMessage.fileId)" href="#" class="chat-message-file">
-                            {{ chatMessage.fileName }}
-                        </a>
-                    </template>
+            <!-- 채팅 메시지 목록 -->
+            <div class="chat-room-body" ref="messageContainer">
+                <div v-for="(chatMessage, index) in chatMessages" :key="index"
+                    :class="['chat-message', chatMessage.memberId === loggedInMemberId || chatMessage.sentByMe ? 'my-message' : 'partner-message']">
+                    <a class="chat-message-nickname">{{ chatMessage.nickname }}</a>
+                    <a class="chat-message-date">{{ formatTime(chatMessage.createAt) }}</a>
+                    <div class="message-bubble">
+                        <p v-if="chatMessage.message" class="chat-message-text">{{ chatMessage.message }}</p>
+                        <template v-else-if="chatMessage.fileName">
+                            <img v-if="isImage(chatMessage.fileName)" :src="chatMessage.chatImage"
+                                class="chat-message-image img-fluid border border-2 border-white" />
+                            <a v-else @click.stop="downloadFile(chatMessage.fileId)" href="#" class="chat-message-file">
+                                {{ chatMessage.fileName }}
+                            </a>
+                        </template>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 채팅 입력 창 -->
-        <div class="chat-room-footer">
-            <input v-model="newMessage" type="text" placeholder="메시지를 입력하세요..." class="message-input"
-                @keyup.enter.prevent="sendMessage" />
-            <label class="attach-button">
-                +
-                <input type="file" ref="fileInput" @change="sendFile" multiple hidden />
-            </label>
-            <button @click="sendMessage" class="send-button">전송</button>
+            <!-- 채팅 입력 창 -->
+            <div class="chat-room-footer">
+                <input v-model="newMessage" type="text" placeholder="메시지를 입력하세요..." class="message-input"
+                    @keyup.enter.prevent="sendMessage" />
+                <label class="attach-button">
+                    +
+                    <input type="file" ref="fileInput" @change="sendFile" multiple hidden />
+                </label>
+                <button @click="sendMessage" class="send-button">전송</button>
+            </div>
         </div>
     </div>
 </template>
@@ -67,6 +69,10 @@ const props = defineProps({
     chat: {
         type: Object,
         required: true,
+    },
+    showChatRoom: {
+        type: Boolean,
+        required: true
     },
     messages: Array,
     stompClient: Object
@@ -106,8 +112,12 @@ const chatMessageListApi = async () => {
     }
 }
 
+const isVisible = ref(false);
 onMounted(() => {
     chatMessageListApi();
+    setTimeout(() => {
+        isVisible.value = true;
+    }, 50);
 });
 
 // props.chat이 변경될 때마다 API 호출
@@ -274,7 +284,10 @@ const formatTime = (dateString) => {
 };
 
 const closeChatRoom = () => {
-    emit("close-chat-room");
+    isVisible.value = false
+    setTimeout(() => {
+        emit('close-chat-room');
+    }, 300);
 };
 
 const goToFileList = () => {
@@ -296,6 +309,16 @@ const goToDetails = () => {
     border-radius: 10px;
     overflow: hidden;
     background-color: #fff;
+    opacity: 0;
+    transform: translateX(50px) scale(0.9);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.chat-room-container.show {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
 }
 
 /* 채팅방 헤더 스타일 */
