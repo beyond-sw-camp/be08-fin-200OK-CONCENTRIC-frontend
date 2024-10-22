@@ -144,13 +144,27 @@ onMounted(() => {
 
 <template>
   <nav
-    class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
+    class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none"
     :class="isRTL ? 'top-0 position-sticky z-index-sticky' : ''"
     v-bind="$attrs"
     id="navbarBlur"
     data-scroll="true"
   >
     <div class="px-3 py-1 ms-0 d-flex align-items-center justify-content-between" style="padding-left: 0; width: 100%; display: flex">
+      <div>
+        <a
+            href="#"
+            @click="minimizeSidebar"
+            class="p-0 nav-link text-white"
+            id="iconNavbarSidenav"
+        >
+          <div class="sidenav-toggler-inner">
+            <i class="sidenav-toggler-line bg-white"></i>
+            <i class="sidenav-toggler-line bg-white"></i>
+            <i class="sidenav-toggler-line bg-white"></i>
+          </div>
+        </a>
+      </div>
       <div>
         <sidenav-profile/>
       </div>
@@ -170,20 +184,7 @@ onMounted(() => {
               <span class="d-sm-inline d-none">Logout</span>
             </button>
           </li>
-          <li class="nav-item ps-3 d-flex align-items-center">
-            <a
-              href="#"
-              @click="minimizeSidebar"
-              class="p-0 nav-link text-white"
-              id="iconNavbarSidenav"
-            >
-              <div class="sidenav-toggler-inner">
-                <i class="sidenav-toggler-line bg-white"></i>
-                <i class="sidenav-toggler-line bg-white"></i>
-                <i class="sidenav-toggler-line bg-white"></i>
-              </div>
-            </a>
-          </li>
+
           <li class="px-3 nav-item d-flex align-items-center">
             <a class="p-0 nav-link text-white" @click="toggleConfigurator">
               <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav"></i>
@@ -247,7 +248,18 @@ onMounted(() => {
           </li>
           <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
             <a
-                href="#"
+                href="/profile"
+                class="p-0 nav-link text-white"
+                aria-expanded="false"
+                style="border: none; background-color: transparent;"
+            >
+              <i class="fa fa-user"></i>
+              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
+            </a>
+          </li>
+          <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
+            <a
+                href="/social"
                 class="p-0 nav-link text-white"
                 @click="stateStore.toggleSocial"
                 aria-expanded="false"
@@ -257,7 +269,17 @@ onMounted(() => {
               <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
             </a>
           </li>
-
+          <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
+            <a
+                href="/storage/private"
+                class="p-0 nav-link text-white"
+                aria-expanded="false"
+                style="border: none; background-color: transparent;"
+            >
+              <i class="fa fa-archive"></i>
+              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
+            </a>
+          </li>
         </ul>
 
       </div>

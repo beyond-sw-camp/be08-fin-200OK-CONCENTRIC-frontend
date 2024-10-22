@@ -7,6 +7,7 @@ import router from "./router";
 import "./assets/css/nucleo-icons.css";
 import "./assets/css/nucleo-svg.css";
 import ArgonDashboard from "./argon-dashboard";
+import ganttastic from "@infectoone/vue-ganttastic";
 
 import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:8080/v1/api';
@@ -69,4 +70,5 @@ appInstance.use(store);
 appInstance.use(router);
 appInstance.use(ArgonDashboard);
 appInstance.use(pinia);
+appInstance.use(ganttastic);
 appInstance.mount("#app");

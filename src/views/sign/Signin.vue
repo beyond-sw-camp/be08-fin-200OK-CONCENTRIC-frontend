@@ -193,7 +193,7 @@
           <div class="overlay-container">
             <div class="overlay">
               <div class="overlay-panel overlay-left">
-                <h1>Welcome Back!</h1>
+                <h1 style="background: linear-gradient(to right, #9de0f6, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Welcome Back!</h1>
                 <p>To keep connected with us please login with your personal info</p>
                 <argon-button
                     class="ghost"
