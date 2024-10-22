@@ -1,29 +1,33 @@
 <template>
-    <div class="chat-room-detail-container">
-        <!-- 채팅방 헤더 -->
-        <div class="chat-title-header">
-            <div class="chat-room-title">
-                <h6 v-if="!isEditingTitle">
-                    {{ chatRoomName }}
-                    <button @click.stop="editTitle" class="edit-button">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </button>
-                </h6>
+    <div v-if="showChatRoomDetails">
+        <div :class="['chat-room-detail-container', isVisible ? 'show' : '']">
+            <!-- 채팅방 헤더 -->
+            <div class="chat-title-header">
+                <div class="chat-room-title">
+                    <h6 v-if="!isEditingTitle">
+                        {{ chatRoomName }}
+                        <button @click.stop="editTitle" class="edit-button">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </button>
+                    </h6>
 
-                <div v-else class="edit-title-container">
-                    <input v-model="newChatRoomName" class="edit-title-input" />
-                    <button @click.stop="saveTitle" class="save-button">확인</button>
+                    <div v-else class="edit-title-container">
+                        <input v-model="newChatRoomName" class="edit-title-input" />
+                        <button @click.stop="saveTitle" class="save-button">확인</button>
+                    </div>
                 </div>
+                <button @click="closeChatRoomDetails" class="close-button">
+                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                </button>
             </div>
+            <!-- 참여자 -->
+            <ul class="member-list">
+                <li v-for="member in members" :key="member.memberId" class="member-item">
+                    <img :src="member.profileImage" class="profile-image" />
+                    <span class="member-name">{{ member.nickname }}</span>
+                </li>
+            </ul>
         </div>
-
-        <!-- 참여자 -->
-        <ul class="member-list">
-            <li v-for="member in members" :key="member.memberId" class="member-item">
-                <img :src="member.profileImage" class="profile-image" />
-                <span class="member-name">{{ member.nickname }}</span>
-            </li>
-        </ul>
     </div>
 </template>
 
@@ -39,6 +43,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    showChatRoomDetails: {
+        type: Boolean,
+        required: true
+    }
 });
 
 const isEditingTitle = ref(false);
@@ -47,7 +55,7 @@ const newChatRoomName = ref(props.chat.nickname); // 수정 채팅방 이름
 const chatRoomId = props.chat.chatRoomId;
 
 const members = ref([]); // 참여자 목록
-const emit = defineEmits(['chat-room-updated'])
+const emit = defineEmits(['chat-room-updated', 'close-details'])
 
 // 채팅방 참여자 목록
 const findChatParticipantApi = async () => {
@@ -90,8 +98,12 @@ const getProfileImage = async (imageUrl) => {
     // console.log(profileImage.value);
 }
 
+const isVisible = ref(false);
 onMounted(() => {
     findChatParticipantApi();
+    setTimeout(() => {
+        isVisible.value = true;
+    }, 50);
 });
 
 // 채팅방 이름 수정 모드로 전환
@@ -112,8 +124,10 @@ const saveTitle = async () => {
     try {
         const response = await axios.put(
             "/chat/rename",
-            {   chatRoomId: chatRoomId,
-                nickname: newChatRoomName.value },
+            {
+                chatRoomId: chatRoomId,
+                nickname: newChatRoomName.value
+            },
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -129,14 +143,33 @@ const saveTitle = async () => {
     }
 };
 
+const closeChatRoomDetails = () => {
+    isVisible.value = false
+    setTimeout(() => {
+        emit('close-details');
+    }, 300);
+};
+
+
 </script>
 
 <style scoped>
 .chat-room-detail-container {
     width: 350px;
+    max-height: 300px;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #fff;
+    opacity: 0;
+    transform: translateX(50px) scale(0.9);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.chat-room-detail-container.show {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
 }
 
 .chat-title-header {
@@ -214,18 +247,16 @@ const saveTitle = async () => {
     align-items: end;
 }
 
-.leave-button {
+.close-button {
+    background: none;
     border: none;
-    font-size: 13px;
-    color: #444;
-    border-radius: 10px;
-    padding: 0px 10px;
     cursor: pointer;
-    height: 30px;
-    margin: 10px;
+    color: #666;
+    font-size: 11pt;
+    margin-right: 10px;
 }
 
-.leave-button:hover {
-    background-color: #ececec;
+.close-button:hover {
+    color: #5b5b5b;
 }
 </style>
