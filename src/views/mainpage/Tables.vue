@@ -1,39 +1,46 @@
 <template>
   <div class="py-4 container-fluid">
-    <!-- Left arrow (fixed) -->
-    <a
-        class="page-link"
-        href="#"
-        aria-label="Previous"
-        style="position: fixed; left: 20px; top: 50%; transform: translateY(-50%); z-index: 10;"
-        @click.prevent="toggleView"
-    >
-      <i class="fa fa-angle-left"></i>
-      <span class="sr-only">Previous</span>
-    </a>
 
-    <!-- Tasks and Calendar components (toggle view) -->
-    <div v-if="currentView === 'tasks'" class="tasks-container mx-5" style="min-height: 600px;">
-      <Tasks />
-    </div>
-    <div v-else-if="currentView === 'calendar'" class="card calendar-container mx-5 mt-0 p-3 shadow-sm" style="min-height: 600px;">
-      <div class="card-body">
-        <CalenderView />
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="false">
+      <!-- Indicators -->
+      <ol class="carousel-indicators">
+        <li
+            data-bs-target="#carouselExampleIndicators"
+            data-bs-slide-to="0"
+            class="active">
+        </li>
+        <li
+            data-bs-target="#carouselExampleIndicators"
+            data-bs-slide-to="1">
+        </li>
+      </ol>
+
+      <div class="carousel-inner">
+        <div class="carousel-item active tasks-slide">
+          <Tasks class="d-block w-100" alt="First slide" />
+        </div>
+        <div class="carousel-item">
+          <CalenderView class="d-block w-100" alt="Second slide" />
+        </div>
       </div>
-      <week-calender/>
-    </div>
 
-    <!-- Right arrow (fixed) -->
-    <a
-        class="page-link"
-        href="#"
-        aria-label="Next"
-        style="position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10;"
-        @click.prevent="toggleView"
-    >
-      <i class="fa fa-angle-right"></i>
-      <span class="sr-only">Next</span>
-    </a>
+      <a
+          class="carousel-control-prev"
+          href="#carouselExampleIndicators"
+          role="button"
+          data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a
+          class="carousel-control-next"
+          href="#carouselExampleIndicators"
+          role="button"
+          data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
 
   </div>
 </template>
@@ -79,3 +86,19 @@ const moveToday = () => {
   }
 };
 </script>
+
+<style scoped>
+
+.tasks-slide {
+  position: relative;
+  padding: 0 50px;
+}
+
+.carousel-control-prev {
+  justify-content: left;
+}
+
+.carousel-control-next {
+  justify-content: right;
+}
+</style>

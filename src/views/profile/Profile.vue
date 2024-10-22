@@ -58,7 +58,7 @@ onBeforeUnmount(() => {
               text-align: center;
               margin-bottom: 20px;
               background: linear-gradient(90deg, rgba(138, 155, 249, 1) 0%, rgba(134, 237, 218, 1) 100%);
-              color: white;
+              color: #121235;
 
             ">
               마이페이지

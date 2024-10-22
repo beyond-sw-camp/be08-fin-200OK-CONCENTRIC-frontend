@@ -85,7 +85,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem("user")) || false;
-  const isLoggedIn = user["state"]["isLoggedIn"];
+  const isLoggedIn = user.state?.isLoggedIn || false;
 
   if(to.path !== "/signin" && !isLoggedIn){
     next("/signin");
