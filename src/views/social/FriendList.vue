@@ -2,35 +2,46 @@
   <div class="friend-list">
     <h2 class="friend-list-title">친구 목록</h2>
     <div class="friend-cards">
-      <div class="friend-card" v-for="friend in friends" :key="friend.id">
-        <img :src="getProfileImage(friend.profileImage)" alt="Profile Image" class="friend-image"/>
+      <div class="friend-card" v-for="friend in friends" :key="friend.id" >
+        <img :src="getProfileImage(friend.profileImage)" alt="Profile Image" class="friend-image" @click="openProfile(friend)"/>
         <div class="friend-info">
           <h5 class="friend-name">{{ friend.nickname }}</h5>
-<!--          <p class="friend-status">{{ friend.status }}</p>-->
         </div>
       </div>
     </div>
+
+    <!-- 프로필 모달 -->
+    <friend-profile v-if="selectedFriend" :friend="selectedFriend" :show-modal="true" @close="closeProfile" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import {ref, onMounted} from 'vue';
 import axios from 'axios';
+import FriendProfile from './FriendProfile.vue'; // 모달 컴포넌트 임포트
 
-const friends = ref();
+const friends = ref([]);
+const selectedFriend = ref(null); // 선택된 친구를 저장할 상태
 
 const getFriends = async () => {
   try {
     const response = await axios.get('friendship/list');
     friends.value = response.data;
-  }catch(err) {
+  } catch (err) {
     console.log(err);
   }
-  console.log(friends.value);
+};
+
+const openProfile = (friend) => {
+  selectedFriend.value = friend; // 선택된 친구 설정
+};
+
+const closeProfile = () => {
+  selectedFriend.value = null; // 선택된 친구 초기화
 };
 
 const getProfileImage = (imageString) => {
-  if(imageString == null){
+  if (imageString == null) {
     return require('@/assets/img/애옹.png');
   }
   const byteCharacters = atob(imageString);
@@ -41,15 +52,13 @@ const getProfileImage = (imageString) => {
   }
 
   const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: 'image' });
+  const blob = new Blob([byteArray], {type: 'image'});
   return URL.createObjectURL(blob);
 };
-
 
 onMounted(() => {
   getFriends();
 });
-
 </script>
 
 <style scoped>

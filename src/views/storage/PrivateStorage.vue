@@ -22,7 +22,7 @@
             <button class="download-button" @click="downloadFile(file.storageFileId)">
               <i class="fas fa-arrow-down"></i>
             </button>
-            <button class="delete-button" @click="deleteFile(file.storageFileId, i)">
+            <button class="delete-button" @click="deleteConfirm(file.storageFileId, i)">
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
@@ -194,6 +194,12 @@ const downloadFile = async (id) => {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+const deleteConfirm = (id, idx) => {
+  if(confirm(`${storageFiles.value[idx]['originalName']} 을 삭제하시겠습니까?`)){
+    deleteFile(id, idx);
+  }
+};
 
 const deleteFile = async (id, idx) => {
   const response = await axios.post(`storage/delete/file`,

@@ -65,6 +65,10 @@ const imageUrl = ref("");
 const background = ref("");
 
 const getProfileImage = async (fileUrl) => {
+  if (userStore.userInfo.imageUrl == null) {
+    imageUrl.value = require('@/assets/img/애옹.png');
+    return;
+  }
   try {
     const response = await axios.post('storage/image/profile',
         null,
@@ -82,6 +86,10 @@ const getProfileImage = async (fileUrl) => {
 };
 
 const getBackGroundImage = async (fileUrl) => {
+  if (userStore.userInfo.background == null) {
+    background.value = require('@/assets/img/애옹.png');
+    return;
+  }
   try {
     const response = await axios.post('storage/image/profile',
         null,
