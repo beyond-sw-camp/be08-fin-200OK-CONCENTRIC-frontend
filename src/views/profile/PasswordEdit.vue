@@ -5,8 +5,10 @@ import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
 import { useUserStore } from "@/store/user";
 import { ref, watch } from "vue";
 import axios from 'axios';
+import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
+const router = useRouter();
 
 const previousPassword = ref('');
 const password = ref('');
@@ -45,11 +47,15 @@ const updatePassword = async () => {
           params: {
             previous: previousPassword.value,
             current: password.value,
-          }
+          },
+          validateStatus: false
         }
     );
     if(response.status === 400){
       passwordInValid.value = true;
+    }else if(response.status === 200){
+      alert("비밀번호가 변경되었습니다.");
+      router.push("/profile");
     }
   }catch(error){
     console.log(error);

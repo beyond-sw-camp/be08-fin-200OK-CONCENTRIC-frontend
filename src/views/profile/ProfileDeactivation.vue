@@ -5,8 +5,10 @@ import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
 import { useUserStore } from "@/store/user";
 import { ref, watch } from "vue";
 import axios from 'axios';
+import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
+const router = useRouter();
 
 const password = ref('');
 const passwordConfirm = ref('');
@@ -17,6 +19,10 @@ watch(passwordConfirm, () => {
   passwordNotMatched.value = password.value !== passwordConfirm.value;
 });
 
+watch(password, () =>{
+  passwordInValid.value = false;
+});
+
 
 const confirmDeactivation = () => {
   if(confirm("정말 탈퇴하시겠습니까?")){
@@ -24,8 +30,27 @@ const confirmDeactivation = () => {
   }
 }
 
-const deactivationRequest = () => {
-  return;
+const deactivationRequest = async () => {
+  try {
+    const response = await axios.put('member/delete',
+        {
+          email: userStore.userInfo['email'],
+          password: password.value,
+        },
+        {
+          validateStatus: false
+        }
+    );
+    if(response.status === 400){
+      passwordInValid.value = true;
+    }else if(response.status === 200){
+      userStore.clearUser();
+      localStorage.removeItem("user");
+      router.push("/");
+    }
+  }catch (error) {
+    console.error(error);
+  }
 }
 
 </script>
@@ -42,6 +67,9 @@ const deactivationRequest = () => {
               type="password"
               v-model="password"
           />
+          <p class="mx-auto mb-4 text-sm" v-if="passwordInValid && password && passwordConfirm">
+            비밀번호가 틀렸습니다.
+          </p>
         </div>
 
         <div class="col-md-12">
