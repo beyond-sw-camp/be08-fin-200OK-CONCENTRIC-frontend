@@ -18,6 +18,7 @@ import Globe from "@/examples/Globe.vue";
 import ChatNotification from "./views/chat/components/ChatNotification.vue";
 
 import { useStateStore } from "@/store/states";
+import { useRoute } from "vue-router"; 
 
 const store = useStore();
 const isNavFixed = computed(() => store.state.isNavFixed);
@@ -40,7 +41,8 @@ const navClasses = computed(() => {
   };
 });
 
-const stateStore = useStateStore();
+const route = useRoute();
+const showConfigurator = computed(() => route.name !== 'Signin');
 
 </script>
 <template>
@@ -63,7 +65,7 @@ const stateStore = useStateStore();
     <app-footer v-show="showFooter" />
 
     <configurator
-      :toggle="toggleConfigurator"
+      v-if="showConfigurator"
       :class="[showConfig ? 'show' : '', hideConfigButton ? 'd-none' : '']"
     />
 
