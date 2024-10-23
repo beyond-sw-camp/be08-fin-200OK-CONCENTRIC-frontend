@@ -13,22 +13,27 @@
     </div>
 
     <ul class="file-list">
-      <li v-for="(file, i) in storageFiles" :key="i">
-        <div class="file-item" v-if="showFiles[i]">
-          <span class="file-name">{{ file.originalName }}</span>
-          <span class="file-size">{{ getSizePresent(file.size) }}</span>
-          <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
-          <div>
-            <button class="download-button" @click="downloadFile(file.storageFileId)">
-              <i class="fas fa-arrow-down"></i>
-            </button>
-            <button class="delete-button" @click="deleteConfirm(file.storageFileId, i)">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </div>
-        </div>
-      </li>
+      <transition-group name="fade" tag="ul">
+        <li v-for="(file, i) in storageFiles" :key="file.storageFileId" style="list-style: none; margin: 0; padding: 0;">
+        <transition name="fade">
+            <div class="file-item" v-if="showFiles[i]">
+              <span class="file-name">{{ file.originalName }}</span>
+              <span class="file-size">{{ getSizePresent(file.size) }}</span>
+              <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
+              <div>
+                <button class="download-button" @click="downloadFile(file.storageFileId)">
+                  <i class="fas fa-arrow-down"></i>
+                </button>
+                <button class="delete-button" @click="deleteConfirm(file.storageFileId, i)">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          </transition>
+        </li>
+      </transition-group>
     </ul>
+
 
     <UploadModal v-if="isModalOpen" @close="closeUploadModal" :files-to-upload="filesToUpload" @files-uploaded="handleFilesUploaded">
       <template #header>
@@ -353,4 +358,12 @@ input[type="file"] {
 .delete-button:hover {
   color: #86EDDA;
 }
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  opacity: 0;
+}
+
 </style>

@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeMount, onMounted, onBeforeUnmount, ref } from "vue";
+import { onBeforeMount, onMounted, onBeforeUnmount, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 import setNavPills from "@/assets/js/nav-pills.js";
@@ -12,19 +12,40 @@ import NotificationList from "@/views/notification/NotificationList.vue";
 import PasswordEdit from "@/views/profile/PasswordEdit.vue";
 import ProfileDeactivation from "@/views/profile/ProfileDeactivation.vue";
 import { useStateStore } from "@/store/states";
+import { useRoute } from "vue-router";
 
 const body = document.getElementsByTagName("body")[0];
 
 const store = useStore();
 const stateStore = useStateStore();
 const activeTab = ref("");
+const route = useRoute();
 
 const setActiveTab = tab => activeTab.value = tab;
+
+watch(
+    () => route.query.tab,
+    (newTab) => {
+      if (newTab) {
+        activeTab.value = newTab;
+      } else {
+        activeTab.value = "profile_card"; // 기본 탭
+      }
+    },
+    { immediate: true } // 초기값 설정
+);
 
 onMounted(() => {
   store.state.isAbsolute = true;
   setNavPills();
   setTooltip();
+
+  const tabParam = route.query.tab;
+  if (tabParam){
+    setActiveTab(tabParam);
+  } else {
+    setActiveTab('profile_card');
+  }
 });
 onBeforeMount(() => {
   store.state.imageLayout = "profile-overview";
@@ -32,7 +53,6 @@ onBeforeMount(() => {
   store.state.showFooter = true;
   store.state.hideConfigButton = true;
   body.classList.add("profile-overview");
-  setActiveTab("profile_card");
 });
 onBeforeUnmount(() => {
   store.state.isAbsolute = false;

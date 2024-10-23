@@ -130,9 +130,6 @@ const getProfileImage = async () => {
     console.error(error);
   }
 }
-const gotoProfile = () => {
-  router.push("/profile");
-}
 
 onMounted(() => {
   if(!checkLogin()) return;
@@ -209,6 +206,7 @@ onMounted(() => {
               class="px-2 py-3 dropdown-menu dropdown-menu-end me-n4"
               :class="showMenu ? 'show' : ''"
               aria-labelledby="dropdownMenuButton"
+              v-show="showMenu"
             >
               <li class="mb-2" v-for="notification in notifications" :key="notification.id"
 
@@ -247,38 +245,35 @@ onMounted(() => {
             </ul>
           </li>
           <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
-            <a
-                href="/profile"
+            <router-link
+                to="/profile?tab=profile_card"
                 class="p-0 nav-link text-white"
                 aria-expanded="false"
                 style="border: none; background-color: transparent;"
             >
               <i class="fa fa-user"></i>
-              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
-            </a>
+            </router-link>
           </li>
           <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
-            <a
-                href="/social"
+            <router-link
+                to="/profile?tab=friend_list"
                 class="p-0 nav-link text-white"
                 @click="stateStore.toggleSocial"
                 aria-expanded="false"
                 style="border: none; background-color: transparent;"
             >
               <i class="fa fa-users"></i>
-              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
-            </a>
+            </router-link>
           </li>
           <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
-            <a
-                href="/storage/private"
+            <router-link
+                to="/profile?tab=private_storage"
                 class="p-0 nav-link text-white"
                 aria-expanded="false"
                 style="border: none; background-color: transparent;"
             >
               <i class="fa fa-archive"></i>
-              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
-            </a>
+            </router-link>
           </li>
         </ul>
 
@@ -301,13 +296,15 @@ onMounted(() => {
       <div
           class="pe-md-5 d-flex align-items-center"
       >
-        <a href="javascript:;" @click="gotoProfile" class="profile-img-container">
+        <router-link
+            to="/profile?tab=profile_card"
+            class="profile-img-container">
           <img
               :src="profileImage"
               class="profile-img rounded-circle img-fluid border border-2 border-white"
               alt="Profile"
           />
-        </a>
+        </router-link>
       </div>
       <div class="d-flex align-items-center">
             <right-top-clock/>
