@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import {computed, ref, onMounted, onBeforeUnmount} from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import Breadcrumbs from "../../examples/Breadcrumbs.vue";
@@ -22,6 +22,8 @@ const numOfNotifications = ref(0);
 const friendshipRequests = ref();
 const numOfFriendshipRequests = ref(0);
 const profileImage = ref();
+const showNotifications = ref([]);
+
 const currentRouteName = computed(() => {
   return route.name;
 });
@@ -29,6 +31,7 @@ const currentDirectory = computed(() => {
   let dir = route.path.split("/")[1];
   return dir.charAt(0).toUpperCase() + dir.slice(1);
 });
+
 const minimizeSidebar = () => store.commit("sidebarMinimize");
 const toggleConfigurator = () => store.commit("toggleConfigurator");
 const closeMenu = () => {
@@ -37,7 +40,8 @@ const closeMenu = () => {
   }, 100);
 };
 const toggleDropdown = () => {
-  showMenu.value = true;
+  // showMenu.value = true;
+  showMenu.value = !showMenu.value;
 }
 const logout = async () => {
   try{
@@ -51,7 +55,7 @@ const logout = async () => {
 
     if(response.status === 200 || response.status === 400 || response.status === 401){
       userStore.clearUser();
-      // axios.defaults.headers.common['Authorization'] = null;
+      axios.defaults.headers.common['Authorization'] = null;
       localStorage.removeItem("user");
       router.push("/");
     }
@@ -75,15 +79,16 @@ const loadNotifications = async () => {
     notifications.value.forEach(notification => {
       notification.createDate = new Date(notification['createDate']).toLocaleString().substring(0, 22);
       if (!notification.isRead) numOfNotifications.value += 1;
+      showNotifications.value.push(true);
     });
   } catch (error) {
     console.log(error);
   }
 }
-const updateRead = (notification) => {
+const updateRead = (notification, idx) => {
   notification.isRead = !notification.isRead;
-  if(notification.isRead) numOfNotifications.value -= 1;
-  else numOfNotifications.value += 1;
+  numOfNotifications.value -= 1;
+  showNotifications.value[idx] = false;
   updateReadApi(notification);
 }
 const updateReadApi = async (notification) => {
@@ -131,11 +136,23 @@ const getProfileImage = async () => {
   }
 }
 
+const handleClickOutside = (event) => {
+  const dropdownMenu = document.getElementById('dropdownMenuButton');
+  if (showMenu.value && !dropdownMenu.contains(event.target)) {
+    showMenu.value = false;
+  }
+};
+
 onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
   if(!checkLogin()) return;
   loadNotifications();
   loadFriendshipRequest();
   getProfileImage();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
@@ -187,41 +204,33 @@ onMounted(() => {
               <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav"></i>
             </a>
           </li>
-          <li
-            class="nav-item dropdown d-flex align-items-center"
-          >
+          <li class="nav-item dropdown d-flex align-items-center">
             <a
-              href="#"
-              class="p-0 nav-link text-white"
-              :class="[showMenu ? 'show' : '']"
-              id="dropdownMenuButton"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              @click="toggleDropdown"
+                href="#"
+                class="p-0 nav-link text-white"
+                :class="[showMenu ? 'show' : '']"
+                id="dropdownMenuButton"
+                aria-expanded="showMenu"
+                @click.stop="toggleDropdown"
             >
               <i class="cursor-pointer fa fa-bell"></i>
               <span class="notification-badge" v-show="numOfNotifications > 0">{{ numOfNotifications }}</span>
             </a>
             <ul
-              class="px-2 py-3 dropdown-menu dropdown-menu-end me-n4"
-              :class="showMenu ? 'show' : ''"
-              aria-labelledby="dropdownMenuButton"
-              v-show="showMenu"
+                class="px-2 py-3 dropdown-menu dropdown-menu-end me-n4"
+                :class="showMenu ? 'show' : ''"
+                aria-labelledby="dropdownMenuButton"
+                v-show="showMenu"
             >
-              <li class="mb-2" v-for="notification in notifications" :key="notification.id"
-
-                  @blur="closeMenu"
-              >
-                <a class="dropdown-item border-radius-md" href="javascript:;"
-                   :class="{ 'bg-light': notification.isRead }"
-                >
+              <transition-group class="dropdown-menu-animation" name="fade" tag="ul" style="padding-left: 0; margin-left: 0;">
+              <li class="mb-2" v-for="(notification, i) in notifications" :key="notification.id" style="list-style: none;">
+                <transition name="fade">
+                <a v-if="showNotifications[i]" class="dropdown-item border-radius-md"
+                   href="javascript:;" :class="{ 'bg-light': notification.isRead }"
+                  style="padding-left: 0.5rem;">
                   <div class="py-1 d-flex">
                     <div class="my-auto">
-                      <img
-                        src="../../assets/img/koongya.png"
-                        class="avatar avatar-sm me-3"
-                        alt="user image"
-                      />
+                      <img src="../../assets/img/koongya.png" class="avatar avatar-sm me-3" alt="user image" />
                     </div>
                     <div class="d-flex flex-column justify-content-center">
                       <h6 class="mb-1 text-sm font-weight-normal">
@@ -232,16 +241,20 @@ onMounted(() => {
                         {{ notification.createDate }}
                       </p>
                     </div>
-                    <div class="my-auto ms-auto" >
-                      <button @click.stop="updateRead(notification)"
-                              class="btn btn-sm btn-outline-primary"
-                              style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
-                        {{ notification.isRead ? '읽음' : '안 읽음' }}
+                    <div class="my-auto ms-auto">
+                      <button
+                          @click.stop="updateRead(notification, i)"
+                          class="btn btn-sm btn-outline-primary"
+                          style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                        <i class="fa fa-check"></i>
                       </button>
+
                     </div>
                   </div>
                 </a>
+                </transition>
               </li>
+              </transition-group>
             </ul>
           </li>
           <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
@@ -353,5 +366,12 @@ onMounted(() => {
 
   .fa:hover {
     color: #5e5e71;
+  }
+
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s;
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+    opacity: 0;
   }
 </style>
