@@ -12,12 +12,16 @@ import ganttastic from "@infectoone/vue-ganttastic";
 import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:8080/v1/api';
 axios.interceptors.request.use((config) => {
+    if(config.url === '/member/login') {
+        config.headers.authorization = undefined;
+        return config;
+    }
     if(localStorage.getItem('user')){
         const token = JSON.parse(localStorage.getItem('user'))['state']['accessToken'];
         if(token){
             config.headers.authorization = token;
             config.withCredentials = true;
-    }
+        }
     }
     return config;
 });
