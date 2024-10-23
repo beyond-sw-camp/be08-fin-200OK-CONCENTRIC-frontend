@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
               style="border: none; background-color: transparent;"
             >
               <i class="fa fa-door-open" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>
-              <span class="d-sm-inline d-none">Logout</span>
+              <span class="d-sm-inline d-none" style="color: #121235">Logout</span>
             </button>
           </li>
 
@@ -362,6 +362,7 @@ onBeforeUnmount(() => {
   .fa {
     color: #121235;
     transition: color 0.1s ease;
+    font-size: 1.6rem;
   }
 
   .fa:hover {

@@ -11,16 +11,8 @@ const store = useStore();
             class="text-sm text-center copyright text-muted"
             :class="store.state.isRTL ? 'text-lg-end' : 'text-lg-start'"
           >
-            ©
-            {{ new Date().getFullYear() }}, made with
-            <i class="fa fa-heart"></i> by
-            <a
-              href="https://www.creative-tim.com"
-              class="font-weight-bold"
-              target="_blank"
-              >Creative Tim</a
-            >
-            for a better web.
+            ©© 2024 200.ok | Project: CONCENTRIC
+            All rights reserved.
           </div>
         </div>
         <div class="col-lg-6">
@@ -29,15 +21,7 @@ const store = useStore();
           >
             <li class="nav-item">
               <a
-                href="https://www.creative-tim.com"
-                class="nav-link text-muted"
-                target="_blank"
-                >Creative Tim</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                href="https://www.creative-tim.com/presentation"
+                href="#"
                 class="nav-link text-muted"
                 target="_blank"
                 >About Us</a
@@ -45,10 +29,10 @@ const store = useStore();
             </li>
             <li class="nav-item">
               <a
-                href="https://www.creative-tim.com/blog"
+                href="https://github.com/beyond-sw-camp/be08-fin-200OK-CONCENTRIC-frontend.git"
                 class="nav-link text-muted"
                 target="_blank"
-                >Blog</a
+                >GitHub</a
               >
             </li>
             <li class="nav-item">
