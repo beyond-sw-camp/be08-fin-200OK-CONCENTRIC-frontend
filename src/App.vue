@@ -69,3 +69,39 @@ const stateStore = useStateStore();
 
   </main>
 </template>
+<style scoped>
+html, body {
+  height: 100%; /* 화면 전체 높이 */
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* 스크롤 제거 */
+}
+
+.landing-bg {
+  height: 100vh;
+  width: 100%;
+  background-color: #1a1a1a; /* 원하는 배경색 */
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.main-content {
+  height: 100vh; /* 뷰포트 높이 전체 사용 */
+  overflow-y: auto; /* 내용이 넘칠 경우 스크롤 허용 */
+  background-color: #f8f9fa; /* 배경색 (필요 시 수정) */
+}
+
+.sidenav {
+  width: 250px;
+  background-color: #333; /* 사이드바 배경 */
+  color: white;
+}
+
+footer {
+  background-color: #f8f9fa;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+}
+</style>

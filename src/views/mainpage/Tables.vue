@@ -159,4 +159,5 @@ const updateView = (view) => {
   opacity: 0.4;
   background-color: rgba(0, 0, 0, 0.75); /* 반투명한 배경색 */
 }
+
 </style>
