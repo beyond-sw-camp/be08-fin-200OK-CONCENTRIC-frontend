@@ -125,6 +125,7 @@ onBeforeUnmount(() => {
   border: none; /* 경계선 제거 */
   border-radius: 5px;
   background-color: transparent;
+  cursor: pointer;
 }
 
 .list-group-item:hover {
