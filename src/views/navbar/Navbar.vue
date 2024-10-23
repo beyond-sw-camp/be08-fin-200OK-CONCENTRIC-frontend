@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import {computed, ref, onMounted, onBeforeUnmount} from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import Breadcrumbs from "../../examples/Breadcrumbs.vue";
@@ -37,7 +37,8 @@ const closeMenu = () => {
   }, 100);
 };
 const toggleDropdown = () => {
-  showMenu.value = true;
+  // showMenu.value = true;
+  showMenu.value = !showMenu.value;
 }
 const logout = async () => {
   try{
@@ -51,7 +52,7 @@ const logout = async () => {
 
     if(response.status === 200 || response.status === 400 || response.status === 401){
       userStore.clearUser();
-      // axios.defaults.headers.common['Authorization'] = null;
+      axios.defaults.headers.common['Authorization'] = null;
       localStorage.removeItem("user");
       router.push("/");
     }
@@ -131,11 +132,23 @@ const getProfileImage = async () => {
   }
 }
 
+const handleClickOutside = (event) => {
+  const dropdownMenu = document.getElementById('dropdownMenuButton');
+  if (showMenu.value && !dropdownMenu.contains(event.target)) {
+    showMenu.value = false;
+  }
+};
+
 onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
   if(!checkLogin()) return;
   loadNotifications();
   loadFriendshipRequest();
   getProfileImage();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
@@ -187,41 +200,86 @@ onMounted(() => {
               <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav"></i>
             </a>
           </li>
-          <li
-            class="nav-item dropdown d-flex align-items-center"
-          >
+<!--          <li-->
+<!--            class="nav-item dropdown d-flex align-items-center"-->
+<!--          >-->
+<!--            <a-->
+<!--              href="#"-->
+<!--              class="p-0 nav-link text-white"-->
+<!--              :class="[showMenu ? 'show' : '']"-->
+<!--              id="dropdownMenuButton"-->
+<!--              data-bs-toggle="dropdown"-->
+<!--              aria-expanded="false"-->
+<!--              @click="toggleDropdown"-->
+<!--            >-->
+<!--              <i class="cursor-pointer fa fa-bell"></i>-->
+<!--              <span class="notification-badge" v-show="numOfNotifications > 0">{{ numOfNotifications }}</span>-->
+<!--            </a>-->
+<!--            <ul-->
+<!--              class="px-2 py-3 dropdown-menu dropdown-menu-end me-n4"-->
+<!--              :class="showMenu ? 'show' : ''"-->
+<!--              aria-labelledby="dropdownMenuButton"-->
+<!--              v-show="showMenu"-->
+<!--            >-->
+<!--              <li class="mb-2" v-for="notification in notifications" :key="notification.id"-->
+
+<!--                  @blur="closeMenu"-->
+<!--              >-->
+<!--                <a class="dropdown-item border-radius-md" href="javascript:;"-->
+<!--                   :class="{ 'bg-light': notification.isRead }"-->
+<!--                >-->
+<!--                  <div class="py-1 d-flex">-->
+<!--                    <div class="my-auto">-->
+<!--                      <img-->
+<!--                        src="../../assets/img/koongya.png"-->
+<!--                        class="avatar avatar-sm me-3"-->
+<!--                        alt="user image"-->
+<!--                      />-->
+<!--                    </div>-->
+<!--                    <div class="d-flex flex-column justify-content-center">-->
+<!--                      <h6 class="mb-1 text-sm font-weight-normal">-->
+<!--                        <span class="font-weight-bold">{{ notification.message }}</span>-->
+<!--                      </h6>-->
+<!--                      <p class="mb-0 text-xs text-secondary">-->
+<!--                        <i class="fa fa-clock me-1"></i>-->
+<!--                        {{ notification.createDate }}-->
+<!--                      </p>-->
+<!--                    </div>-->
+<!--                    <div class="my-auto ms-auto" >-->
+<!--                      <button @click.stop="updateRead(notification)"-->
+<!--                              class="btn btn-sm btn-outline-primary"-->
+<!--                              style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">-->
+<!--                        {{ notification.isRead ? '읽음' : '안 읽음' }}-->
+<!--                      </button>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </a>-->
+<!--              </li>-->
+<!--            </ul>-->
+<!--          </li>-->
+          <li class="nav-item dropdown d-flex align-items-center">
             <a
-              href="#"
-              class="p-0 nav-link text-white"
-              :class="[showMenu ? 'show' : '']"
-              id="dropdownMenuButton"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              @click="toggleDropdown"
+                href="#"
+                class="p-0 nav-link text-white"
+                :class="[showMenu ? 'show' : '']"
+                id="dropdownMenuButton"
+                aria-expanded="showMenu"
+                @click.stop="toggleDropdown"
             >
               <i class="cursor-pointer fa fa-bell"></i>
               <span class="notification-badge" v-show="numOfNotifications > 0">{{ numOfNotifications }}</span>
             </a>
             <ul
-              class="px-2 py-3 dropdown-menu dropdown-menu-end me-n4"
-              :class="showMenu ? 'show' : ''"
-              aria-labelledby="dropdownMenuButton"
-              v-show="showMenu"
+                class="px-2 py-3 dropdown-menu dropdown-menu-end me-n4"
+                :class="showMenu ? 'show' : ''"
+                aria-labelledby="dropdownMenuButton"
+                v-show="showMenu"
             >
-              <li class="mb-2" v-for="notification in notifications" :key="notification.id"
-
-                  @blur="closeMenu"
-              >
-                <a class="dropdown-item border-radius-md" href="javascript:;"
-                   :class="{ 'bg-light': notification.isRead }"
-                >
+              <li class="mb-2" v-for="notification in notifications" :key="notification.id">
+                <a class="dropdown-item border-radius-md" href="javascript:;" :class="{ 'bg-light': notification.isRead }">
                   <div class="py-1 d-flex">
                     <div class="my-auto">
-                      <img
-                        src="../../assets/img/koongya.png"
-                        class="avatar avatar-sm me-3"
-                        alt="user image"
-                      />
+                      <img src="../../assets/img/koongya.png" class="avatar avatar-sm me-3" alt="user image" />
                     </div>
                     <div class="d-flex flex-column justify-content-center">
                       <h6 class="mb-1 text-sm font-weight-normal">
@@ -232,10 +290,8 @@ onMounted(() => {
                         {{ notification.createDate }}
                       </p>
                     </div>
-                    <div class="my-auto ms-auto" >
-                      <button @click.stop="updateRead(notification)"
-                              class="btn btn-sm btn-outline-primary"
-                              style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                    <div class="my-auto ms-auto">
+                      <button @click.stop="updateRead(notification)" class="btn btn-sm btn-outline-primary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
                         {{ notification.isRead ? '읽음' : '안 읽음' }}
                       </button>
                     </div>
