@@ -114,6 +114,11 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+
+.list-group {
+  background-color: rgba(255, 255, 255, 1); /* 완전히 불투명한 흰색 배경 */
+}
+
 .list-group-item {
   transition: background-color 0.3s, color 0.3s;
   margin-bottom: 10px; /* 링크 간의 간격 증가 */
@@ -143,5 +148,6 @@ onBeforeUnmount(() => {
   border-radius: 10px;
   overflow: hidden; /* 카드 안의 요소가 경계를 넘지 않도록 */
 }
+
 </style>
 

@@ -346,7 +346,12 @@ onMounted(() => {
     object-fit: cover;
     border-radius: 50%;
   }
-  .navbar{
-    //background-color: #1a2035;
+  .fa {
+    color: #121235;
+    transition: color 0.1s ease;
+  }
+
+  .fa:hover {
+    color: #5e5e71;
   }
 </style>
