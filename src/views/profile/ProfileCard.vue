@@ -1,20 +1,16 @@
 <template>
-  <div class="card card-profile" style="box-shadow: none; ">
-    <img
-        :src="background"
-        alt="Image placeholder"
-    />
-    <div class="row justify-content-center">
-      <div class="col-4 col-lg-4 order-lg-2">
-        <div class="mt-n4 mt-lg-4 mb-4 mb-lg-0">
-
-            <!-- 이미지 바인딩 -->
-            <img
-                :src="imageUrl"
-                class="profile-img rounded-circle img-fluid border border-2 border-white"
-                alt="Profile"
-            />
-
+  <div class="container">
+    <div class="card card-profile"
+         :style="{ backgroundImage: `url(${background})`}"
+    >
+    <div class="card-profile">
+      <div class="card-body pt-0">
+        <div class="d-flex flex-column align-items-center mt-8">
+          <img
+              :src="imageUrl"
+              class="profile-img rounded-circle img-fluid border border-2 border-white"
+              alt="Profile"
+          />
           <input
               type="file"
               ref="fileInput"
@@ -23,33 +19,20 @@
               style="display: none;"
           />
         </div>
+        <div class="text-center mt-4">
+          <h5>
+            {{ userStore.userInfo['nickname'] }}
+          </h5>
+          <div class="h6 mt-4">
+            <i class="ni business_briefcase-24 mr-2"></i>{{ userStore.userInfo['content'] }}
+          </div>
+          <div class="h6 mt-4">
+            <i class="ni business_briefcase-24 mr-2"></i>가입일 : {{ userStore.userInfo['createDate'] }}
+          </div>
+        </div>
       </div>
     </div>
-<!--    <div class="d-flex justify-content-end pe-4" style="font-size: 0.5rem">-->
-<!--      <router-link to="/profile/edit">-->
-<!--        <argon-button>Edit profile</argon-button>-->
-<!--      </router-link>-->
-<!--    </div>-->
 
-    <div class="card-body pt-0">
-      <div class="text-center mt-4">
-        <h5>
-          {{ userStore.userInfo['nickname'] }}
-<!--          <span class="font-weight-light">, 35</span>-->
-        </h5>
-<!--        <div class="h6 font-weight-300">-->
-<!--          <i class="ni location_pin mr-2"></i>Bucharest, Romania-->
-<!--        </div>-->
-        <div class="h6 mt-4">
-          <i class="ni business_briefcase-24 mr-2"></i>{{ userStore.userInfo['content'] }}
-        </div>
-<!--        <div>-->
-<!--          <i class="ni education_hat mr-2"></i>University of Computer Science-->
-<!--        </div>-->
-        <div class="h6 mt-4">
-          <i class="ni business_briefcase-24 mr-2"></i>가입일 : {{ userStore.userInfo['createDate'] }}
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -112,20 +95,37 @@ onMounted(() => {
 });
 </script>
 <style scoped>
-
-.profile-img-container {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  overflow: hidden;
-  display: block;
-  position: relative;
-}
-
 .profile-img {
-  width: 100%;
-  height: 100%;
+  width: 8rem;
+  height: 8rem;
   object-fit: cover; /* 이미지가 원형 내에 잘 맞도록 */
   border-radius: 50%; /* 이미지도 원형으로 */
+  background-position: center;
+}
+
+.background-image {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+.card-profile{
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  height: 24rem;
+  width: 120vh;
+  padding-top:12%;
+}
+.content-over-background {
+  position: relative;
+  z-index: 2;
+}
+.card-body{
+  z-index:2;
+}
+.card{
+  border-right:none;
 }
 </style>

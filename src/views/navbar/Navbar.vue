@@ -349,6 +349,7 @@ onMounted(() => {
   .fa {
     color: #121235;
     transition: color 0.1s ease;
+    font-size: 1.6rem;
   }
 
   .fa:hover {
