@@ -242,9 +242,13 @@ onBeforeUnmount(() => {
                       </p>
                     </div>
                     <div class="my-auto ms-auto">
-                      <button @click.stop="updateRead(notification, i)" class="btn btn-sm btn-outline-primary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
-                        {{ notification.isRead ? '읽음' : '안 읽음' }}
+                      <button
+                          @click.stop="updateRead(notification, i)"
+                          class="btn btn-sm btn-outline-primary"
+                          style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                        <i class="fa fa-check"></i>
                       </button>
+
                     </div>
                   </div>
                 </a>
