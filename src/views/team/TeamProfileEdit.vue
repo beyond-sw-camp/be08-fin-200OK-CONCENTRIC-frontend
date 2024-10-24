@@ -78,7 +78,7 @@
   // Fetch team data on mount
   fetchTeamData();
   </script>
-  
+   
   <style scoped>
   .team-edit-container {
     max-width: 800px; /* 가로 길이를 늘리기 위해 변경 */

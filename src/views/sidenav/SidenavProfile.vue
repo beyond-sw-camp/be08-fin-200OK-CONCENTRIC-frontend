@@ -19,10 +19,10 @@
         <img :src="require('@/assets/img/icons/expand_more_40dp_000000.png')" class="navbar-brand-img w-25" alt="expand_more_icon" />
       </a>
 
-      <!-- 팀이 없는 경우에도 공간을 차지하도록 투명 공간 추가 -->
+      <!-- 팀이 없는 경우에도 공간을 차지하도록 팀 생성 버튼 추가 -->
       <div v-else class="p-0 dropdown-hover ms-4">
-        <button type="button" class="btn btn-success ms-3" >
-          +New Team
+        <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal">
+          + 팀 생성
         </button>
       </div>
 
@@ -45,9 +45,11 @@
   <div v-if="showCreateTeamModal" class="modal-overlay" @click="closeCreateTeamModal">
     <div class="modal-content" @click.stop>
       <h2>팀 생성</h2>
-      <input type="text" v-model="newTeamName" placeholder="팀 이름" />
-      <button @click="createTeam">팀 생성</button>
-      <button @click="closeCreateTeamModal">닫기</button>
+      <input type="text" v-model="newTeamName" placeholder="팀 이름" class="form-control" />
+      <div class="modal-actions">
+        <button class="btn btn-primary" @click="createTeam">팀 생성</button>
+        <button class="btn btn-secondary" @click="closeCreateTeamModal">닫기</button>
+      </div>
     </div>
   </div>
 </template>
@@ -56,23 +58,22 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/store/user'; // Pinia 스토어 import
+import { useUserStore } from '@/store/user';
 
 const showMenu = ref(false);
 const teams = ref([]);
-const selectedItem = ref({ name: "팀 선택", image: null }); // 기본값을 "팀 선택"으로 설정
+const selectedItem = ref({ name: "팀 선택", image: null });
 const defaultImage = require("@/assets/img/sample_images/371754@2x.png");
 
-const showCreateTeamModal = ref(false);
+const showCreateTeamModal = ref(false); // showCreateTeamModal 정의
 const newTeamName = ref('');
 
-const router = useRouter(); // Vue Router 사용
+const router = useRouter();
 
 const toggleMenu = () => {
   showMenu.value = !showMenu.value;
 };
 
-// 로그인한 유저의 팀 목록을 가져오는 함수
 const fetchUserTeams = async () => {
   const userStore = useUserStore();
   try {
@@ -83,7 +84,6 @@ const fetchUserTeams = async () => {
       }
     });
 
-    // 유저가 속한 팀 목록 설정
     teams.value = response.data.filter(team => 
       team.createdBy === userStore.userId || team.members.includes(userStore.userId)
     );
@@ -92,35 +92,29 @@ const fetchUserTeams = async () => {
   }
 };
 
-// 선택한 팀 설정 및 팀 페이지로 라우팅
 const selectItem = (item) => {
   if (!item || !item.id) {
     console.error("유효하지 않은 팀을 선택했습니다.");
-    return; // 유효하지 않은 경우 처리
+    return;
   }
   selectedItem.value = item;
   showMenu.value = false;
-
-  // 선택한 팀의 페이지로 라우팅 (예: `/team/:id`로 이동)
   router.push(`/team/${item.id}`);
 };
 
-// 팀 생성 모달 열기
 const openCreateTeamModal = () => {
-  showCreateTeamModal.value = true;
+  showCreateTeamModal.value = true; // 모달 열기
 };
 
-// 팀 생성 모달 닫기
 const closeCreateTeamModal = () => {
-  showCreateTeamModal.value = false;
+  showCreateTeamModal.value = false; // 모달 닫기
   newTeamName.value = ''; // 입력값 초기화
 };
 
-// 팀 생성 API 호출
 const createTeam = async () => {
   const userStore = useUserStore();
   try {
-    const response = await axios.post("/team/create", {
+    await axios.post("/team/register", {
       name: newTeamName.value,
       createdBy: userStore.userId
     }, {
@@ -129,15 +123,13 @@ const createTeam = async () => {
         "Authorization": `Bearer ${userStore.token}`
       }
     });
-    // 팀 생성 후 리스트 새로고침
     await fetchUserTeams();
-    closeCreateTeamModal(); // 모달 닫기
+    closeCreateTeamModal();
   } catch (error) {
     console.error("팀 생성에 실패했습니다.", error);
   }
 };
 
-// 컴포넌트가 마운트될 때 팀 목록 가져오기
 onMounted(() => {
   fetchUserTeams();
 });
@@ -151,13 +143,6 @@ onMounted(() => {
   opacity: 0;
   transform: translateY(-10px);
 }
-
-/* 투명 공간을 차지하는 클래스 */
-.invisible {
-  visibility: hidden;
-}
-
-/* 모달 스타일 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -168,13 +153,46 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 10000; /* 모달을 최상단으로 설정 */
 }
-
 .modal-content {
   background: white;
   padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  width: 350px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+.modal-content .form-control {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+}
+.modal-actions .btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+}
+.modal-actions .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+.modal-actions .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
 }
 </style>
