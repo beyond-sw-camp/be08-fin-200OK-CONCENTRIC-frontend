@@ -91,6 +91,9 @@
                       <p class="mx-auto mb-4 text-sm" v-if="!isVerified && duplicated">
                         이미 가입된 이메일입니다
                       </p>
+                      <p class="mx-auto mb-4 text-sm" v-if="emailPatternInvalid && signupEmail">
+                        잘못된 형식입니다
+                      </p>
                     </div>
 
                     <div class="mb-3" v-if="isVerified">
@@ -269,8 +272,10 @@ const duplicated = ref(false);
 const isRegistered = ref(false);
 const nicknameDuplicate = ref(false);
 const passwordPatternInvalid = ref(false);
+const emailPatternInvalid = ref(false);
 
 const passwordPattern = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_]).{8,}$/;
+const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const verificationCode = ref("");
 const signupEmail = ref("");
@@ -281,6 +286,12 @@ const signupNickname = ref("");
 watch(signupPassword, (newPassword) => {
   passwordPatternInvalid.value = !passwordPattern.test(newPassword);
 });
+
+watch(signupEmail, (newEmail) => {
+  emailPatternInvalid.value = !emailPattern.test(newEmail);
+});
+
+watch()
 
 const isRightPanelActive = ref(false);
 const signUp = () => {
@@ -330,6 +341,7 @@ const loginApi = async () => {
 const sendCode = (event) => {
   console.log(signupEmail.value);
   event.preventDefault();
+  if(emailPatternInvalid.value) return;
   onVerifying.value = false;
   duplicated.value = false;
   sendCodeApi();
@@ -397,7 +409,7 @@ const signup = (event) => {
 };
 
 const signupApi = async () => {
-  if(!(signupEmail.value && signupPassword.value && signupName.value && signupNickname.value)) return;
+  if(!(signupEmail.value && signupPassword.value && signupName.value && signupNickname.value && !passwordPatternInvalid.value)) return;
   try {
     const response = await axios.post(
         "/member/register",
