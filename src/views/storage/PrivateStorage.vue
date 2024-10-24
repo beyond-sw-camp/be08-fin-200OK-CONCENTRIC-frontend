@@ -1,5 +1,8 @@
 <template>
-  <div class="file-storage">
+  <div>
+    <div style="font-size: 1.5rem">
+      파일함
+    </div>
     <div class="usage-text">{{ currentSizeMB }}MB / {{ capacityMB }}MB ({{ usagePercentage }}%)</div>
     <div class="usage-bar">
       <div
@@ -16,38 +19,45 @@
       <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;">
         <li v-for="(file, i) in storageFiles" :key="file.storageFileId" style="list-style: none;">
         <transition name="fade">
-            <div class="file-item" v-if="showFiles[i]">
-              <span class="file-name">{{ file.originalName }}</span>
-              <span class="file-size">{{ getSizePresent(file.size) }}</span>
-              <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
-              <div>
-                <button class="download-button" @click="downloadFile(file.storageFileId)">
-                  <i class="fas fa-arrow-down"></i>
-                </button>
-                <button class="delete-button" @click="deleteConfirm(file.storageFileId, i)">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </div>
+          <div class="file-item" v-if="showFiles[i]">
+            <span class="file-name"
+                  @click="downloadFile(file.storageFileId)"
+            style="font-size: 0.8rem">
+              {{ file.originalName }}
+            </span>
+            <span class="file-size">{{ getSizePresent(file.size) }}</span>
+            <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
+            <div>
+              <button class="download-button" @click="downloadFile(file.storageFileId)">
+                <i class="fas fa-arrow-down"></i>
+              </button>
+              <button class="delete-button" @click="deleteConfirm(file.storageFileId, i)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
             </div>
-          </transition>
-        </li>
-      </transition-group>
-    </ul>
-
-
-    <UploadModal v-if="isModalOpen" @close="closeUploadModal" :files-to-upload="filesToUpload" @files-uploaded="handleFilesUploaded">
-      <template #header>
-        <h2>파일 업로드</h2>
-      </template>
-      <template #body>
-        <p>파일을 드래그 앤 드롭하거나 선택하세요.</p>
-      </template>
-      <template #footer>
-<!--        <button @click="uploadFiles">업로드</button>-->
-<!--        <button @click="closeUploadModal">취소</button>-->
-      </template>
-    </UploadModal>
+          </div>
+        </transition>
+      </li>
+    </transition-group>
   </div>
+
+    <transition name="fade-modal">
+      <UploadModal v-if="isModalOpen"
+                   @close="closeUploadModal"
+                   :files-to-upload="filesToUpload"
+                   @files-uploaded="handleFilesUploaded"
+      >
+
+        <template #header>
+          <h2>파일 업로드</h2>
+        </template>
+        <template #body>
+          <p>파일을 드래그 앤 드롭하거나 선택하세요.</p>
+        </template>
+
+      </UploadModal>
+    </transition>
+
 </template>
 
 <script setup>
@@ -231,9 +241,18 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
+.fade-modal-enter-active, .fade-modal-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-modal-enter-from, .fade-modal-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
 .file-storage {
   max-width: 100%;
-  //margin: 20px auto;
   padding: 20px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -276,7 +295,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 4px 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid rgba(200, 200, 200, 0.2) !important;
   align-items: center;
   overflow: hidden;
 }
@@ -288,6 +307,11 @@ onMounted(() => {
   text-overflow: ellipsis;
   max-width: 200px;
   flex-grow: 1;
+}
+
+.file-name:hover{
+  color: #9e9ea8;
+  cursor: pointer;
 }
 
 .file-size {
@@ -358,12 +382,4 @@ input[type="file"] {
 .delete-button:hover {
   color: #86EDDA;
 }
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-  opacity: 0;
-}
-
 </style>
