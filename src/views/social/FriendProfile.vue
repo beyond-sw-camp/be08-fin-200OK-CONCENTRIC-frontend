@@ -38,20 +38,8 @@ const closeProfile = () => {
   emit('close'); // 부모 컴포넌트에 이벤트 전파
 };
 
-const getImage = (imageString) => {
-  if (imageString == null) {
-    return require('@/assets/img/애옹.png');
-  }
-  const byteCharacters = atob(imageString);
-  const byteNumbers = new Array(byteCharacters.length);
-
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], {type: 'image'});
-  return URL.createObjectURL(blob);
+const getImage = (image) => {
+  return image ? image : require('@/assets/img/애옹.png');
 };
 
 </script>
