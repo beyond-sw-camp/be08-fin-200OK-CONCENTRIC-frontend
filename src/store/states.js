@@ -19,6 +19,10 @@ export const useStateStore = defineStore('states', () =>{
         state.numOfNotifications -= 1;
     }
 
+    const increaseNumOfNotifications = () => {
+        state.numOfNotifications += 1;
+    };
+
     const decreaseNumOfFriendRequests = () => {
         state.numOfFriendRequests -= 1;
     }
@@ -32,6 +36,7 @@ export const useStateStore = defineStore('states', () =>{
         setNumOfFriendRequests,
         decreaseNumOfNotifications,
         decreaseNumOfFriendRequests,
+        increaseNumOfNotifications,
         numOfNotifications,
         numOfFriendRequests,
     }
