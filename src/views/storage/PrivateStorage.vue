@@ -15,7 +15,7 @@
       <button class="upload-button" @click="openUploadModal">업로드</button>
     </div>
 
-    <ul class="file-list">
+    <div class="file-list">
       <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;">
         <li v-for="(file, i) in storageFiles" :key="file.storageFileId" style="list-style: none;">
         <transition name="fade">
@@ -57,7 +57,7 @@
 
       </UploadModal>
     </transition>
-
+  </div>
 </template>
 
 <script setup>
