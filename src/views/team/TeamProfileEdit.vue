@@ -85,7 +85,7 @@
     margin: 30px auto 0; /* 상단 마진을 30px 추가 */
     padding: 30px; /* 패딩을 늘려서 공간 확보 */
     background-color: #f8f9fa;
-    border-radius: 10px;
+    border:none;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 추가 */
   }
   

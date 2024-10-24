@@ -64,78 +64,53 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <div class="container-fluid" style="height: 150vh">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary" style="box-shadow: none;">
-      <!-- navbar Content -->
-    </nav>
-    <div class="row" style="margin-top: 10%;">
-      <div class="col-md-2">
-          <ul class="list-group shadow-sm sticky-menu">
-            <li class="list-group-item list-group-item-action"
-            style="
-              font-size: 1.5rem;
-              font-weight: bold;
-              text-align: center;
-              margin-bottom: 20px;
-              background: linear-gradient(90deg, rgba(138, 155, 249, 1) 0%, rgba(134, 237, 218, 1) 100%);
-              color: #121235;
+  <div class="team-page-container d-flex">
+    <div class="sidebar">
+        <ul class="menu">
+          <li style="pointer-events: none">
+            마이 페이지
+          </li>
+          <li :class="{ active: activeTab === 'profile_card' }"
+              @click="setActiveTab('profile_card')">
+            <i class="fa fa-user" aria-hidden="true"></i>프로필</li>
+          <li :class="{ active: activeTab === 'profile_edit' }"
+              @click="setActiveTab('profile_edit')">
+            <i class="fa fa-edit" aria-hidden="true"></i>정보 수정</li>
+          <li :class="{ active: activeTab === 'private_storage' }"
+              @click="setActiveTab('private_storage')">
+            <i class="fa fa-archive" aria-hidden="true"></i>파일함</li>
+          <li :class="{ active: activeTab === 'social' }"
+              @click="setActiveTab('social')">
+            <i class="fa fa-users" aria-hidden="true"></i>친구</li>
+          <li :class="{ active: activeTab === 'notification_list' }"
+              @click="setActiveTab('notification_list')">
+            <i class="fa fa-bell" aria-hidden="true"></i>알림</li>
+          <li :class="{ active: activeTab === 'password_edit' }"
+              @click="setActiveTab('password_edit')">
+            <i class="fa fa-cog" aria-hidden="true"></i>비밀번호 변경</li>
+          <li :class="{ active: activeTab === 'profile_deactivation' }"
+              @click="setActiveTab('profile_deactivation')">
+            <i class="fa fa-trash" aria-hidden="true"></i>회원 탈퇴</li>
 
-            ">
-              마이페이지
-            </li>
-            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'profile_card' }]"
-                @click="setActiveTab('profile_card')">프로필</li>
-            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'profile_edit' }]"
-                @click="setActiveTab('profile_edit')">정보 수정</li>
-            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'private_storage' }]"
-                @click="setActiveTab('private_storage')">파일함</li>
-            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'social' }]"
-                @click="setActiveTab('social')">친구</li>
-            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'notification_list' }]"
-                @click="setActiveTab('notification_list')">알림</li>
-            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'password_edit' }]"
-                @click="setActiveTab('password_edit')">비밀번호 변경</li>
-            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'profile_deactivation' }]"
-                @click="setActiveTab('profile_deactivation')">회원 탈퇴</li>
-
-          </ul>
-      </div>
-      <div class="col-md-6" style="margin-left: 10%;">
-          <profile-card v-if="activeTab === 'profile_card'"/>
-          <profile-edit v-if="activeTab === 'profile_edit'"/>
-          <private-storage v-if="activeTab === 'private_storage'"/>
-          <social v-if="activeTab === 'social'"/>
-          <notification-list v-if="activeTab === 'notification_list'"/>
-          <password-edit v-if="activeTab === 'password_edit'"/>
-          <profile-deactivation v-if="activeTab === 'profile_deactivation'"/>
-      </div>
+        </ul>
+    </div>
+    <div class="main-content">
+        <profile-card v-if="activeTab === 'profile_card'"/>
+        <profile-edit v-if="activeTab === 'profile_edit'"/>
+        <private-storage v-if="activeTab === 'private_storage'"/>
+        <social v-if="activeTab === 'social'"/>
+        <notification-list v-if="activeTab === 'notification_list'"/>
+        <password-edit v-if="activeTab === 'password_edit'"/>
+        <profile-deactivation v-if="activeTab === 'profile_deactivation'"/>
     </div>
   </div>
 </template>
 
 <style scoped>
-
-.list-group {
-  background-color: rgba(255, 255, 255, 1); /* 완전히 불투명한 흰색 배경 */
-}
-
-.list-group-item {
-  transition: background-color 0.3s, color 0.3s;
-  margin-bottom: 10px; /* 링크 간의 간격 증가 */
-  border: none; /* 경계선 제거 */
-  border-radius: 5px;
-  background-color: transparent;
-  cursor: pointer;
-}
-
-.list-group-item:hover {
-  background-color: #007BFF; /* Hover 배경색 */
-  color: white; /* Hover 텍스트 색상 */
-}
-
-.list-group-item.active {
-  background-color: #66a3ff; /* 선택된 항목의 배경색 */
-  color: white; /* 선택된 항목의 텍스트 색상 */
+.team-page-container {
+  display: flex;
+  height: 100vh;
+  transform: translateY(18%);
 }
 
 .sticky-menu {
@@ -150,5 +125,36 @@ onBeforeUnmount(() => {
   overflow: hidden; /* 카드 안의 요소가 경계를 넘지 않도록 */
 }
 
+
+.menu li {
+  padding: 0.6rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.menu li i {
+  margin-right: 1rem;
+}
+
+.menu li.active,
+.menu li:hover {
+  background-color: #e3e3e3;
+  color: rgb(0, 0, 0);
+}
+
+.main-content {
+  flex-grow: 1;
+  padding-inline: 10rem;
+}
+
+.sidebar {
+  width: 15%;
+  padding: 1rem;
+  border-right: 1px solid #dee2e6;
+  flex-shrink: 0;
+}
 </style>
 
