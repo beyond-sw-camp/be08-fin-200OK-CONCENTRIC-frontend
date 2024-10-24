@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <transition name="fade">
     <ul v-show="visible" class="dropdown-menu"
         :style="{ position: 'absolute', zIndex: 9999 }">
@@ -40,4 +40,4 @@ const handleSelect = (item) => {
   opacity: 0;
   transform: translateY(-10px);
 }
-</style>
+</style> -->
