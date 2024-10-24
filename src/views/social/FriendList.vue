@@ -64,9 +64,20 @@ const getProfileImage = (friend) => {
 };
 
 const deleteConfirm = (friend, idx) => {
-  // if(confirm(`${friend.nickname} 님을 삭제하시겠습니까?`)){
-  //
-  // }
+  if(confirm(`${friend.nickname} 님을 삭제하시겠습니까?`)){
+    deleteFriend(friend, idx);
+  }
+}
+
+const deleteFriend = async (friend, idx) => {
+  try {
+    const response = await axios.delete(`friendship/delete/${friend.id}`);
+    if(response.status === 200){
+      showFriends.value[idx] = false;
+    }
+  }catch (err) {
+    console.error(err);
+  }
 }
 
 onMounted(() => {
