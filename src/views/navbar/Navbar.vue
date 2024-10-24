@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref, onMounted, onBeforeUnmount} from "vue";
+import {computed, ref, onMounted, onBeforeUnmount, watch} from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import Breadcrumbs from "../../examples/Breadcrumbs.vue";
@@ -34,6 +34,15 @@ const currentDirectory = computed(() => {
 
 const minimizeSidebar = () => store.commit("sidebarMinimize");
 const toggleConfigurator = () => store.commit("toggleConfigurator");
+
+watch(stateStore.numOfNotifications, () => {
+  numOfNotifications.value = stateStore.numOfNotifications;
+});
+
+watch(stateStore.numOfFriendRequests, () => {
+  numOfFriendshipRequests.value = stateStore.numOfFriendRequests;
+});
+
 const closeMenu = () => {
   setTimeout(() => {
     showMenu.value = false;
@@ -81,13 +90,14 @@ const loadNotifications = async () => {
       if (!notification.isRead) numOfNotifications.value += 1;
       showNotifications.value.push(true);
     });
+    stateStore.setNumOfNotifications(numOfNotifications.value);
   } catch (error) {
     console.log(error);
   }
 }
 const updateRead = (notification, idx) => {
   notification.isRead = !notification.isRead;
-  numOfNotifications.value -= 1;
+  stateStore.decreaseNumOfNotifications();
   showNotifications.value[idx] = false;
   updateReadApi(notification);
 }
@@ -105,6 +115,7 @@ const loadFriendshipRequest = async () => {
     );
     friendshipRequests.value = response.data;
     numOfFriendshipRequests.value = friendshipRequests.value.length;
+    stateStore.setNumOfNotifications(numOfFriendshipRequests.value);
   } catch (error) {
     console.log(error);
   }
@@ -260,11 +271,11 @@ onBeforeUnmount(() => {
             <router-link
                 to="/profile?tab=friend_list"
                 class="p-0 nav-link text-white"
-                @click="stateStore.toggleSocial"
                 aria-expanded="false"
                 style="border: none; background-color: transparent;"
             >
               <i class="fa fa-users"></i>
+              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
             </router-link>
           </li>
           <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
