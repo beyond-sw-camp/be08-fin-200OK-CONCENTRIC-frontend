@@ -7,7 +7,7 @@ import setTooltip from "@/assets/js/tooltip.js";
 import ProfileCard from "@/views/profile/ProfileCard.vue";
 import ProfileEdit from "@/views/profile/ProfileEdit.vue";
 import PrivateStorage from "@/views/storage/PrivateStorage.vue";
-import FriendList from "@/views/social/FriendList.vue";
+import Social from "@/views/social/Social.vue";
 import NotificationList from "@/views/notification/NotificationList.vue";
 import PasswordEdit from "@/views/profile/PasswordEdit.vue";
 import ProfileDeactivation from "@/views/profile/ProfileDeactivation.vue";
@@ -89,8 +89,8 @@ onBeforeUnmount(() => {
                 @click="setActiveTab('profile_edit')">정보 수정</li>
             <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'private_storage' }]"
                 @click="setActiveTab('private_storage')">파일함</li>
-            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'friend_list' }]"
-                @click="setActiveTab('friend_list')">친구</li>
+            <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'social' }]"
+                @click="setActiveTab('social')">친구</li>
             <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'notification_list' }]"
                 @click="setActiveTab('notification_list')">알림</li>
             <li :class="['list-group-item', 'list-group-item-action', { active: activeTab === 'password_edit' }]"
@@ -104,7 +104,7 @@ onBeforeUnmount(() => {
           <profile-card v-if="activeTab === 'profile_card'"/>
           <profile-edit v-if="activeTab === 'profile_edit'"/>
           <private-storage v-if="activeTab === 'private_storage'"/>
-          <friend-list v-if="activeTab === 'friend_list'"/>
+          <social v-if="activeTab === 'social'"/>
           <notification-list v-if="activeTab === 'notification_list'"/>
           <password-edit v-if="activeTab === 'password_edit'"/>
           <profile-deactivation v-if="activeTab === 'profile_deactivation'"/>
@@ -125,6 +125,7 @@ onBeforeUnmount(() => {
   border: none; /* 경계선 제거 */
   border-radius: 5px;
   background-color: transparent;
+  cursor: pointer;
 }
 
 .list-group-item:hover {

@@ -40,11 +40,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import {onMounted, ref} from "vue";
 import axios from "axios";
-import { useUserStore } from "@/store/user";
+import {useStateStore} from "@/store/states";
 
 const notifications = ref([]);
+const stateStore = useStateStore();
 
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
@@ -62,6 +63,7 @@ const getNotifications = async () => {
 
 const updateRead = (notification) => {
   notification.isRead = !notification.isRead;
+  stateStore.decreaseNumOfNotifications();
   updateReadApi(notification);
 };
 
