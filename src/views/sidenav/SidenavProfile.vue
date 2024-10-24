@@ -1,6 +1,9 @@
 <template>
   <router-link class="m-0 navbar-brand d-flex align-items-center" to="#">
-    <img :src="selectedItem.image || defaultImage" class="navbar-brand-img w-25 ms-5" alt="profile_image" />
+    <img :src="selectedItem.image || defaultImage"
+         class="w-25 ms-5"
+         alt="profile_image"
+    />
 
     <div class="dropdown-placeholder">
       <a
@@ -17,8 +20,10 @@
       </a>
 
       <!-- 팀이 없는 경우에도 공간을 차지하도록 투명 공간 추가 -->
-      <div v-else class="p-0 dropdown-hover ms-4 invisible">
-        팀 선택
+      <div v-else class="p-0 dropdown-hover ms-4">
+        <button type="button" class="btn btn-success ms-3" >
+          +New Team
+        </button>
       </div>
 
       <transition name="fade">
