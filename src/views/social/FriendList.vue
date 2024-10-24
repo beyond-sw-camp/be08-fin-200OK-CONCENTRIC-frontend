@@ -2,14 +2,29 @@
   <div class="friend-list">
     <h2 class="friend-list-title">친구 목록</h2>
     <div class="friend-cards">
-      <div class="friend-card" v-for="friend in friends" :key="friend.id" >
-        <img :src="getProfileImage(friend.profileImage)" alt="Profile Image" class="friend-image" @click="openProfile(friend)"/>
-        <div class="friend-info">
-          <h5 class="friend-name">{{ friend.nickname }}</h5>
-        </div>
-      </div>
-    </div>
+      <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;">
+        <ul v-for="(friend, i) in friends" :key="friend.id" style="list-style: none; margin-left: 0; padding-left: 0;">
+          <transition name="fade">
+          <div class="friend-card"
+               style="display: flex; justify-content: space-between; align-items: center;"
+               v-if="showFriends[i]">
+            <img :src="getProfileImage(friend)" alt="Profile Image" class="friend-image" @click="openProfile(friend)"/>
+            <div class="friend-info">
+              <h5 class="friend-name">{{ friend.nickname }}</h5>
+            </div>
+            <button
+                class="btn btn-outline-danger btn-sm"
+                style="justify-content: center; margin: 0 auto;"
+                @click="deleteConfirm(friend, i)"
+            >
+              친구 삭제
+            </button>
 
+          </div>
+          </transition>
+        </ul>
+      </transition-group>
+    </div>
     <!-- 프로필 모달 -->
     <friend-profile v-if="selectedFriend" :friend="selectedFriend" :show-modal="true" @close="closeProfile" />
   </div>
@@ -22,11 +37,15 @@ import FriendProfile from './FriendProfile.vue'; // 모달 컴포넌트 임포�
 
 const friends = ref([]);
 const selectedFriend = ref(null); // 선택된 친구를 저장할 상태
+const showFriends = ref([]);
 
 const getFriends = async () => {
   try {
     const response = await axios.get('friendship/list');
     friends.value = response.data;
+    friends.value.forEach((friend) => {
+      showFriends.value.push(true);
+    });
   } catch (err) {
     console.log(err);
   }
@@ -40,21 +59,26 @@ const closeProfile = () => {
   selectedFriend.value = null; // 선택된 친구 초기화
 };
 
-const getProfileImage = (imageString) => {
-  if (imageString == null) {
-    return require('@/assets/img/애옹.png');
-  }
-  const byteCharacters = atob(imageString);
-  const byteNumbers = new Array(byteCharacters.length);
-
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], {type: 'image'});
-  return URL.createObjectURL(blob);
+const getProfileImage = (friend) => {
+  return friend.profileImage ? friend.profileImage : require('@/assets/img/애옹.png');
 };
+
+const deleteConfirm = (friend, idx) => {
+  if(confirm(`${friend.nickname} 님을 삭제하시겠습니까?`)){
+    deleteFriend(friend, idx);
+  }
+}
+
+const deleteFriend = async (friend, idx) => {
+  try {
+    const response = await axios.delete(`friendship/delete/${friend.id}`);
+    if(response.status === 200){
+      showFriends.value[idx] = false;
+    }
+  }catch (err) {
+    console.error(err);
+  }
+}
 
 onMounted(() => {
   getFriends();
@@ -115,5 +139,12 @@ onMounted(() => {
 .friend-status {
   margin: 0;
   color: #666;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  opacity: 0;
 }
 </style>
