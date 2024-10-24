@@ -1,15 +1,14 @@
 <script setup>
-import {computed, ref, onMounted, onBeforeUnmount, watch} from "vue";
-import { useStore } from "vuex";
-import { useRoute } from "vue-router";
-import Breadcrumbs from "../../examples/Breadcrumbs.vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {useStore} from "vuex";
+import {useRoute, useRouter} from "vue-router";
 import SidenavProfile from "@/views/sidenav/SidenavProfile.vue";
 
-import { useUserStore } from "@/store/user.js";
+import {useUserStore} from "@/store/user.js";
 import axios from 'axios';
-import { useRouter } from 'vue-router';
-import { useStateStore } from "@/store/states";
+import {useStateStore} from "@/store/states";
 import RightTopClock from "@/views/navbar/RightTopClock.vue";
+
 const showMenu = ref(false);
 const store = useStore();
 const isRTL = computed(() => store.state.isRTL);
@@ -18,29 +17,21 @@ const userStore = useUserStore();
 const router = useRouter();
 const stateStore = useStateStore();
 const notifications = ref();
-const numOfNotifications = ref(0);
+const numOfNotifications = ref(stateStore.numOfNotifications);
 const friendshipRequests = ref();
-const numOfFriendshipRequests = ref(0);
+const numOfFriendshipRequests = ref(stateStore.numOfFriendRequests);
 const profileImage = ref();
 const showNotifications = ref([]);
-
-const currentRouteName = computed(() => {
-  return route.name;
-});
-const currentDirectory = computed(() => {
-  let dir = route.path.split("/")[1];
-  return dir.charAt(0).toUpperCase() + dir.slice(1);
-});
 
 const minimizeSidebar = () => store.commit("sidebarMinimize");
 const toggleConfigurator = () => store.commit("toggleConfigurator");
 
-watch(stateStore.numOfNotifications, () => {
-  numOfNotifications.value = stateStore.numOfNotifications;
+watch(() => stateStore.numOfNotifications, (newVal) => {
+  numOfNotifications.value = newVal;
 });
 
-watch(stateStore.numOfFriendRequests, () => {
-  numOfFriendshipRequests.value = stateStore.numOfFriendRequests;
+watch(() => stateStore.numOfFriendRequests, (newVal) => {
+  numOfFriendshipRequests.value = newVal;
 });
 
 const closeMenu = () => {
@@ -73,11 +64,6 @@ const logout = async () => {
     console.log(err);
   }
 
-  // if(response.headers.authorization !== undefined){
-  //   axios.defaults.headers.common['Authorization'] = response.headers.authorization;
-  //   userStore.updateToken(response.headers.authorization);
-  //   console.log(response.headers.authorization);
-  // }
 }
 const loadNotifications = async () => {
   try {
@@ -98,6 +84,7 @@ const loadNotifications = async () => {
 const updateRead = (notification, idx) => {
   notification.isRead = !notification.isRead;
   stateStore.decreaseNumOfNotifications();
+  numOfNotifications.value = stateStore.numOfNotifications;
   showNotifications.value[idx] = false;
   updateReadApi(notification);
 }
@@ -115,7 +102,7 @@ const loadFriendshipRequest = async () => {
     );
     friendshipRequests.value = response.data;
     numOfFriendshipRequests.value = friendshipRequests.value.length;
-    stateStore.setNumOfNotifications(numOfFriendshipRequests.value);
+    stateStore.setNumOfFriendRequests(numOfFriendshipRequests.value);
   } catch (error) {
     console.log(error);
   }
@@ -269,7 +256,7 @@ onBeforeUnmount(() => {
           </li>
           <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
             <router-link
-                to="/profile?tab=friend_list"
+                to="/profile?tab=social"
                 class="p-0 nav-link text-white"
                 aria-expanded="false"
                 style="border: none; background-color: transparent;"
@@ -305,19 +292,6 @@ onBeforeUnmount(() => {
             class="form-control"
             :placeholder="isRTL ? 'أكتب هنا...' : 'Type here...'"
         />
-      </div>
-      <div
-          class="pe-md-5 d-flex align-items-center"
-      >
-        <router-link
-            to="/profile?tab=profile_card"
-            class="profile-img-container">
-          <img
-              :src="profileImage"
-              class="profile-img rounded-circle img-fluid border border-2 border-white"
-              alt="Profile"
-          />
-        </router-link>
       </div>
       <div class="d-flex align-items-center">
             <right-top-clock/>

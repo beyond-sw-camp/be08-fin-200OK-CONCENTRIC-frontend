@@ -1,42 +1,7 @@
 <template>
-  <div class="friend-list">
-    <h2 class="friend-list-title">친구 요청</h2>
-    <div class="friend-cards">
-      <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;">
-        <ul v-for="(friendRequest, i) in friendRequests" :key="friendRequest.id" style="list-style: none; margin-left: 0; padding-left: 0;">
-          <transition name="fade">
-            <div class="friend-card"
-                 style="display: flex; justify-content: space-between; align-items: center;"
-                 v-if="showFriendRequests[i]">
-              <img :src="getProfileImage(friendRequest)" alt="Profile Image" class="friend-image" @click="openProfile(friendRequest)"/>
-              <div class="friend-info">
-                <h5 class="friend-name">{{ friendRequest.nickname }}</h5>
-              </div>
-              <button
-                  class="btn btn-outline btn-sm"
-                  style="justify-content: center; margin: 0 auto; margin-right: 10px;"
-                  @click="acceptFriend(friendRequest, true, i)"
-              >
-                수락
-              </button>
-              <button
-                  class="btn btn-outline-danger btn-sm"
-                  style="justify-content: center; margin: 0 auto;"
-                  @click="acceptFriend(friendRequest, true, i)"
-              >
-                거절
-              </button>
 
-            </div>
-          </transition>
-        </ul>
-      </transition-group>
-    </div>
-    <!-- 프로필 모달 -->
-    <friend-profile v-if="selectedFriend" :friend="selectedFriend" :show-modal="true" @close="closeProfile" />
-  </div>
   <div class="friend-list">
-    <h2 class="friend-list-title">친구 목록</h2>
+<!--    <h2 class="friend-list-title">친구 목록</h2>-->
     <div class="friend-cards">
       <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;">
         <ul v-for="(friend, i) in friends" :key="friend.id" style="list-style: none; margin-left: 0; padding-left: 0;">
@@ -70,14 +35,10 @@
 import {ref, onMounted} from 'vue';
 import axios from 'axios';
 import FriendProfile from './FriendProfile.vue';
-import { useStateStore } from "@/store/states";
 
-const stateStore = useStateStore();
 const friends = ref([]);
 const selectedFriend = ref(null);
 const showFriends = ref([]);
-const friendRequests = ref([]);
-const showFriendRequests = ref([]);
 
 const getFriends = async () => {
   try {
@@ -91,24 +52,12 @@ const getFriends = async () => {
   }
 };
 
-const getFriendRequests = async () => {
-  try {
-    const response = await axios.get('friendship/request/list');
-    friendRequests.value = response.data;
-    friendRequests.value.forEach((friend) => {
-      showFriendRequests.value.push(true);
-    });
-  }catch(err) {
-    console.log(err);
-  }
-}
-
 const openProfile = (friend) => {
-  selectedFriend.value = friend; // 선택된 친구 설정
+  selectedFriend.value = friend;
 };
 
 const closeProfile = () => {
-  selectedFriend.value = null; // 선택된 친구 초기화
+  selectedFriend.value = null;
 };
 
 const getProfileImage = (friend) => {
@@ -132,27 +81,8 @@ const deleteFriend = async (friend, idx) => {
   }
 }
 
-const acceptFriend = async (friendRequest, tof, idx) => {
-  try {
-    const response = await axios.get("friendship/request/update",
-        {
-          params: {
-            senderId: friendRequest.memberId,
-            isAccept: tof,
-          }
-        });
-    if(response.status === 200){
-      showFriends.value[idx] = false;
-      stateStore.decreaseNumOfFriendRequests();
-    }
-  }catch(err) {
-    console.log(err);
-  }
-}
-
 onMounted(() => {
   getFriends();
-  getFriendRequests();
 });
 </script>
 
