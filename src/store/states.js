@@ -3,27 +3,36 @@ import { reactive, computed } from 'vue';
 
 export const useStateStore = defineStore('states', () =>{
     const state = reactive({
-        showSocial: false,
-        showProfileMenu: false,
+        numOfNotifications: 0,
+        numOfFriendRequests: 0,
     });
 
-    const toggleSocial = () => {
-        state.showSocial = !state.showSocial;
-        console.log(state.showSocial);
+    const setNumOfNotifications = (value) => {
+      state.numOfNotifications = value;
+    };
+
+    const setNumOfFriendRequests = (value) => {
+        state.numOfFriendRequests = value;
     }
 
-    const setShowProfileMenu = (tof) => {
-        state.showProfileMenu = tof;
+    const decreaseNumOfNotifications = () => {
+        state.numOfNotifications -= 1;
     }
 
-    const showSocial = computed(() => state.showSocial);
-    const showProfileMenu = computed(() => state.showProfileMenu);
+    const decreaseNumOfFriendRequests = () => {
+        state.numOfFriendRequests -= 1;
+    }
+
+    const numOfNotifications = computed(() => state.numOfNotifications);
+    const numOfFriendRequests = computed(() => state.numOfFriendRequests);
 
     return {
         state,
-        toggleSocial,
-        showSocial,
-        showProfileMenu,
-        setShowProfileMenu
+        setNumOfNotifications,
+        setNumOfFriendRequests,
+        decreaseNumOfNotifications,
+        decreaseNumOfFriendRequests,
+        numOfNotifications,
+        numOfFriendRequests,
     }
 });

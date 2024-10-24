@@ -1,6 +1,7 @@
 <template>
+
   <div class="friend-list">
-    <h2 class="friend-list-title">친구 목록</h2>
+<!--    <h2 class="friend-list-title">친구 목록</h2>-->
     <div class="friend-cards">
       <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;">
         <ul v-for="(friend, i) in friends" :key="friend.id" style="list-style: none; margin-left: 0; padding-left: 0;">
@@ -33,10 +34,10 @@
 <script setup>
 import {ref, onMounted} from 'vue';
 import axios from 'axios';
-import FriendProfile from './FriendProfile.vue'; // 모달 컴포넌트 임포트
+import FriendProfile from './FriendProfile.vue';
 
 const friends = ref([]);
-const selectedFriend = ref(null); // 선택된 친구를 저장할 상태
+const selectedFriend = ref(null);
 const showFriends = ref([]);
 
 const getFriends = async () => {
@@ -52,11 +53,11 @@ const getFriends = async () => {
 };
 
 const openProfile = (friend) => {
-  selectedFriend.value = friend; // 선택된 친구 설정
+  selectedFriend.value = friend;
 };
 
 const closeProfile = () => {
-  selectedFriend.value = null; // 선택된 친구 초기화
+  selectedFriend.value = null;
 };
 
 const getProfileImage = (friend) => {
