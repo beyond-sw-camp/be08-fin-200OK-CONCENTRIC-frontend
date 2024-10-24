@@ -322,6 +322,7 @@
   .profile-name {
   font-weight: bold;
   margin-right: 745px;
+  white-space: nowrap; 
   text-align: left;
   }
   .member-name {

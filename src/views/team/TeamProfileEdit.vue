@@ -5,14 +5,15 @@
       <!-- Team Name Input -->
       <div class="form-group">
         <label for="teamName">팀 이름</label>
-        <input type="text" id="teamName" v-model="selectedTeam.name" placeholder="팀 이름을 입력하세요" />
+        <input type="text" id="teamName" v-model="teamName" placeholder="팀 이름을 입력하세요" />
       </div>
   
       <!-- Team Image Upload -->
       <div class="form-group">
         <label for="teamImage">팀 이미지</label>
         <input type="file" id="teamImage" @change="handleImageUpload" />
-        <img v-if="selectedTeam.imageUrl" :src="selectedTeam.imageUrl" alt="Team Image" class="image-preview" />
+        <img v-if="imageUrl" :src="imageUrl" alt="Team Image" class="image-preview" />
+        <img v-else :src="defaultImageUrl" alt="Default Team Image" class="image-preview" />
       </div>
   
       <!-- Save Button -->
@@ -21,96 +22,109 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { ref, onMounted } from 'vue';
   import axios from 'axios';
-  import { useRoute, useRouter } from 'vue-router';
+  import { useRoute } from 'vue-router';
   
   const route = useRoute();
-  const router = useRouter();
+  const teamName = ref("");  // 팀 이름 저장
+  const imageUrl = ref("");  // 이미지 URL 저장
+  const defaultImageUrl = require('@/assets/img/애옹.png');  // 기본 이미지 URL 저장
   const selectedTeam = ref({
-    name: '',
-    description: '',
-    imageUrl: '',
+    image: null,  // 업로드된 파일을 저장할 필드
   });
   
-  const fetchTeamData = async () => {
+  // 팀 정보를 가져오는 함수
+  const getTeamInfo = async (teamId) => {
     try {
-      const response = await axios.get(`/team/${route.params.id}`);
-      selectedTeam.value = response.data;
-      console.log(selectedTeam.value);
+      const response = await axios.get(`/team/${teamId}`);
+      const teamData = response.data;
+      teamName.value = teamData.name;
+      imageUrl.value = teamData.imageUrl || defaultImageUrl;  // 기본 이미지 사용
     } catch (error) {
-      console.error('팀 정보를 불러오는데 실패했습니다:', error);
+      console.error("팀 정보를 불러오는 중 오류 발생:", error);
     }
   };
   
+  // 이미지 업로드 핸들러
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      selectedTeam.value.imageUrl = reader.result;
-    };
-    reader.readAsDataURL(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        imageUrl.value = reader.result;  // 이미지 미리보기 업데이트
+        selectedTeam.value.image = file;  // 파일 객체 저장
+      };
+      reader.readAsDataURL(file);
+    }
   };
   
+  // 팀 정보 업데이트 함수
   const updateTeam = async () => {
     try {
       const formData = new FormData();
-      formData.append('name', selectedTeam.value.name);
-      if (selectedTeam.value.imageUrl) {
-        formData.append('image', selectedTeam.value.imageUrl);
+      formData.append('name', teamName.value);
+      if (selectedTeam.value.image) {
+        formData.append('image', selectedTeam.value.image);
       }
   
-      await axios.put(`/team/${route.params.id}`, formData);
+      await axios.put(`/team/update/${route.params.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       alert('팀 정보가 수정되었습니다.');
     } catch (error) {
       console.error('팀 정보를 수정하는데 실패했습니다:', error);
     }
   };
   
+  // 수정 확인 후 업데이트 함수 호출
   const confirmUpdate = () => {
-  if (confirm("수정 사항을 저장하시겠습니까?")) {
-    updateTeam();
-  }
-};
+    if (confirm("수정 사항을 저장하시겠습니까?")) {
+      updateTeam();
+    }
+  };
   
-
-  
-  // Fetch team data on mount
-  fetchTeamData();
+  // 컴포넌트 마운트 시 팀 정보 불러오기
+  onMounted(() => {
+    const teamId = route.params.id;  // URL에서 teamId 가져오기
+    getTeamInfo(teamId);
+  });
   </script>
-   
+  
   <style scoped>
   .team-edit-container {
-    max-width: 800px; /* 가로 길이를 늘리기 위해 변경 */
-    margin: 30px auto 0; /* 상단 마진을 30px 추가 */
-    padding: 30px; /* 패딩을 늘려서 공간 확보 */
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 30px;
     background-color: #f8f9fa;
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 추가 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
   
   h2 {
-    margin-bottom: 30px; /* 제목과 요소 간의 간격 추가 */
-    font-size: 1.5rem; /* 제목 크기 조정 */
+    margin-bottom: 30px;
+    font-size: 1.5rem;
   }
   
   .form-group {
-    margin-bottom: 40px; /* 요소 간의 여백을 늘림 */
+    margin-bottom: 40px;
   }
   
   label {
     display: block;
-    margin-bottom: 12px; /* 라벨과 입력 필드 간의 간격 */
+    margin-bottom: 12px;
     font-weight: bold;
   }
   
   input[type="text"],
   input[type="file"] {
     width: 100%;
-    padding: 12px; /* 패딩을 늘려서 입력 필드 넓게 */
+    padding: 12px;
     border-radius: 5px;
     border: 1px solid #dee2e6;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 추가 */
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
   }
   
   button {
@@ -120,9 +134,9 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 20px; /* 버튼 간의 간격을 늘림 */
+    margin-top: 20px;
     transition: background-color 0.3s;
-    width: 100%; /* 버튼의 가로 길이 늘리기 */
+    width: 100%;
   }
   
   button:hover {
@@ -130,10 +144,10 @@
   }
   
   .image-preview {
-    max-width: 150px; /* 이미지 프리뷰 크기 조정 */
+    max-width: 150px;
     margin-top: 10px;
     border-radius: 10px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* 이미지에 그림자 추가 */
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
   }
   </style>
   
