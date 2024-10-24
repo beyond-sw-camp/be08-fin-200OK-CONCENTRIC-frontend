@@ -47,46 +47,13 @@ const userStore = useUserStore();
 const imageUrl = ref("");
 const background = ref("");
 
-const getProfileImage = async (fileUrl) => {
-  if (userStore.userInfo.imageUrl == null) {
-    imageUrl.value = require('@/assets/img/애옹.png');
-    return;
-  }
-  try {
-    const response = await axios.post('storage/image/profile',
-        null,
-        {
-          params: {
-            path: userStore.userInfo['imageUrl'],
-          },
-          responseType: 'blob',
-        },
-    );
-    imageUrl.value = URL.createObjectURL(response.data);
-  } catch (error) {
-    console.error(error);
-  }
+const getProfileImage = async () => {
+  imageUrl.value = userStore.userInfo.imageUrl ? userStore.userInfo.imageUrl : require('@/assets/img/애옹.png');
+  console.log(imageUrl.value);
 };
 
-const getBackGroundImage = async (fileUrl) => {
-  if (userStore.userInfo.background == null) {
-    background.value = require('@/assets/img/애옹.png');
-    return;
-  }
-  try {
-    const response = await axios.post('storage/image/profile',
-        null,
-        {
-          params: {
-            path: userStore.userInfo['background'],
-          },
-          responseType: 'blob',
-        },
-    );
-    background.value = URL.createObjectURL(response.data);
-  } catch (error) {
-    console.error(error);
-  }
+const getBackGroundImage = async () => {
+  background.value = userStore.userInfo.background ? userStore.userInfo.background : require('@/assets/img/애옹.png');
 };
 
 onMounted(() => {

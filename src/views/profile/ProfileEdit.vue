@@ -104,50 +104,20 @@ const backgroundFile = ref(null);
 
 const nicknameDuplicate = ref(false);
 
-const getProfileImage = async () => {
-  if (userStore.userInfo.imageUrl == null) {
-    imageUrl.value = require('@/assets/img/애옹.png');
-    return;
-  }
-  try {
-    const response = await axios.post('storage/image/profile', null, {
-      params: { path: userStore.userInfo['imageUrl'] },
-      responseType: 'blob',
-    });
-    imageUrl.value = URL.createObjectURL(response.data);
-  } catch (error) {
-    console.error(error);
-  }
+const getUser = () => {
+    name.value = userStore.userInfo.name;
+    email.value = userStore.userInfo.email;
+    createDate.value = userStore.userInfo.createDate;
+    nickname.value = userStore.userInfo.nickname;
+    introduction.value = userStore.userInfo.content;
 };
 
-const getUser = async () => {
-  try {
-    const response = await axios.get(`member/${userStore.userInfo['id']}`);
-    name.value = response.data.name;
-    email.value = response.data.email;
-    createDate.value = response.data.createDate;
-    nickname.value = response.data.nickname;
-    introduction.value = response.data.content;
-
-  } catch (err) {
-    console.error(err);
-  }
+const getProfileImage = async () => {
+  imageUrl.value = userStore.userInfo.imageUrl ? userStore.userInfo.imageUrl : require('@/assets/img/애옹.png');
 };
 
 const getBackGroundImage = async () => {
-  if (userStore.userInfo.background == null) {
-    background.value = require('@/assets/img/애옹.png');
-    return;
-  }
-  try {
-    const response = await axios.post('storage/image/profile', null, {
-      params: { path: userStore.userInfo['background'] },
-      responseType: 'blob',
-    });
-    background.value = URL.createObjectURL(response.data);
-  } catch (error) {
-    console.error(error);
-  }
+  background.value = userStore.userInfo.background ? userStore.userInfo.background : require('@/assets/img/애옹.png');
 };
 
 const triggerProfileInput = () => {

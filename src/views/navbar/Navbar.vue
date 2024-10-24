@@ -119,20 +119,9 @@ const checkLogin = () => {
   return true;
 }
 const getProfileImage = async () => {
-  try {
-    const path = userStore.userInfo['imageUrl'];
-    const response = await axios.post(`storage/image/profile`,
-        null,
-        {
-          params: {
-            path: path,
-          },
-          responseType: 'blob',
-        });
-    console.log(response.data);
-    profileImage.value = URL.createObjectURL(response.data);
-  } catch (error) {
-    console.error(error);
+  const user = userStore.userInfo;
+  if(user){
+    profileImage.value = user.imageUrl == null ? require('@/assets/img/애옹.png') : user.imageUrl;
   }
 }
 
