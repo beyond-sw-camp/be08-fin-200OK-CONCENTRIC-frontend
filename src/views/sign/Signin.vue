@@ -1,15 +1,15 @@
 <template>
   <div class="py-4 container-fluid d-flex justify-content-center align-items-center min-vh-100">
     <main class="mt-0 main-content d-flex justify-content-center align-items-center" :class="{ 'right-panel-active': isRightPanelActive }">
-      <div class="page-header min-vh-50 d-flex justify-content-center align-items-center rounded shadow-sm">
+      <div class="page-header min-vh-50 d-flex justify-content-center align-items-center rounded shadow-sm" style="width: 750px;">
         <div class="container" style="border-radius: 20px;">
           <div class="row">
             <!-- 로그인 폼 -->
             <div class="mx-auto col-12 col-md-6 d-flex flex-column mx-lg-0">
               <div class="card card-plain">
-                <div class="pb-0 card-header text-start">
-                  <h4 class="font-weight-bolder">Sign In</h4>
-                  <p class="mb-0">Enter your email and password to sign in</p>
+                <div class="pb-0 card-header text-start" style="background: transparent;">
+                  <h4 class="font-weight-bolder">로그인</h4>
+                  <p class="mb-0">이메일과 비밀번호를 입력하세요.</p>
                 </div>
                 <div class="card-body">
                   <form role="form">
@@ -45,20 +45,20 @@
                           size="lg"
                           @click="login"
                       >
-                        Sign In
+                        로그인
                       </argon-button>
                     </div>
                   </form>
                 </div>
                 <div class="px-1 pt-0 text-center card-footer px-lg-2">
                   <p class="mx-auto mb-4 text-sm">
-                    Don't have an account?
+                    계정이 없으신가요?
                     <a
                         href="javascript:;"
                         class="text-success text-gradient font-weight-bold"
                         @click="signUp"
                     >
-                      Sign Up
+                      회원 가입
                     </a>
                   </p>
                 </div>
@@ -67,9 +67,9 @@
             <!-- 회원가입 폼 -->
             <div class="mx-auto col-12 col-md-6 d-flex flex-column mx-lg-0">
               <div class="card card-plain">
-                <div class="pb-0 card-header text-start">
-                  <h4 class="font-weight-bolder">Sign Up</h4>
-                  <p class="mb-0">Enter your email and password to sign up</p>
+                <div class="pb-0 card-header text-start" style="background: transparent;">
+                  <h4 class="font-weight-bolder">회원 가입</h4>
+                  <p class="mb-0">이메일과 비밀번호를 입력하세요.</p>
                 </div>
                 <div class="card-body">
                   <form role="form">
@@ -83,13 +83,13 @@
                           v-model="signupEmail"
                       />
                       <p class="mx-auto mb-4 text-sm" v-if="isVerified">
-                        Email verified
+                        이메일 인증이 완료되었습니다
                       </p>
                       <p class="mx-auto mb-4 text-sm" v-if="!isVerified && isSent && onVerifying">
-                        Verification failed
+                        인증에 실패했습니다
                       </p>
                       <p class="mx-auto mb-4 text-sm" v-if="!isVerified && duplicated">
-                        Duplicated email
+                        이미 가입된 이메일입니다
                       </p>
                     </div>
 
@@ -102,6 +102,9 @@
                           size="lg"
                           v-model="signupPassword"
                       />
+                      <p class="mx-auto mb-4 text-sm" v-if="passwordPatternInvalid && signupPassword">
+                        비밀번호는 특수문자, 영문, 숫자가 각각 포함된 8자리 이상이어야 합니다.
+                      </p>
                     </div>
                     <div class="mb-3" v-if="isVerified">
                       <argon-input
@@ -122,6 +125,9 @@
                           size="lg"
                           v-model="signupNickname"
                       />
+                      <p class="mx-auto mb-4 text-sm" v-if="nicknameDuplicate && signupNickname">
+                        이미 사용중인 닉네임입니다
+                      </p>
                     </div>
 
                     <div class="mb-3" v-if="!isVerified && isSent">
@@ -144,7 +150,7 @@
                           size="lg"
                           @click="sendCode"
                       >
-                        Send Code
+                        인증번호 전송
                       </argon-button>
                     </div>
                     <div class="text-center" v-if="!isVerified && isSent">
@@ -156,7 +162,7 @@
                           size="lg"
                           @click="verifyCode"
                       >
-                        Verify
+                        인증
                       </argon-button>
                     </div>
                     <div class="text-center" v-if="isVerified">
@@ -168,7 +174,7 @@
                           size="lg"
                           @click="signup"
                       >
-                        Sign Up
+                        회원 가입
                       </argon-button>
                     </div>
                     
@@ -176,13 +182,13 @@
                 </div>
                 <div class="px-1 pt-0 text-center card-footer px-lg-2">
                   <p class="mx-auto mb-4 text-sm">
-                    Already have an account?
+                    이미 계정이 있으신가요?
                     <a
                         href="javascript:;"
                         class="text-success text-gradient font-weight-bold"
                         @click="signIn"
                     >
-                      Sign In
+                      로그인
                     </a>
                   </p>
                 </div>
@@ -193,39 +199,39 @@
           <div class="overlay-container">
             <div class="overlay">
               <div class="overlay-panel overlay-left">
-                <h1 style="background: linear-gradient(to right, #9de0f6, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Welcome Back!</h1>
-                <p>To keep connected with us please login with your personal info</p>
+                <h2 style="background: linear-gradient(to right, #9de0f6, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">환영합니다!</h2>
+                <p>간단한 정보를 입력 후 이용하세요</p>
                 <argon-button
                     class="ghost"
                     variant="gradient"
                     color="success"
                     @click="signIn"
                 >
-                  Sign In
+                  로그인
                 </argon-button>
               </div>
-              <div class="overlay-panel overlay-right" v-if="!isRegisterd">
-                <h1 style="color: #9de0f6">Hi!</h1>
-                <p>Enter your personal details and start your journey with us</p>
+              <div class="overlay-panel overlay-right" v-if="!isRegistered">
+                <h2 style="color: #9de0f6">안녕하세요!</h2>
+                <p>계정이 없다면 가입하세요</p>
                 <argon-button
                     class="ghost"
                     variant="gradient"
                     color="success"
                     @click="signUp"
                 >
-                  Sign Up
+                  회원 가입
                 </argon-button>
               </div>
-              <div class="overlay-panel overlay-right" v-if="isRegisterd">
-                <h1 style="color: #9de0f6">Registered!</h1>
-                <p>Enter your email and password</p>
+              <div class="overlay-panel overlay-right" v-if="isRegistered">
+                <h1 style="color: #9de0f6">가입되었습니다!</h1>
+                <p>이제 이메일과 비밀번호를 입력하세요.</p>
                 <argon-button
                     class="ghost"
                     variant="gradient"
                     color="success"
                     @click="signUp"
                 >
-                  Sign Up
+                  회원 가입
                 </argon-button>
               </div>
             </div>
@@ -238,7 +244,7 @@
 </template>
 
 <script setup>
-import { ref, onBeforeUnmount, onBeforeMount, onMounted } from "vue";
+import {ref, onBeforeUnmount, onBeforeMount, onMounted, watch} from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user.js";
@@ -260,13 +266,21 @@ const isVerified = ref(false);
 const isSent = ref(false);
 const onVerifying = ref(false);
 const duplicated = ref(false);
-const isRegisterd = ref(false);
+const isRegistered = ref(false);
+const nicknameDuplicate = ref(false);
+const passwordPatternInvalid = ref(false);
+
+const passwordPattern = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_]).{8,}$/;
 
 const verificationCode = ref("");
 const signupEmail = ref("");
 const signupPassword = ref("");
 const signupName = ref("");
 const signupNickname = ref("");
+
+watch(signupPassword, (newPassword) => {
+  passwordPatternInvalid.value = !passwordPattern.test(newPassword);
+});
 
 const isRightPanelActive = ref(false);
 const signUp = () => {
@@ -292,7 +306,6 @@ const loginApi = async () => {
           headers: {
             "Content-Type": "application/json",
           },
-          withCredentials: true,
           validateStatus: false
         }
     );
@@ -305,9 +318,9 @@ const loginApi = async () => {
       
       router.push("/tables");
     }else if(response.status === 404 || response.status === 400){
-          alert("아이디 또는 패스워드가 잘못되었다.");
+      alert("아이디 또는 패스워드가 잘못되었습니다.");
     }else if(response.status === 403){
-      alert("탈퇴한 사용자다.");
+      alert("탈퇴한 사용자입니다.");
     }
   } catch (err) {
     console.log(err);
@@ -384,6 +397,7 @@ const signup = (event) => {
 };
 
 const signupApi = async () => {
+  if(!(signupEmail.value && signupPassword.value && signupName.value && signupNickname.value)) return;
   try {
     const response = await axios.post(
         "/member/register",
@@ -394,7 +408,7 @@ const signupApi = async () => {
           nickname: signupNickname.value
         },
         {
-          withCredentials: true,
+          validateStatus: false
         }
     );
     
@@ -404,12 +418,16 @@ const signupApi = async () => {
       onVerifying.value = false;
       isSent.value = false;
       duplicated.value = false;
+      nicknameDuplicate.value = false;
+      isRegistered.value = true;
 
       verificationCode.value = "";
       signupEmail.value = "";
       signupPassword.value = "";
       signupName.value = "";
       signupNickname.value = "";
+    }else if(response.status === 409) {
+      nicknameDuplicate.value = true;
     }
 
     console.log(response.data);
