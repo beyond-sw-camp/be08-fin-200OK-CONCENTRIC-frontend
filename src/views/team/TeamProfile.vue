@@ -29,11 +29,6 @@
                       <p class="mb-0 font-weight-bold text-sm">{{ selectedTeam.role }}</p>
                     </div>
                   </div>
-                  <div class="mx-auto mt-3 col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 d-flex justify-content-end">
-                    <button class="btn btn-custom btn-sm mt-2" @click="openEditModal">
-                      프로필 수정
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -165,53 +160,32 @@
         // 그룹원 프로필 이미지 가져오기
         await Promise.all(
         members.value.map(async (member, index) => {
-            if (member.profileImageUrl) {
+            if (member.profileImage) {
                 try {
-                    const profileImage = await getProfileImage(member.profileImageUrl);
+                    const profileImage = await getTeamsProfileImage(member.profileImage);
                     members.value[index] = { ...member, profileImage }; // 반응성 유지
                     console.log('Profile Image URL:', profileImage);
             } catch (error) {
-                    console.error("이미지를 불러오는 데 실패했습니다.", error);
+                    console.error("그룹원 이미지를 불러오는 데 실패했습니다.", error);
             }
         }
     })
   );
   
         // 그룹장의 프로필 사진 가져오기
-        if (leader.value && leader.value.profileImageUrl) {
+            if (leader.value && leader.value.profileImage) {
             try {
-                const profilePic = await getProfileImage(leader.value.profileImageUrl);
+                const profilePic = await getTeamsProfileImage(leader.value.profileImage); // 여기서 프로필 이미지를 가져옴
                 leader.value = { ...leader.value, profilePic }; // 반응성 유지
+                console.log('그룹장 Profile Image URL:', profilePic);
             } catch (error) {
-                console.error('리더 이미지 못찾음', error);
+                console.error('그룹장 이미지를 불러오는 데 실패했습니다.', error);
             }
         }
       };
   
-  // 프로필 이미지 가져오는 함수
-  const getProfileImage = async (imageUrl) => {
-  try {
-    const response = await axios.post(`storage/image/profile`, null, {
-      params: {
-        path: imageUrl,
-      },
-      responseType: 'blob',
-    });
   
-    if (response.status !== 200) {
-      throw new Error('이미지 요청 실패');
-    }
-  
-    const imageSrc = URL.createObjectURL(response.data);
-    console.log('이미지 요청 성공:', response);
-    return imageSrc;
-  } catch (error) {
-    console.error('이미지 요청 중 오류 발생:', error);
-    throw error; // 호출한 쪽에서 처리를 위해 오류를 던진다.
-  }
-  };
-  
-  
+
       // 팀원 목록을 백엔드에서 불러오는 메서드
       const fetchTeamMembers = async () => {
         try {
@@ -227,50 +201,18 @@
   
       // 팀 정보가 변경될 때마다 팀원 목록을 가져오는 watch
       watch(() => props.team, async (newTeam) => {
-        selectedTeam.value = newTeam;
-        await fetchTeamMembers(); // 팀원 목록 불러오기
-      });
+        if (newTeam) {
+            selectedTeam.value = newTeam;
+            await fetchTeamMembers(); // 팀원 목록 불러오기
+        } else {
+            console.warn("팀 정보가 정의되지 않았습니다.");
+        }
+        });
   
       // 컴포넌트가 처음 로드될 때 팀원 목록을 가져오기
       onMounted(fetchTeamMembers);
   
-      const openFileDialog = () => {
-        document.getElementById('edit-file-input').click();
-      };
-  
-      const updateProfileImage = async (event) => {
-        const file = event.target.files[0];
-        if (file || selectedTeam.value.name) {
-          const formData = new FormData();
-          if (file) formData.append('file', file);
-          formData.append('name', selectedTeam.value.name);
-  
-          try {
-            const response = await axios.post(`/team/update/${selectedTeam.value.id}`, formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            });
-  
-            const updatedTeam = response.data;
-            selectedTeam.value.icon = updatedTeam.icon;
-            selectedTeam.value.name = updatedTeam.name;
-  
-            const teamIndex = teamList.value.findIndex(team => team.id === updatedTeam.id);
-            if (teamIndex !== -1) {
-              teamList.value[teamIndex] = updatedTeam;
-            }
-  
-          } catch (error) {
-            console.error('프로필 업데이트 중 오류 발생:', error);
-          }
-        }
-      };
-  
-      const saveProfile = async () => {
-        await updateProfileImage();
-        closeEditModal();
-      };
+      
   
       const openEditModal = () => {
         isEditModalVisible.value = true;
@@ -317,6 +259,18 @@
           console.error('팀원 삭제 중 오류 발생:', error);
         }
       };
+      const getTeamsProfileImage = (imageString) => {
+            const byteCharacters = atob(imageString);
+            const byteNumbers = new Array(byteCharacters.length);
+
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'image' });
+            return URL.createObjectURL(blob);
+        };
   
       return {
         selectedTeam,
@@ -334,9 +288,6 @@
         confirmDelete,
         closeDeleteModal,
         deleteMember,
-        updateProfileImage,
-        saveProfile,
-        openFileDialog,
       };
     },
   };
@@ -431,4 +382,3 @@
   background-color: #0056b3;
   }
   </style>
-  

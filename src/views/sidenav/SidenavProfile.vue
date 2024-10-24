@@ -89,6 +89,10 @@ const fetchUserTeams = async () => {
 
 // 선택한 팀 설정 및 팀 페이지로 라우팅
 const selectItem = (item) => {
+  if (!item || !item.id) {
+    console.error("유효하지 않은 팀을 선택했습니다.");
+    return; // 유효하지 않은 경우 처리
+  }
   selectedItem.value = item;
   showMenu.value = false;
 

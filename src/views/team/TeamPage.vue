@@ -6,18 +6,22 @@
           <li :class="{ active: activeSection === 'profile' }" @click="setActiveSection('profile')">
             <i class="ni ni-single-02 text-dark"></i> 팀 정보
           </li>
+          <li :class="{ active: activeSection === 'edit' }" @click="setActiveSection('edit')">
+            <i class="ni ni-settings-gear-65 text-success"></i> 정보 수정
+          </li>
           <li :class="{ active: activeSection === 'schedule' }" @click="setActiveSection('schedule')">
             <i class="ni ni-calendar-grid-58 text-warning"></i> 팀 일정
           </li>
           <li :class="{ active: activeSection === 'files' }" @click="setActiveSection('files')">
             <i class="ni ni-folder-17 text-info"></i> 파일함
-          </li>
+          </li>   
         </ul>
       </div>
-  
+    
       <!-- Main content -->
       <div class="main-content">
         <TeamProfile v-if="activeSection === 'profile'" :team="team" />
+        <TeamProfileEdit v-if="activeSection === 'edit'" :team="team" />  <!-- 수정된 부분 -->
         <p v-if="activeSection === 'schedule'"></p>
         <p v-if="activeSection === 'files'"></p>
       </div>
@@ -29,6 +33,7 @@
   import { useRoute } from 'vue-router';
   import axios from 'axios';
   import TeamProfile from '../team/TeamProfile.vue';
+  import TeamProfileEdit from '../team/TeamProfileEdit.vue';  
   
   const route = useRoute();
   const team = ref({});
