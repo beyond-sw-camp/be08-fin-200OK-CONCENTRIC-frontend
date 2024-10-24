@@ -38,7 +38,7 @@
 
                 <ul class="friend-list-body">
                     <li v-for="friend in friends" :key="friend.id" class="friend-list-item">
-                        <img :src="getFriendsProfileImage(friend.profileImage)" class="profile-image" />
+                        <img :src="friend.profileImage ? friend.profileImage : require('@/assets/img/애옹.png')" class="profile-image" />
                         <span class="friend-name">{{ friend.nickname }}</span>
                         <button @click="addPrivateChat(friend)" class="friend-list-select">
                             추가
@@ -155,22 +155,13 @@ const getFriendListApi = async () => {
     try {
         const response = await axios.get("/friendship/list");
         friends.value = response.data;
+        console.log(friends.value);
+        friends.value.forEach(friend => {
+            console.log(friend.profileImage);
+        });
     } catch (err) {
         console.error("친구 목록을 가져오는데 실패했습니다.", err);
     }
-};
-
-const getFriendsProfileImage = (imageString) => {
-    const byteCharacters = atob(imageString);
-    const byteNumbers = new Array(byteCharacters.length);
-
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: 'image' });
-    return URL.createObjectURL(blob);
 };
 
 // 채팅 추가
@@ -190,6 +181,9 @@ const addPrivateChat = async (friend) => {
         console.log(newChatRoom);
         emit("add-chat-room", newChatRoom);
         showFriendList.value = false;
+        if (response.status == 409) {
+            alert("이미 존재하는 채팅방입니다.");
+        }
     } catch (err) {
         console.error("채팅방 추가에 실패했습니다.", err);
     }
@@ -367,6 +361,7 @@ const closeFriendList = () => {
     justify-content: space-between;
     align-items: center;
     padding: 15px 13px 15px 20px;
+    font-size: 14px;
     height: 60px;
     border-bottom: 1px solid #f5f5f5;
 }

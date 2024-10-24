@@ -1,19 +1,22 @@
 <template>
-    <div class="team-page-container">
+    <div class="team-page-container d-flex">
       <!-- Sidebar -->
       <div class="sidebar">
         <ul class="menu">
+          <li style="pointer-events: none;">
+            팀 정보 페이지
+          </li>
           <li :class="{ active: activeSection === 'profile' }" @click="setActiveSection('profile')">
-            <i class="ni ni-single-02 text-dark"></i> 팀 정보
+            <i class="fa fa-user" aria-hidden="true"></i> 팀 정보
           </li>
           <li :class="{ active: activeSection === 'edit' }" @click="setActiveSection('edit')">
-            <i class="ni ni-settings-gear-65 text-success"></i> 정보 수정
+            <i class="fa fa-edit" aria-hidden="true"></i> 정보 수정
           </li>
-          <li :class="{ active: activeSection === 'schedule' }" @click="setActiveSection('schedule')">
-            <i class="ni ni-calendar-grid-58 text-warning"></i> 팀 일정
-          </li>
+<!--          <li :class="{ active: activeSection === 'schedule' }" @click="setActiveSection('schedule')">-->
+<!--            <i class="ni ni-calendar-grid-58 text-warning"></i> 팀 일정-->
+<!--          </li>-->
           <li :class="{ active: activeSection === 'files' }" @click="setActiveSection('files')">
-            <i class="ni ni-folder-17 text-info"></i> 파일함
+            <i class="fa fa-archive" aria-hidden="true"></i> 파일함
           </li>   
         </ul>
       </div>
@@ -72,29 +75,28 @@
   }
   
   .sidebar {
-    width: 250px;
-    background-color: #f8f9fa;
-    padding: 20px;
+    width: 15%;
+    padding: 1rem 1rem 1rem 3rem;
     border-right: 1px solid #dee2e6;
-    border-radius: 10px; /* Rounded corners */
+    flex-shrink: 0;
   }
   
   .menu {
-    list-style-type: none;
+    list-style-type: text;
     padding: 0;
   }
   
   .menu li {
-    padding: 15px;
+    padding: 0.6rem;
     display: flex;
     align-items: center;
     cursor: pointer;
-    border-radius: 8px;
-    transition: background-color 0.3s, color 0.3s;
+    border-radius: 6px;
+    transition: background-color 0.15s, color 0.15s;
   }
   
   .menu li i {
-    margin-right: 10px;
+    margin-right: 1rem;
   }
   
   .menu li.active,
@@ -105,7 +107,6 @@
   
   .main-content {
     flex-grow: 1;
-    padding: 20px;
   }
   </style>
   

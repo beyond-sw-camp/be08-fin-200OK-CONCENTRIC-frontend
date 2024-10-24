@@ -99,8 +99,13 @@
     margin: 30px auto;
     padding: 30px;
     background-color: #f8f9fa;
+<<<<<<< HEAD
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+=======
+    border:none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 추가 */
+>>>>>>> f85501efb1077bada52ae4c7d76774090ff94f63
   }
   
   h2 {

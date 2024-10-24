@@ -8,14 +8,17 @@
      🗑️ 읽은 알림 삭제
     </button>
     <div class="notification-list">
+      <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;" class="notification-list">
       <div
           class="notification-item"
-          v-for="(notification) in notifications"
+          v-for="(notification, i) in notifications"
           :key="notification.id"
       >
+        <transition name="fade">
         <div
             class="notification-card"
             :class="notification.isRead ? 'bg-light' : 'bg-white'"
+            v-if="showNotifications[i]"
         >
           <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -34,8 +37,11 @@
             </div>
           </div>
         </div>
+        </transition>
       </div>
+      </transition-group>
     </div>
+
   </div>
 </template>
 
@@ -45,6 +51,7 @@ import axios from "axios";
 import {useStateStore} from "@/store/states";
 
 const notifications = ref([]);
+const showNotifications = ref([]);
 const stateStore = useStateStore();
 
 const formatDate = (timestamp) => {
@@ -56,6 +63,9 @@ const getNotifications = async () => {
   try {
     const response = await axios.get("/notification/list");
     notifications.value = response.data;
+    notifications.value.forEach(notification => {
+      showNotifications.value.push(true);
+    });
   } catch (error) {
     console.error(error);
   }
@@ -63,7 +73,8 @@ const getNotifications = async () => {
 
 const updateRead = (notification) => {
   notification.isRead = !notification.isRead;
-  stateStore.decreaseNumOfNotifications();
+  if (notification.isRead) stateStore.decreaseNumOfNotifications();
+  else stateStore.increaseNumOfNotifications();
   updateReadApi(notification);
 };
 
@@ -79,7 +90,18 @@ const deleteConfirm = () => {
 
 const deleteNotifications = async () => {
   try {
+    const toDelete = [];
+    for(let i = 0; i < notifications.value.length; i++) {
+      if(notifications.value[i].isRead){
+        toDelete.push(i);
+      }
+    }
     const response = await axios.delete(`/notification/read/delete`);
+    if(response.status === 200){
+      toDelete.forEach((idx) => {
+        showNotifications.value[idx] = false;
+      })
+    }
   }catch(error) {
     console.error(error);
   }
@@ -129,5 +151,12 @@ onMounted(() => {
 
 .notification-card .btn {
   font-size: 0.75rem;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  opacity: 0;
 }
 </style>

@@ -1,47 +1,56 @@
 <template>
-  <router-link class="m-0 navbar-brand d-flex align-items-center" to="#">
-    <img :src="selectedItem.image || defaultImage"
-         class="w-25 ms-5"
-         alt="profile_image"
+  <div class="row col-auto">
+    <div class="col image-container">
+      <a :href="selectedItem.link || '/'" class="image-link align-content-center">
+    <img
+        :src="selectedItem.image || defaultImage"
+        class="w-25 ms-5"
+        alt="profile_image"
     />
-
-    <div class="dropdown-placeholder">
-      <a
-        v-if="teams.length > 0"
-        href="#"
-        class="p-0 dropdown-hover ms-4"
-        :class="[showMenu ? 'show' : '']"
-        id="dropdownMenuButton"
-        aria-expanded="true"
-        @click="toggleMenu"
-      >
-        {{ selectedItem.name || "팀 선택" }}
-        <img :src="require('@/assets/img/icons/expand_more_40dp_000000.png')" class="navbar-brand-img w-25" alt="expand_more_icon" />
-      </a>
-
-      <!-- 팀이 없는 경우에도 공간을 차지하도록 팀 생성 버튼 추가 -->
-      <div v-else class="p-0 dropdown-hover ms-4">
-        <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal">
-          + 팀 생성
-        </button>
-      </div>
-
-      <transition name="fade">
-        <ul v-show="showMenu && teams.length > 0" class="dropdown-menu" :style="{ position: 'absolute', zIndex: 9999 }">
-          <li v-for="team in teams" :key="team.id">
-            <a href="#" class="dropdown-item" @click="selectItem(team)">
-              {{ team.name }}
-            </a>
-          </li>
-          <li class="dropdown-item">
-            <button class="btn btn-link" @click="openCreateTeamModal">+ 팀 생성</button>
-          </li>
-        </ul>
-      </transition>
+  </a>
     </div>
-  </router-link>
+    <div class="col">
+      <router-link class="m-0 navbar-brand d-flex align-items-center" to="#">
 
-  <!-- 팀 생성 모달 -->
+      <div class="dropdown-placeholder">
+        <a
+          v-if="teams.length > 0"
+          href="#"
+          class="p-0 dropdown-hover ms-4"
+          :class="[showMenu ? 'show' : '']"
+          id="dropdownMenuButton"
+          aria-expanded="true"
+          @click="toggleMenu"
+        >
+          {{ selectedItem.name || "팀 선택" }}
+          <img :src="require('@/assets/img/icons/expand_more_40dp_000000.png')"
+               class="navbar-brand-img w-25"
+               alt="expand_more_icon"/>
+        </a>
+
+        <!-- 팀이 없는 경우에도 공간을 차지하도록 팀 생성 버튼 추가 -->
+        <div v-else class="p-0 dropdown-hover ms-4">
+          <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal">
+            + 팀 생성
+          </button>
+        </div>
+
+        <transition name="fade">
+          <ul v-show="showMenu && teams.length > 0" class="dropdown-menu" :style="{ position: 'absolute', zIndex: 9999 }">
+            <li v-for="team in teams" :key="team.id">
+              <a href="#" class="dropdown-item" @click="selectItem(team)">
+                {{ team.name }}
+              </a>
+            </li>
+            <li class="dropdown-item">
+              <button class="btn btn-link" @click="openCreateTeamModal">+ 팀 생성</button>
+            </li>
+          </ul>
+        </transition>
+      </div>
+    </router-link>
+    </div>
+  </div>
   <div v-if="showCreateTeamModal" class="modal-overlay" @click="closeCreateTeamModal">
     <div class="modal-content" @click.stop>
       <h2>팀 생성</h2>
@@ -194,5 +203,13 @@ onMounted(() => {
   background-color: #6c757d;
   border-color: #6c757d;
   color: white;
+}
+
+.image-container {
+  display: inline-block; /* 부모가 자식의 크기에 맞게 축소 */
+}
+
+.image-link {
+  display: inline-block; /* 링크도 이미지 크기에 맞춤 */
 }
 </style>
