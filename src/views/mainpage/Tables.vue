@@ -1,58 +1,100 @@
 <template>
-  <div class="py-4 container-fluid">
-    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="false">
-      <!-- Indicators -->
-      <ol class="carousel-indicators">
-        <li
-            data-bs-target="#carouselExampleIndicators"
-            data-bs-slide-to="0"
-            class="active">
-        </li>
-        <li
-            data-bs-target="#carouselExampleIndicators"
-            data-bs-slide-to="1">
-        </li>
-      </ol>
-
-      <div class="carousel-inner">
-        <div class="carousel-item active tasks-slide">
-          <Tasks class="d-block w-100" alt="First slide" />
-        </div>
-        <div class="carousel-item">
-          <CalenderView class="d-block w-100" alt="Second slide" />
+  <div class="row min-vh-75 container">
+    <div class="col-2 py-4" >
+      <div class="card ">
+        <div class="sidebar">
+          <ul class="menu">
+            <li style="border-bottom: 0.5px solid rgba(0, 0, 0, 0.2); width: 90%; border-radius: 0">
+              메뉴
+            </li>
+            <li>
+              <router-link
+                  to="/profile?tab=profile_card"
+                  class="p-0 nav-link"
+                  style="color: #121235"
+              >
+                <i class="fa fa-user"></i>마이 페이지
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                  to="/profile?tab=social"
+                  class="p-0 nav-link"
+                  style="color: #121235;"
+              >
+                <i class="fa fa-users"></i>소셜
+<!--                <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>-->
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                  to="/profile?tab=private_storage"
+                  class="p-0 nav-link"
+                  aria-expanded="false"
+                  style="color: #121235"
+              >
+                <i class="fa fa-archive"></i>파일함
+              </router-link>
+            </li>
+          </ul>
         </div>
       </div>
-
-      <a
-          class="carousel-control-prev"
-          href="#carouselExampleIndicators"
-          role="button"
-          data-bs-slide="prev"
-          @click="toggleView"
-      >
-        <span class="carousel-control-prev-icon" aria-hidden="true"
-              data-bs-toggle="popover"
-              data-bs-placement="top"
-              :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"
-        ></span>
-        <span class="sr-only"
-        >Previous</span>
-      </a>
-      <a
-          class="carousel-control-next"
-          href="#carouselExampleIndicators"
-          role="button"
-          data-bs-slide="next"
-          @click="toggleView"
-      >
-        <span class="carousel-control-next-icon" aria-hidden="true"
-              data-bs-toggle="popover"
-              data-bs-placement="top"
-              :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"></span>
-        <span class="sr-only">Next</span>
-      </a>
     </div>
+    <div class="col-10 py-4 container-fluid">
+      <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="false">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+          <li
+              data-bs-target="#carouselExampleIndicators"
+              data-bs-slide-to="0"
+              class="active">
+          </li>
+          <li
+              data-bs-target="#carouselExampleIndicators"
+              data-bs-slide-to="1">
+          </li>
+        </ol>
 
+        <div class="carousel-inner">
+          <div class="carousel-item active tasks-slide">
+            <Tasks class="d-block w-100" alt="First slide" />
+          </div>
+          <div class="carousel-item">
+            <CalenderView class="d-block w-100" alt="Second slide" />
+          </div>
+        </div>
+
+        <a
+            class="carousel-control-prev"
+            href="#carouselExampleIndicators"
+            role="button"
+            data-bs-slide="prev"
+            @click="toggleView"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"
+                data-bs-toggle="popover"
+                data-bs-placement="top"
+                :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"
+          ></span>
+          <span class="sr-only"
+          >Previous</span>
+        </a>
+        <a
+            class="carousel-control-next"
+            href="#carouselExampleIndicators"
+            role="button"
+            data-bs-slide="next"
+            @click="toggleView"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"
+                data-bs-toggle="popover"
+                data-bs-placement="top"
+                :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+
+    </div>
   </div>
 </template>
 
@@ -138,6 +180,31 @@ const updateView = (view) => {
 </script>
 
 <style scoped>
+.menu li {
+  padding: 0.6rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.menu li i {
+  margin-right: 1rem;
+}
+
+.menu li.active,
+.menu li:hover {
+  background-color: #e3e3e3;
+  color: rgb(0, 0, 0);
+}
+
+.sidebar {
+  width: 100%;
+  padding-top: 1rem;
+  flex-shrink: 0;
+  align-content: center;
+}
 
 .tasks-slide {
   position: relative;

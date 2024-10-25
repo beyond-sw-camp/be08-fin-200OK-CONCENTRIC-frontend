@@ -186,11 +186,6 @@ onBeforeUnmount(() => {
             </button>
           </li>
 
-          <li class="px-3 nav-item d-flex align-items-center">
-            <a class="p-0 nav-link text-white" @click="toggleConfigurator">
-              <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav"></i>
-            </a>
-          </li>
           <li class="nav-item dropdown d-flex align-items-center">
             <a
                 href="#"
@@ -244,37 +239,9 @@ onBeforeUnmount(() => {
               </transition-group>
             </ul>
           </li>
-          <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
-            <router-link
-                to="/profile?tab=profile_card"
-                class="p-0 nav-link text-white"
-                aria-expanded="false"
-                style="border: none; background-color: transparent;"
-            >
-              <i class="fa fa-user"></i>
-            </router-link>
-          </li>
-          <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
-            <router-link
-                to="/profile?tab=social"
-                class="p-0 nav-link text-white"
-                aria-expanded="false"
-                style="border: none; background-color: transparent;"
-            >
-              <i class="fa fa-users"></i>
-              <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>
-            </router-link>
-          </li>
-          <li class="nav-item d-flex align-items-center position-relative" style="margin-left: 15px;">
-            <router-link
-                to="/profile?tab=private_storage"
-                class="p-0 nav-link text-white"
-                aria-expanded="false"
-                style="border: none; background-color: transparent;"
-            >
-              <i class="fa fa-archive"></i>
-            </router-link>
-          </li>
+
+
+
         </ul>
 
       </div>
