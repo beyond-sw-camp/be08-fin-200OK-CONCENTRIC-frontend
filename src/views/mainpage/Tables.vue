@@ -1,11 +1,43 @@
 <template>
   <div class="row min-vh-75 container">
     <div class="col-2 py-4" >
-      <div class="card min-vh-50">
-        <div>
-          안녕
+      <div class="card ">
+        <div class="sidebar">
+          <ul class="menu">
+            <li style="border-bottom: 0.5px solid rgba(0, 0, 0, 0.2); width: 90%; border-radius: 0">
+              메뉴
+            </li>
+            <li>
+              <router-link
+                  to="/profile?tab=profile_card"
+                  class="p-0 nav-link"
+                  style="color: #121235"
+              >
+                <i class="fa fa-user"></i>마이 페이지
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                  to="/profile?tab=social"
+                  class="p-0 nav-link"
+                  style="color: #121235;"
+              >
+                <i class="fa fa-users"></i>소셜
+<!--                <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>-->
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                  to="/profile?tab=private_storage"
+                  class="p-0 nav-link"
+                  aria-expanded="false"
+                  style="color: #121235"
+              >
+                <i class="fa fa-archive"></i>파일함
+              </router-link>
+            </li>
+          </ul>
         </div>
-
       </div>
     </div>
     <div class="col-10 py-4 container-fluid">
@@ -148,6 +180,31 @@ const updateView = (view) => {
 </script>
 
 <style scoped>
+.menu li {
+  padding: 0.6rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.menu li i {
+  margin-right: 1rem;
+}
+
+.menu li.active,
+.menu li:hover {
+  background-color: #e3e3e3;
+  color: rgb(0, 0, 0);
+}
+
+.sidebar {
+  width: 100%;
+  padding-top: 1rem;
+  flex-shrink: 0;
+  align-content: center;
+}
 
 .tasks-slide {
   position: relative;
