@@ -1,58 +1,68 @@
 <template>
-  <div class="py-4 container-fluid">
-    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="false">
-      <!-- Indicators -->
-      <ol class="carousel-indicators">
-        <li
-            data-bs-target="#carouselExampleIndicators"
-            data-bs-slide-to="0"
-            class="active">
-        </li>
-        <li
-            data-bs-target="#carouselExampleIndicators"
-            data-bs-slide-to="1">
-        </li>
-      </ol>
+  <div class="row min-vh-75 container">
+    <div class="col-2 py-4" >
+      <div class="card min-vh-50">
+        <div>
+          안녕
+        </div>
 
-      <div class="carousel-inner">
-        <div class="carousel-item active tasks-slide">
-          <Tasks class="d-block w-100" alt="First slide" />
+      </div>
+    </div>
+    <div class="col-10 py-4 container-fluid">
+      <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="false">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+          <li
+              data-bs-target="#carouselExampleIndicators"
+              data-bs-slide-to="0"
+              class="active">
+          </li>
+          <li
+              data-bs-target="#carouselExampleIndicators"
+              data-bs-slide-to="1">
+          </li>
+        </ol>
+
+        <div class="carousel-inner">
+          <div class="carousel-item active tasks-slide">
+            <Tasks class="d-block w-100" alt="First slide" />
+          </div>
+          <div class="carousel-item">
+            <CalenderView class="d-block w-100" alt="Second slide" />
+          </div>
         </div>
-        <div class="carousel-item">
-          <CalenderView class="d-block w-100" alt="Second slide" />
-        </div>
+
+        <a
+            class="carousel-control-prev"
+            href="#carouselExampleIndicators"
+            role="button"
+            data-bs-slide="prev"
+            @click="toggleView"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"
+                data-bs-toggle="popover"
+                data-bs-placement="top"
+                :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"
+          ></span>
+          <span class="sr-only"
+          >Previous</span>
+        </a>
+        <a
+            class="carousel-control-next"
+            href="#carouselExampleIndicators"
+            role="button"
+            data-bs-slide="next"
+            @click="toggleView"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"
+                data-bs-toggle="popover"
+                data-bs-placement="top"
+                :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"></span>
+          <span class="sr-only">Next</span>
+        </a>
       </div>
 
-      <a
-          class="carousel-control-prev"
-          href="#carouselExampleIndicators"
-          role="button"
-          data-bs-slide="prev"
-          @click="toggleView"
-      >
-        <span class="carousel-control-prev-icon" aria-hidden="true"
-              data-bs-toggle="popover"
-              data-bs-placement="top"
-              :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"
-        ></span>
-        <span class="sr-only"
-        >Previous</span>
-      </a>
-      <a
-          class="carousel-control-next"
-          href="#carouselExampleIndicators"
-          role="button"
-          data-bs-slide="next"
-          @click="toggleView"
-      >
-        <span class="carousel-control-next-icon" aria-hidden="true"
-              data-bs-toggle="popover"
-              data-bs-placement="top"
-              :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"></span>
-        <span class="sr-only">Next</span>
-      </a>
     </div>
-
   </div>
 </template>
 

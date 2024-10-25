@@ -220,7 +220,7 @@ export default {
 }
 
 .modal-content {
-  position: absolute;
+  position: relative;
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -228,6 +228,7 @@ export default {
   max-width: 90%;
   z-index: 10000;
   cursor: grab;
+  transform: translateY(20%);
 }
 
 .modal-content:active {
