@@ -46,8 +46,8 @@
               <div v-if="leader" class="group-leader">
                 <h6 class="text-uppercase">그룹장</h6>
                 <div class="profile-box position-relative">
-                  <img :src="leader.value.profileImage ? leader.value.profileImage : require('@/assets/img/애옹.png')" class="member-icon" />
-                  <span class="profile-name">{{ leader.nickname }}</span>
+                  <img :src="leader.profileImage ? leader.profileImage : require('@/assets/img/애옹.png')" class="member-icon" />
+                  <span class="member-name">{{ leader.nickname }}</span>
                 </div>
                 <hr class="horizontal dark" />
               </div>
@@ -180,7 +180,7 @@ export default {
       }
     );
 
-    onMounted(fetchTeamMembers);
+    onMounted(async() => (fetchTeamMembers()));
     fetchTeamData();
 
     const openEditModal = () => {
@@ -281,7 +281,7 @@ export default {
   
   .profile-name {
   font-weight: bold;
-  margin-right: 745px;
+  margin-right: 700px;
   text-align: left;
   }
   .member-name {
