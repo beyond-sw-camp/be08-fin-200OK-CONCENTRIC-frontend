@@ -102,14 +102,19 @@ const fetchUserTeams = async () => {
 };
 
 const selectItem = (item) => {
+  const userStore = useUserStore();  // Pinia 스토어 사용
   if (!item || !item.id) {
     console.error("유효하지 않은 팀을 선택했습니다.");
     return;
   }
   selectedItem.value = item;
   showMenu.value = false;
+
+  userStore.setTeamId(item.id);
+
   router.push(`/team/${item.id}`);
 };
+
 
 const openCreateTeamModal = () => {
   showCreateTeamModal.value = true; // 모달 열기
