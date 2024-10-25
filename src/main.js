@@ -32,6 +32,7 @@ axios.interceptors.response.use(
         if(token){
             const user = JSON.parse(localStorage.getItem('user'));
             if(user){
+                user['state']['team_id'] = null;
                 user['state']['accessToken'] = token;
                 localStorage.setItem('user', JSON.stringify(user));
             }
@@ -40,6 +41,7 @@ axios.interceptors.response.use(
             console.log("unauthorized");
             const user = JSON.parse(localStorage.getItem('user'));
             if(user){
+                user['state']['team_id'] = null;
                 user['state']['userInfo'] = undefined;
                 user['state']['isLoggedIn'] = false;
                 user['state']['accessToken'] = undefined;
@@ -54,6 +56,7 @@ axios.interceptors.response.use(
             console.log("unauthorized.");
             const user = JSON.parse(localStorage.getItem('user'));
             if(user){
+                user['state']['team_id'] = null;
                 user['state']['userInfo'] = undefined;
                 user['state']['isLoggedIn'] = false;
                 user['state']['accessToken'] = undefined;

@@ -6,7 +6,8 @@ export const useUserStore = defineStore('user', () => {
     const state = reactive({
         userInfo: null,
         isLoggedIn: false,
-        accessToken: null
+        accessToken: null,
+        team_id: null,
     });
 
     const setUser = (user) => {
@@ -31,6 +32,14 @@ export const useUserStore = defineStore('user', () => {
         state.userInfo = user;
     }
 
+    // team_id 설정 (Setter)
+    const setTeamId = (teamId) => {
+        state.team_id = teamId;
+    };
+
+    // team_id 조회 (Getter)
+    const teamId = computed(() => state.team_id);
+
     const userInfo = computed(() => state.userInfo);
     const isLoggedIn = computed(() => state.isLoggedIn);
     const accessToken = computed(() => state.accessToken);
@@ -41,6 +50,8 @@ export const useUserStore = defineStore('user', () => {
         clearUser, 
         setToken,
         updateUser,
+        setTeamId,
+        teamId,
         userInfo,
         isLoggedIn,
         accessToken,
