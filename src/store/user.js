@@ -8,6 +8,7 @@ export const useUserStore = defineStore('user', () => {
         isLoggedIn: false,
         accessToken: null,
         team_id: null,
+        teams: [],
     });
 
     const setUser = (user) => {
@@ -37,6 +38,18 @@ export const useUserStore = defineStore('user', () => {
         state.team_id = teamId;
     };
 
+    const updateTeam = (updatedTeam) => {
+        const index = state.teams.findIndex(team => team.id === updatedTeam.id);
+        if (index !== -1) {
+            state.teams.splice(index, 1, updatedTeam); 
+        } else {
+            state.teams.push(updatedTeam); 
+        }
+    };
+    const leaveTeam = (teamId) => {
+        state.teams = state.teams.filter(team => team.id !== teamId); 
+    };
+
     // team_id 조회 (Getter)
     const teamId = computed(() => state.team_id);
 
@@ -55,6 +68,8 @@ export const useUserStore = defineStore('user', () => {
         userInfo,
         isLoggedIn,
         accessToken,
+        updateTeam,
+        leaveTeam,
     };
 },
 {
