@@ -2,53 +2,53 @@
   <div class="row col-auto">
     <div class="col image-container">
       <a :href="selectedItem.link || '/'" class="image-link align-content-center">
-    <img
-        :src="selectedItem.image || defaultImage"
-        class="w-25 ms-5"
-        alt="profile_image"
-    />
-  </a>
+        <img
+          :src="selectedItem.image || defaultImage"
+          class="w-25 ms-5"
+          alt="profile_image"
+        />
+      </a>
     </div>
     <div class="col">
       <router-link class="m-0 navbar-brand d-flex align-items-center" to="#">
+        <div class="dropdown-placeholder">
+          <a
+            v-if="teams.length > 0"
+            href="#"
+            class="p-0 dropdown-hover ms-4"
+            :class="[showMenu ? 'show' : '']"
+            id="dropdownMenuButton"
+            aria-expanded="true"
+            @click="toggleMenu"
+          >
+            {{ selectedItem.name || "팀 선택" }}
+            <img :src="require('@/assets/img/icons/expand_more_40dp_000000.png')"
+                 class="navbar-brand-img w-25"
+                 alt="expand_more_icon"/>
+          </a>
 
-      <div class="dropdown-placeholder">
-        <a
-          v-if="teams.length > 0"
-          href="#"
-          class="p-0 dropdown-hover ms-4"
-          :class="[showMenu ? 'show' : '']"
-          id="dropdownMenuButton"
-          aria-expanded="true"
-          @click="toggleMenu"
-        >
-          {{ selectedItem.name || "팀 선택" }}
-          <img :src="require('@/assets/img/icons/expand_more_40dp_000000.png')"
-               class="navbar-brand-img w-25"
-               alt="expand_more_icon"/>
-        </a>
+          <div v-else class="p-0 dropdown-hover ms-4">
+            <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal">
+              + 팀 생성
+            </button>
+          </div>
 
-        <!-- 팀이 없는 경우에도 공간을 차지하도록 팀 생성 버튼 추가 -->
-        <div v-else class="p-0 dropdown-hover ms-4">
-          <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal">
-            + 팀 생성
-          </button>
+          <transition name="fade">
+            <ul v-show="showMenu && teams.length > 0" class="dropdown-menu" :style="{ position: 'absolute', zIndex: 9999 }">
+              <li v-for="team in teams" :key="team.id" class="d-flex justify-content-between align-items-center">
+                <a href="#" class="dropdown-item" @click="selectItem(team)">
+                  {{ team.name }}
+                </a>
+                <button v-if="userStore.userInfo && userStore.userInfo.id === team.creatorId" class="delete-icon" @click.stop="deleteTeam(team.id)">X</button>
+
+              </li>
+              <li class="dropdown-item">
+                <button class="btn btn-link" @click="openCreateTeamModal">+ 팀 생성</button>
+              </li>
+            </ul>
+          </transition>
         </div>
-
-        <transition name="fade">
-          <ul v-show="showMenu && teams.length > 0" class="dropdown-menu" :style="{ position: 'absolute', zIndex: 9999 }">
-            <li v-for="team in teams" :key="team.id">
-              <a href="#" class="dropdown-item" @click="selectItem(team)">
-                {{ team.name }}
-              </a>
-            </li>
-            <li class="dropdown-item">
-              <button class="btn btn-link" @click="openCreateTeamModal">+ 팀 생성</button>
-            </li>
-          </ul>
-        </transition>
-      </div>
-    </router-link>
+      </router-link>
     </div>
   </div>
   <div v-if="showCreateTeamModal" class="modal-overlay" @click="closeCreateTeamModal">
@@ -69,12 +69,13 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 
+const userStore = useUserStore();
 const showMenu = ref(false);
 const teams = ref([]);
 const selectedItem = ref({ name: "팀 선택", image: null });
 const defaultImage = require("@/assets/img/sample_images/371754@2x.png");
 
-const showCreateTeamModal = ref(false); // showCreateTeamModal 정의
+const showCreateTeamModal = ref(false);
 const newTeamName = ref('');
 
 const router = useRouter();
@@ -92,29 +93,36 @@ const fetchUserTeams = async () => {
         "Authorization": `Bearer ${userStore.token}`
       }
     });
-
+    
     teams.value = response.data.filter(team => 
       team.createdBy === userStore.userId || team.members.includes(userStore.userId)
     );
+
+    // 로컬 스토리지에서 선택된 팀 정보를 가져와서 설정
+    const storedTeamId = localStorage.getItem('selectedTeamId');
+    if (storedTeamId) {
+      const team = teams.value.find(t => t.id === storedTeamId);
+      if (team) {
+        selectedItem.value = team;
+      }
+    }
   } catch (err) {
     console.error("팀 리스트를 가져오는 데 실패했습니다.", err);
   }
 };
 
 const selectItem = (item) => {
-  const userStore = useUserStore();  // Pinia 스토어 사용
   if (!item || !item.id) {
     console.error("유효하지 않은 팀을 선택했습니다.");
     return;
   }
   selectedItem.value = item;
   showMenu.value = false;
-
-  userStore.setTeamId(item.id);
-
   router.push(`/team/${item.id}`);
-};
 
+  // 선택된 팀 정보를 로컬 스토리지에 저장
+  localStorage.setItem('selectedTeamId', item.id);
+};
 
 const openCreateTeamModal = () => {
   showCreateTeamModal.value = true; // 모달 열기
@@ -144,6 +152,25 @@ const createTeam = async () => {
   }
 };
 
+const deleteTeam = async (teamId) => {
+  const userStore = useUserStore();
+  
+  if (!confirm("정말로 이 팀을 삭제하시겠습니까?")) return;
+  try {
+    await axios.delete(`/team/delete/${teamId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${userStore.token}`
+      }
+    });
+    await fetchUserTeams();
+    router.push('/tables'); // 팀 삭제 후 팀 리스트 갱신
+  
+  } catch (error) {
+    console.error("팀 삭제에 실패했습니다.", error);
+  }
+};
+
 onMounted(() => {
   fetchUserTeams();
 });
@@ -167,7 +194,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10000; /* 모달을 최상단으로 설정 */
+  z-index: 10000;
 }
 .modal-content {
   background: white;
@@ -211,10 +238,23 @@ onMounted(() => {
 }
 
 .image-container {
-  display: inline-block; /* 부모가 자식의 크기에 맞게 축소 */
+  display: inline-block;
 }
 
 .image-link {
-  display: inline-block; /* 링크도 이미지 크기에 맞춤 */
+  display: inline-block;
+}
+.delete-icon {
+  background: none; 
+  border: none; 
+  color: black; 
+  font-size: 14px;
+  cursor: pointer; 
+  padding: 0; 
+  line-height: 1; 
+}
+
+.delete-icon:hover {
+  color: red; 
 }
 </style>
