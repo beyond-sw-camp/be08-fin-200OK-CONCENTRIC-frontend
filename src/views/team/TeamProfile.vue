@@ -59,7 +59,7 @@
                   <div class="member-box">
                     <img :src="member.profileImage ? member.profileImage : require('@/assets/img/애옹.png')" class="member-icon" />
                     <span class="member-name">{{ member.nickname }}</span>
-                    <span class="delete-icon" @click="confirmDelete(member)">X</span>
+                    <span class="delete-icon"  @click="confirmDelete(member)">X</span>
                   </div>
                 </div>
                 <hr class="horizontal dark" />
@@ -85,31 +85,6 @@
               <div class="d-flex justify-content-end mt-4">
                 <button class="btn btn-danger me-3" @click="deleteMember">삭제</button>
                 <button class="btn btn-secondary" @click="closeDeleteModal">취소</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 프로필 수정 모달 -->
-          <div v-if="isEditModalVisible" class="modal">
-            <div class="modal-content">
-              <span class="close" @click="closeEditModal">&times;</span>
-              <h6>프로필 수정</h6>
-              <input
-                type="text"
-                v-model="selectedTeam.name"
-                placeholder="팀 이름 수정"
-                class="form-control mb-2"
-              />
-              <input
-                type="file"
-                id="edit-file-input"
-                @change="updateProfileImage"
-                style="display: none;"
-                accept="image/*"
-              />
-              <button class="btn btn-custom" @click="openFileDialog">프로필 사진 수정</button>
-              <div class="d-flex justify-content-end mt-3">
-                <button class="btn btn-primary" @click="saveProfile">확인</button>
               </div>
             </div>
           </div>
@@ -140,7 +115,6 @@ export default {
     const isEditModalVisible = ref(false);
     const memberToDelete = ref(null);
     const route = useRoute();
-    const userStore = useUserStore();
 
     const separateMembers = async (teamMembers) => {
       if (teamMembers.length > 0) {
@@ -279,17 +253,12 @@ export default {
   margin-right: 10px;
   }
   
-  .profile-name {
+  .profile-name, .member-name{
   font-weight: bold;
   margin-right: 700px;
   text-align: left;
   }
-  .member-name {
-  font-weight: bold;
-  margin-right: 700px;
-  text-align: left;  
-  }
-  
+
   .member-box, .profile-box {
   display: flex;
   align-items: center;

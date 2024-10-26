@@ -8,6 +8,7 @@ export const useUserStore = defineStore('user', () => {
         isLoggedIn: false,
         accessToken: null,
         team_id: null,
+        teams: [],
     });
 
     const setUser = (user) => {
@@ -32,6 +33,18 @@ export const useUserStore = defineStore('user', () => {
         state.userInfo = user;
     }
 
+    const updateTeam = (updatedTeam) => {
+        const index = state.teams.findIndex(team => team.id === updatedTeam.id);
+        if (index !== -1) {
+            state.teams.splice(index, 1, updatedTeam); 
+        } else {
+            state.teams.push(updatedTeam); 
+        }
+    };
+    const leaveTeam = (teamId) => {
+        state.teams = state.teams.filter(team => team.id !== teamId); 
+    };
+
     // team_id 설정 (Setter)
     const setTeamId = (teamId) => {
         state.team_id = teamId;
@@ -55,6 +68,8 @@ export const useUserStore = defineStore('user', () => {
         userInfo,
         isLoggedIn,
         accessToken,
+        updateTeam,
+        leaveTeam,
     };
 },
 {
