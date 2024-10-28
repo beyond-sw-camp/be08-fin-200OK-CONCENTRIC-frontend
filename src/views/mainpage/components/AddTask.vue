@@ -72,6 +72,24 @@
 
 <script>
 import { ref } from 'vue';
+import axios from "axios";
+async function saveTaskToDatabase(task) {
+  try {
+    const userState = JSON.parse(localStorage.getItem('user'));
+    const teamId = userState?.state?.team_id;
+
+    if (teamId) {
+      const payload = {
+        schedule_id: task.id, // 서버에서 반환된 schedule의 ID 사용
+        team_id: teamId,
+      };
+      await axios.post('/api/team_schedule', payload);
+      console.log('Team schedule saved successfully.');
+    }
+  } catch (error) {
+    console.error('Failed to save team schedule:', error);
+  }
+}
 
 export default {
   props: {
