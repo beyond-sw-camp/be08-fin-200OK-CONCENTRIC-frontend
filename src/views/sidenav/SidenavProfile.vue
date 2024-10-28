@@ -1,12 +1,14 @@
 <template>
   <div class="row col-auto">
     <div class="col image-container">
-      <a :href="selectedItem.link || '/'" class="image-link align-content-center">
+      <a :href="selectedItem.link || '/'" class="image-link align-content-center"
+         @click.prevent="resetTeamId">
         <img
           :src="selectedItem.image || defaultImage"
           class="w-25 ms-5"
           alt="profile_image"
         />
+
       </a>
     </div>
     <div class="col">
@@ -80,6 +82,19 @@ const newTeamName = ref('');
 
 const router = useRouter();
 
+const resetTeamId = () => {
+  // Pinia 상태의 team_id를 null로 설정
+  userStore.setTeamId(null);
+
+  // 로컬 스토리지의 team_id도 null로 설정
+  const userData = JSON.parse(localStorage.getItem('user')) || {};
+  userData['state.team_id'] = null;
+  localStorage.setItem('user', JSON.stringify(userData));
+
+  // '/' 경로로 이동
+  router.push('/');
+};
+
 const toggleMenu = () => {
   showMenu.value = !showMenu.value;
 };
@@ -118,10 +133,10 @@ const selectItem = (item) => {
   }
   selectedItem.value = item;
   showMenu.value = false;
-  router.push(`/team/${item.id}`);
+  router.push(`/tables`);
 
   // 선택된 팀 정보를 로컬 스토리지에 저장
-  localStorage.setItem('selectedTeamId', item.id);
+  userStore.setTeamId(item.id);
 };
 
 const openCreateTeamModal = () => {
