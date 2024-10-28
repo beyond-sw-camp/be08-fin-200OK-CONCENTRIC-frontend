@@ -8,48 +8,69 @@ const selectedTab = ref('list');
 </script>
 
 <template>
-  <nav class="nav-tabs">
-    <ul class="nav">
-      <li class="nav-item">
-        <a
-            class="nav-link"
-            :class="{ active: selectedTab === 'list' }"
-            href="#"
-            @click.prevent="selectedTab = 'list'"
-        >
-          친구 목록
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-            class="nav-link"
-            :class="{ active: selectedTab === 'requests' }"
-            href="#"
-            @click.prevent="selectedTab = 'requests'"
-        >
-          친구 요청
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-            class="nav-link"
-            :class="{ active: selectedTab === 'add' }"
-            href="#"
-            @click.prevent="selectedTab = 'add'"
-        >
-          친구 추가
-        </a>
-      </li>
-    </ul>
-  </nav>
-  <div>
-    <friend-list v-if="selectedTab === 'list'"/>
-    <friend-request v-if="selectedTab === 'requests'"/>
-    <add-friend v-if="selectedTab === 'add'"/>
+  <div class="container">
+    <div class="card">
+      <nav class="nav-tabs">
+        <ul class="nav">
+          <li class="nav-item">
+            <a
+                class="nav-link"
+                :class="{ active: selectedTab === 'list' }"
+                href="#"
+                @click.prevent="selectedTab = 'list'"
+            >
+              친구 목록
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+                class="nav-link"
+                :class="{ active: selectedTab === 'requests' }"
+                href="#"
+                @click.prevent="selectedTab = 'requests'"
+            >
+              친구 요청
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+                class="nav-link"
+                :class="{ active: selectedTab === 'add' }"
+                href="#"
+                @click.prevent="selectedTab = 'add'"
+            >
+              친구 추가
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div>
+        <friend-list v-if="selectedTab === 'list'"/>
+        <friend-request v-if="selectedTab === 'requests'"/>
+        <div class="d-flex justify-content-center">
+          <add-friend v-if="selectedTab === 'add'"/>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
+
+.container {
+  padding: 0;
+}
+
+.card{
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  min-height: 600px;
+  width: 120vh;
+  padding-top: 6%;
+  margin: 0 1.5rem;
+}
+
 .nav {
   list-style: none;
   display: flex;
@@ -58,7 +79,7 @@ const selectedTab = ref('list');
 }
 
 .nav-item {
-  margin-right: 20px;
+  margin-left: 1rem;
 }
 
 .nav-link {

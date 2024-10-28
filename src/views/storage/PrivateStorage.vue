@@ -1,62 +1,67 @@
 <template>
-  <div>
-    <div style="font-size: 1.5rem">
-      파일함
-    </div>
-    <div class="usage-text">{{ currentSizeMB }}MB / {{ capacityMB }}MB ({{ usagePercentage }}%)</div>
-    <div class="usage-bar">
-      <div
-          class="usage-fill"
-          :style="{ width: usagePercentage + '%' }"
-      ></div>
-    </div>
+  <div class="container">
+    <div class="card">
+      <div >
+        <div style="font-size: 1.2rem; font-weight: 600;">
+          파일함
+        </div>
+        <div class="usage-text">{{ currentSizeMB }}MB / {{ capacityMB }}MB ({{ usagePercentage }}%)</div>
+          <div class="contents">
+            <div class="usage-bar">
+              <div
+                  class="usage-fill"
+                  :style="{ width: usagePercentage + '%' }"
+              ></div>
+            </div>
 
-    <div class="upload-section">
-      <button class="upload-button" @click="openUploadModal">업로드</button>
-    </div>
-
-    <div class="file-list">
-      <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;">
-        <li v-for="(file, i) in storageFiles" :key="file.storageFileId" style="list-style: none;">
-        <transition name="fade">
-          <div class="file-item" v-if="showFiles[i]">
-            <span class="file-name"
-                  @click="downloadFile(file.storageFileId)"
-            style="font-size: 0.8rem">
-              {{ file.originalName }}
-            </span>
-            <span class="file-size">{{ getSizePresent(file.size) }}</span>
-            <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
-            <div>
-              <button class="download-button" @click="downloadFile(file.storageFileId)">
-                <i class="fas fa-arrow-down"></i>
-              </button>
-              <button class="delete-button" @click="deleteConfirm(file.storageFileId, i)">
-                <i class="fas fa-trash-alt"></i>
-              </button>
+            <div class="upload-section">
+              <button class="upload-button" @click="openUploadModal">업로드</button>
             </div>
           </div>
+          <div class="file-list">
+            <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;">
+              <li v-for="(file, i) in storageFiles" :key="file.storageFileId" style="list-style: none;">
+              <transition name="fade">
+                <div class="file-item" v-if="showFiles[i]">
+                  <span class="file-name"
+                        @click="downloadFile(file.storageFileId)"
+                  style="font-size: 0.8rem">
+                    {{ file.originalName }}
+                  </span>
+                  <span class="file-size">{{ getSizePresent(file.size) }}</span>
+                  <span class="file-date">{{ getDatePresent(file.createDate) }}</span>
+                  <div>
+                    <button class="download-button" @click="downloadFile(file.storageFileId)">
+                      <i class="fas fa-arrow-down"></i>
+                    </button>
+                    <button class="delete-button" @click="deleteConfirm(file.storageFileId, i)">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </transition>
+            </li>
+          </transition-group>
+        </div>
+      </div>
+
+        <transition name="fade-modal">
+          <UploadModal v-if="isModalOpen"
+                      @close="closeUploadModal"
+                      :files-to-upload="filesToUpload"
+                      @files-uploaded="handleFilesUploaded"
+          >
+
+            <template #header>
+              <h2>파일 업로드</h2>
+            </template>
+            <template #body>
+              <p>파일을 드래그 앤 드롭하거나 선택하세요.</p>
+            </template>
+
+          </UploadModal>
         </transition>
-      </li>
-    </transition-group>
-  </div>
-
-    <transition name="fade-modal">
-      <UploadModal v-if="isModalOpen"
-                   @close="closeUploadModal"
-                   :files-to-upload="filesToUpload"
-                   @files-uploaded="handleFilesUploaded"
-      >
-
-        <template #header>
-          <h2>파일 업로드</h2>
-        </template>
-        <template #body>
-          <p>파일을 드래그 앤 드롭하거나 선택하세요.</p>
-        </template>
-
-      </UploadModal>
-    </transition>
+    </div>
   </div>
 </template>
 
@@ -242,6 +247,27 @@ onMounted(() => {
 
 <style scoped>
 
+.container {
+  padding: 0;
+}
+
+.card{
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  min-height: 600px;
+  width: 120vh;
+  padding-top: 6%;
+  margin: 0 1.5rem;
+}
+
+.contents {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .fade-modal-enter-active, .fade-modal-leave-active {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -262,17 +288,17 @@ onMounted(() => {
 
 .usage-text {
   text-align: center;
-  font-size: 20px;
+  font-size: 15px;
   margin-bottom: 10px;
 }
 
 .usage-bar {
-  width: 100%;
+  width: 80%;
   height: 30px;
   background-color: #e0e0e0;
   border-radius: 15px;
   overflow: hidden;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .usage-fill {
@@ -298,6 +324,7 @@ onMounted(() => {
   border-bottom: 1px solid rgba(200, 200, 200, 0.2) !important;
   align-items: center;
   overflow: hidden;
+  margin: 0 4.5rem;
 }
 
 .file-name {
@@ -334,6 +361,7 @@ onMounted(() => {
   justify-content: flex-end;
   align-items: center;
   margin: 10px 0;
+  margin-left: 10px;
 }
 
 input[type="file"] {
@@ -344,9 +372,10 @@ input[type="file"] {
   background-color: #8A9BF9;
   color: #fff;
   border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
-  font-size: 16px;
+  border-radius: 10px;
+  padding: 5px 10px;
+  top: -10%;
+  font-size: 13px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
