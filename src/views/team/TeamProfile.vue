@@ -221,8 +221,8 @@ export default {
   <style scoped>
   .container-fluid {
   padding: 0 2cm;
-  padding-left: 5cm; /* 왼쪽 패딩 추가로 오른쪽으로 이동 */
-  padding-right: 1cm;
+  /* padding-left: 5cm; 왼쪽 패딩 추가로 오른쪽으로 이동 */
+  /* padding-right: 1cm; */
   }
   
   .card {

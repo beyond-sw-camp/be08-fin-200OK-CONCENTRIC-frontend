@@ -1,34 +1,36 @@
 <template>
-  <div class="row col-auto">
-    <div class="col image-container">
+  <div class="row col-auto me-4">
+    <!-- <div class="col image-container">
       <a :href="selectedItem.link || '/'" class="image-link align-content-center">
         <img
           :src="selectedItem.image || defaultImage"
           class="w-25 ms-5"
           alt="profile_image"
         />
+
       </a>
-    </div>
+    </div> -->
     <div class="col">
-      <router-link class="m-0 navbar-brand d-flex align-items-center" to="#">
+      <router-link class="m-0 navbar-brand " to="#">
         <div class="dropdown-placeholder">
           <a
             v-if="teams.length > 0"
             href="#"
-            class="p-0 dropdown-hover ms-4"
+            class="p-0 dropdown-hover ms-0"
             :class="[showMenu ? 'show' : '']"
             id="dropdownMenuButton"
             aria-expanded="true"
             @click="toggleMenu"
+            style="display: flex; align-items: center; margin-left: auto; flex-direction: row-reverse; width: 8rem"
           >
             {{ selectedItem.name || "팀 선택" }}
             <img :src="require('@/assets/img/icons/expand_more_40dp_000000.png')"
-                 class="navbar-brand-img w-25"
+                 class="navbar-brand-img w-20"
                  alt="expand_more_icon"/>
           </a>
 
-          <div v-else class="p-0 dropdown-hover ms-4">
-            <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal">
+          <div v-else class="p-0 dropdown-hover ms-4 d-flex align-items-center">
+            <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal" style="margin-bottom: 0;">
               + 팀 생성
             </button>
           </div>
@@ -80,6 +82,19 @@ const newTeamName = ref('');
 
 const router = useRouter();
 
+const resetTeamId = () => {
+  // Pinia 상태의 team_id를 null로 설정
+  userStore.setTeamId(null);
+
+  // 로컬 스토리지의 team_id도 null로 설정
+  const userData = JSON.parse(localStorage.getItem('user')) || {};
+  userData['state.team_id'] = null;
+  localStorage.setItem('user', JSON.stringify(userData));
+
+  // '/' 경로로 이동
+  router.push('/');
+};
+
 const toggleMenu = () => {
   showMenu.value = !showMenu.value;
 };
@@ -118,10 +133,10 @@ const selectItem = (item) => {
   }
   selectedItem.value = item;
   showMenu.value = false;
-  router.push(`/team/${item.id}`);
+  router.push(`/tables`);
 
   // 선택된 팀 정보를 로컬 스토리지에 저장
-  localStorage.setItem('selectedTeamId', item.id);
+  userStore.setTeamId(item.id);
 };
 
 const openCreateTeamModal = () => {

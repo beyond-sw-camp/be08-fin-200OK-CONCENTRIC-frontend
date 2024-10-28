@@ -1,48 +1,51 @@
 <template>
-  <div class="container position-relative z-index-1">
-    <h2 class="text-center mb-4">알림 목록</h2>
-    <button
-        class="btn btn-outline-danger btn-sm"
-        @click="deleteConfirm"
-    >
-     🗑️ 읽은 알림 삭제
-    </button>
-    <div class="notification-list">
-      <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;" class="notification-list">
-      <div
-          class="notification-item"
-          v-for="(notification, i) in notifications"
-          :key="notification.id"
-      >
-        <transition name="fade">
-        <div
-            class="notification-card"
-            :class="notification.isRead ? 'bg-light' : 'bg-white'"
-            v-if="showNotifications[i]"
+    <div class="card">
+      <h2 class="text-center mb-4" style="font-size: 1.2rem; font-weight:600;">알림 목록</h2>
+      
+        <button
+            class="btn btn-outline-danger btn-sm"
+            @click="deleteConfirm"
+            style="margin:0 1rem 2rem 2rem"
         >
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <strong class="d-block">{{ notification.message }}</strong>
-              <p class="mb-1 text-secondary">{{ notification.message }}</p>
-              <small class="text-muted">{{ formatDate(notification.createDate) }}</small>
-            </div>
-            <div class="d-flex align-items-center">
-              <button
-                  class="btn btn-outline-primary btn-sm me-2"
-                  @click="updateRead(notification)"
-              >
-                {{ notification.isRead ? '읽지 않음' : '읽음' }}
-              </button>
+        🗑️ 읽은 알림 삭제
+        </button>
+      <div class="card-list">
+        <div class="notification-list">
+          <transition-group name="fade" tag="ul" style="margin-left: 0; padding-left: 0;" class="notification-list">
+          <div
+              class="notification-item"
+              v-for="(notification, i) in notifications"
+              :key="notification.id"
+          >
+            <transition name="fade">
+            <div
+                class="notification-card"
+                :class="notification.isRead ? 'bg-light' : 'bg-white'"
+                v-if="showNotifications[i]"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong class="d-block">{{ notification.message }}</strong>
+                  <p class="mb-1 text-secondary" style="font-size: 10pt">{{ notification.message }}</p>
+                  <small class="text-muted">{{ formatDate(notification.createDate) }}</small>
+                </div>
+                <div class="d-flex align-items-center">
+                  <button
+                      class="btn btn-outline-primary btn-sm me-2"
+                      @click="updateRead(notification)"
+                  >
+                    {{ notification.isRead ? '읽지 않음' : '읽음' }}
+                  </button>
 
+                </div>
+              </div>
             </div>
+            </transition>
           </div>
+          </transition-group>
         </div>
-        </transition>
       </div>
-      </transition-group>
     </div>
-
-  </div>
 </template>
 
 <script setup>
@@ -116,7 +119,21 @@ onMounted(() => {
 <style scoped>
 .container {
   max-width: 600px;
-  margin: 0 auto;
+  padding: 0;
+}
+
+.card{
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  min-height: 600px;
+  width: 120vh;
+  padding-top: 6%;
+  margin: 0 1.5rem;
+}
+
+.card-list {
+  margin: 0 2rem;
 }
 
 .notification-list {
@@ -130,6 +147,7 @@ onMounted(() => {
 }
 
 .notification-card {
+  font-size: 11pt;
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

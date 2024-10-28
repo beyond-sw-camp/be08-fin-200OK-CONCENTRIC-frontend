@@ -47,7 +47,7 @@ const showConfigurator = computed(() => route.name !== 'Signin');
 </script>
 <template>
   <ChatNotification />
-  <div
+  <div  
     v-show="layout === 'landing'"
     class="landing-bg h-100 bg-gradient-primary position-fixed w-100"
   ></div>
@@ -57,9 +57,18 @@ const showConfigurator = computed(() => route.name !== 'Signin');
     class="main-content position-relative max-height-vh-100 h-100 border-radius-lg"
   >
 
-    <navbar :class="[navClasses]" v-if="showNavbar" />
-
-    <router-view/>
+    <!-- <navbar :class="[navClasses]" v-if="showNavbar" /> -->
+    <navbar>
+      <router-link to="/tables">private</router-link> |
+      <router-link to="/profile">profile</router-link>
+      <router-link to="/social">social</router-link>
+      <router-link to="/storage/private">privateStorage</router-link>
+      <router-link to="/profile/edit">profileEdit</router-link>
+      <router-link to="/team/:id">teamPage</router-link>
+    </navbar>
+    <div class="content-container d-flex justify-content-center align-items-center">
+      <router-view />
+    </div>
 
 
     <app-footer v-show="showFooter" />

@@ -81,9 +81,9 @@ onMounted(() => {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  height: 24rem;
+  height: 20rem;
   width: 120vh;
-  padding-top:12%;
+  padding-top: 6%;
 }
 .content-over-background {
   position: relative;

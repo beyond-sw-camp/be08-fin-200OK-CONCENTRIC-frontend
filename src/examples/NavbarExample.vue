@@ -70,7 +70,7 @@ defineProps({
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link me-2" to="/signup">
+            <router-link class="nav-link me-2" to="/#">
               <i
                 class="fas fa-user-circle opacity-6 me-1"
                 aria-hidden="true"
