@@ -10,8 +10,7 @@
                 <div class="col-auto">
                   <div class="avatar avatar-xl position-relative">
                     <img
-                      :src="selectedTeam.imageUrl"
-                      alt="profile_image"
+                      :src="teamImage"
                       class="w-100 border-radius-lg"
                     />
                     <input
@@ -26,7 +25,7 @@
                 <div class="col-auto my-auto">
                   <div class="h-100">
                     <h5 class="mb-1">{{ selectedTeam.name }}</h5>
-                    <p class="mb-0 font-weight-bold text-sm">{{ selectedTeam.role }}</p>
+                    <!-- <p class="mb-0 font-weight-bold text-sm">{{ selectedTeam.role }}</p> -->
                   </div>
                 </div>
               </div>
@@ -95,7 +94,7 @@
 </template>
 
 <script>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/store/user';
 import { useRoute, useRouter } from 'vue-router';
@@ -122,6 +121,10 @@ export default {
         members.value = teamMembers.slice(1); // 나머지 팀원들을 그룹원 목록으로 설정
       }
     };
+
+    const teamImage = computed(() => 
+      selectedTeam.value.imageUrl || require('@/assets/img/애옹.png')
+    );
 
     const fetchTeamMembers = async () => {
       try {
