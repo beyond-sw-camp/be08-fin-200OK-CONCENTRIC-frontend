@@ -15,8 +15,11 @@
 <!--          <li :class="{ active: activeSection === 'schedule' }" @click="setActiveSection('schedule')">-->
 <!--            <i class="ni ni-calendar-grid-58 text-warning"></i> 팀 일정-->
 <!--          </li>-->
-        <li :class="{ active: activeSection === 'files' }" @click="setActiveSection('files')">
+        <!-- <li :class="{ active: activeSection === 'files' }" @click="setActiveSection('files')">
           <i class="fa fa-archive" aria-hidden="true"></i> 파일함
+        </li> -->
+        <li :class="{ active: activeSection === 'team_storage' }" @click="setActiveSection('teamstorage')">
+            <i class="fa fa-archive" aria-hidden="true"></i>파일함
         </li>   
       </ul>
     </div>
@@ -24,9 +27,8 @@
     <!-- Main content -->
     <div class="main-content">
       <TeamProfile v-if="activeSection === 'profile'" :team="team" />
-      <TeamProfileEdit v-if="activeSection === 'edit'" :team="team" />  <!-- 수정된 부분 -->
-      <p v-if="activeSection === 'schedule'"></p>
-      <p v-if="activeSection === 'files'"></p>
+      <TeamProfileEdit v-if="activeSection === 'edit'" :team="team" />  
+      <TeamStorage v-if="activeSection == 'teamstorage'" :team="team" />
     </div>
   </div>
 </template>
@@ -36,7 +38,8 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import TeamProfile from '../team/TeamProfile.vue';
-import TeamProfileEdit from '../team/TeamProfileEdit.vue';  
+import TeamProfileEdit from '../team/TeamProfileEdit.vue';
+import TeamStorage from "../storage/TeamStorage.vue";  
 
 const route = useRoute();
 const team = ref({});
@@ -47,6 +50,7 @@ const fetchTeam = async (teamId) => {
   try {
     const response = await axios.get(`/team/${teamId}`);
     team.value = response.data;
+    console.log("팀 정보 : ", team.value)
   } catch (error) {
     console.error('팀 정보를 불러오는데 실패했습니다:', error);
   }
@@ -54,6 +58,7 @@ const fetchTeam = async (teamId) => {
 
 // On component mount, load team data
 onMounted(() => {
+  console.log("Route ID on mount:", route.params.id); // 라우트 ID 확인
   fetchTeam(route.params.id);
 });
 
