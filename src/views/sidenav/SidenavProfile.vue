@@ -1,8 +1,7 @@
 <template>
-  <div class="row col-auto">
-    <div class="col image-container">
-      <a :href="selectedItem.link || '/'" class="image-link align-content-center"
-         @click.prevent="resetTeamId">
+  <div class="row col-auto me-4">
+    <!-- <div class="col image-container">
+      <a :href="selectedItem.link || '/'" class="image-link align-content-center">
         <img
           :src="selectedItem.image || defaultImage"
           class="w-25 ms-5"
@@ -10,27 +9,28 @@
         />
 
       </a>
-    </div>
+    </div> -->
     <div class="col">
-      <router-link class="m-0 navbar-brand d-flex align-items-center" to="#">
+      <router-link class="m-0 navbar-brand " to="#">
         <div class="dropdown-placeholder">
           <a
             v-if="teams.length > 0"
             href="#"
-            class="p-0 dropdown-hover ms-4"
+            class="p-0 dropdown-hover ms-0"
             :class="[showMenu ? 'show' : '']"
             id="dropdownMenuButton"
             aria-expanded="true"
             @click="toggleMenu"
+            style="display: flex; align-items: center; margin-left: auto; flex-direction: row-reverse; width: 8rem"
           >
             {{ selectedItem.name || "팀 선택" }}
             <img :src="require('@/assets/img/icons/expand_more_40dp_000000.png')"
-                 class="navbar-brand-img w-25"
+                 class="navbar-brand-img w-20"
                  alt="expand_more_icon"/>
           </a>
 
-          <div v-else class="p-0 dropdown-hover ms-4">
-            <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal">
+          <div v-else class="p-0 dropdown-hover ms-4 d-flex align-items-center">
+            <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal" style="margin-bottom: 0;">
               + 팀 생성
             </button>
           </div>

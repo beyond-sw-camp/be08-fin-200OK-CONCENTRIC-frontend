@@ -1,11 +1,11 @@
 <template>
   <div class="row min-vh-75 container">
     <div class="col-2 py-4" >
-      <div class="card ">
-        <div class="sidebar">
-          <ul class="menu">
-            <li style="border-bottom: 0.5px solid rgba(0, 0, 0, 0.2); width: 90%; border-radius: 0">
-              메뉴
+      <div class="card " style="min-width: 210px;">
+        <div class="sidebar d-flex flex-column align-items-start" style="min-height: 600px;">
+          <ul class="menu" style="padding-left: 1rem; width: 100%;">
+            <li style="border-bottom: 0.5px solid rgba(0, 0, 0, 0.2); width: 90%; border-radius: 0; font-size: 12pt; font-weight: 600;">
+              Menu
             </li>
             <li>
               <router-link
@@ -89,7 +89,8 @@
           <span class="carousel-control-next-icon" aria-hidden="true"
                 data-bs-toggle="popover"
                 data-bs-placement="top"
-                :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"></span>
+                :data-bs-content="currentView === 'Tasks' ? 'Calendar' : 'Tasks'"
+                ></span>
           <span class="sr-only">Next</span>
         </a>
       </div>
@@ -180,17 +181,24 @@ const updateView = (view) => {
 </script>
 
 <style scoped>
+.container {
+  padding: 0;
+}
 .menu li {
   padding: 0.6rem;
   display: flex;
   align-items: center;
   cursor: pointer;
   border-radius: 6px;
+  font-size: 11pt;
+  margin-right: 1rem;
   transition: background-color 0.15s, color 0.15s;
 }
 
 .menu li i {
   margin-right: 1rem;
+  font-size: 12pt;
+  align-items: left;
 }
 
 .menu li.active,
@@ -208,16 +216,16 @@ const updateView = (view) => {
 
 .tasks-slide {
   position: relative;
-  padding: 0 50px;
+  padding: 0 2.5rem;
 }
 
 .carousel-control-prev {
-  width: 3%;
+  width: 2.5%;
   justify-content: left;
 }
 
 .carousel-control-next {
-  width: 3%;
+  width: 2.5%;
   justify-content: right;
 }
 
@@ -227,4 +235,8 @@ const updateView = (view) => {
   background-color: rgba(0, 0, 0, 0.75); /* 반투명한 배경색 */
 }
 
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(1) grayscale(1) brightness(0.5); /* 아이콘 색상 변경 */
+}
 </style>

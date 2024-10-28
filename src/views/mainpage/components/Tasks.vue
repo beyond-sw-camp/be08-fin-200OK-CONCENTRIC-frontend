@@ -1,5 +1,5 @@
 <template>
-  <div class="card mb-4">
+  <div class="card mb-4" style="min-height: 600px;">
     <div class="card-header pb-0 d-flex justify-content-between align-items-center">
       <h5>Tasks</h5>
       <div class="d-inline-flex align-items-center">

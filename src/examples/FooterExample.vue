@@ -5,19 +5,18 @@ const store = useStore();
 <template>
   <footer class="py-3 footer">
     <div class="container-fluid">
-      <div class="row align-items-center justify-content-lg-between">
-        <div class="mb-4 col-lg-6 mb-lg-0">
+      <div class="row">
+        <div class="col-12 text-center mb-2">
           <div
             class="text-sm text-center copyright text-muted"
-            :class="store.state.isRTL ? 'text-lg-end' : 'text-lg-start'"
           >
             ©© 2024 200.ok | Project: CONCENTRIC
             All rights reserved.
           </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-12 text-center">
           <ul
-            class="nav nav-footer justify-content-center justify-content-lg-end"
+            class="nav nav-footer justify-content-center"
           >
             <li class="nav-item">
               <a
