@@ -125,12 +125,30 @@ export default {
     const selectAll = ref(false);
     const sortOrder = reactive({ key: '', order: 'asc' });
 
+
     const fetchTasks = async () => {
       try {
         const response = await axios.get('/schedule/list');
         tasks.value = response.data;
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        const teamId = user?.team_id ?? user?.state?.team_id; // team_id 가져오기
+
+        if (teamId) {
+          const promises = tasks.value.map((task) =>
+              axios.post('/schedule/create', {
+                teamId: teamId,
+                scheduleId: task.id,
+              })
+          );
+
+          await Promise.all(promises);
+          console.log('team_schedule에 데이터가 성공적으로 추가되었습니다.');
+        } else {
+          console.error('team_id가 없습니다.');
+        }
       } catch (error) {
-        console.error('일정을 불러오는 중 오류가 발생했습니다.', error);
+        console.error('요청 중 오류가 발생했습니다.', error);
       }
     };
 
