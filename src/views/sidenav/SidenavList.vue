@@ -127,7 +127,7 @@ const getRoute = () => {
 
       <li class="nav-item">
         <sidenav-item
-          to="/signup"
+          to="/#"
           :class="getRoute() === 'signup' ? 'active' : ''"
           :navText="isRTL ? 'اشتراك' : 'Sign Up'"
         >
