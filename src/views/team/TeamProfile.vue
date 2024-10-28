@@ -10,15 +10,8 @@
                 <div class="col-auto">
                   <div class="avatar avatar-xl position-relative">
                     <img
-                      :src="teamImage"
+                      :src="selectedTeam.imageUrl ? selectedTeam.imageUrl : require('@/assets/img/애옹.png')"
                       class="w-100 border-radius-lg"
-                    />
-                    <input
-                      type="file"
-                      id="file-input"
-                      @change="updateProfileImage"
-                      style="display: none;"
-                      accept="image/*"
                     />
                   </div>
                 </div>
@@ -94,7 +87,7 @@
 </template>
 
 <script>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/store/user';
 import { useRoute, useRouter } from 'vue-router';
@@ -121,10 +114,6 @@ export default {
         members.value = teamMembers.slice(1); // 나머지 팀원들을 그룹원 목록으로 설정
       }
     };
-
-    const teamImage = computed(() => 
-      selectedTeam.value.imageUrl || require('@/assets/img/애옹.png')
-    );
 
     const fetchTeamMembers = async () => {
       try {
