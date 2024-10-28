@@ -132,15 +132,24 @@ export default {
         tasks.value = response.data;
 
         const user = JSON.parse(localStorage.getItem('user'));
-        const teamId = user?.team_id ?? user?.state?.team_id; // team_id 가져오기
+        const teamId = user?.team_id ?? user?.state?.team_id;
+        console.log('Team ID:', teamId);
 
         if (teamId) {
-          const promises = tasks.value.map((task) =>
-              axios.post('/schedule/create', {
-                teamId: teamId,
-                scheduleId: task.id,
-              })
-          );
+          const promises = tasks.value.map(async (task) => {
+            const requestData = {
+              team_Id: teamId,
+              schedule_Id: task.id,
+            };
+            console.log('Request Data:', requestData); // 요청 데이터 확인
+
+            try {
+              await axios.post('/team_schedule/create', requestData);
+              requestData.push
+            } catch (error) {
+              console.error(`스케줄 ${task.id} 생성 실패:`, error.response.data);
+            }
+          });
 
           await Promise.all(promises);
           console.log('team_schedule에 데이터가 성공적으로 추가되었습니다.');
@@ -151,6 +160,7 @@ export default {
         console.error('요청 중 오류가 발생했습니다.', error);
       }
     };
+
 
     const startEditing = (task, column) => {
       editingTask.id = task.id;
@@ -214,13 +224,29 @@ export default {
     const handleAddTaskConfirm = async (newTask) => {
       try {
         const response = await axios.post('/schedule/create', newTask);
+
         tasks.value.push(response.data);
+        console.log(response.data.id);
+        const userState = JSON.parse(localStorage.getItem('user'));
+        const teamId = userState?.state?.team_id;
+        const teamScheduleData = {
+          teamId: teamId,
+          scheduleId: response.data.id,
+        };
+        if (!teamId){
+          console.error("no team id");
+        }
+        else{
+          const teamResponse = await axios.post('/teamSchedule/create', teamScheduleData);
+        }
+
       } catch (error) {
         console.error('새 일정을 추가하는 중 오류가 발생했습니다.', error);
       } finally {
         closeAddTaskModal();
       }
     };
+
 
     const sortTasks = () => {
       tasks.value.sort((a, b) => a.importance - b.importance);
