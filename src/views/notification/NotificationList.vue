@@ -5,7 +5,7 @@
         <button
             class="btn btn-outline-danger btn-sm"
             @click="deleteConfirm"
-            style="margin:0 1rem 2rem 2rem"
+            style="margin:0 2rem 2rem 2rem"
         >
         🗑️ 읽은 알림 삭제
         </button>
