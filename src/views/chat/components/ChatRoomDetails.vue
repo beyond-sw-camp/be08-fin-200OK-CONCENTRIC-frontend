@@ -23,7 +23,7 @@
             <!-- 참여자 -->
             <ul class="member-list">
                 <li v-for="member in members" :key="member.memberId" class="member-item">
-                    <img :src="member.profileImage" class="profile-image" />
+                    <img :src="member.profileImage ? member.profileImage : require('@/assets/img/default/profile.png')" class="profile-image" />
                     <span class="member-name">{{ member.nickname }}</span>
                 </li>
             </ul>

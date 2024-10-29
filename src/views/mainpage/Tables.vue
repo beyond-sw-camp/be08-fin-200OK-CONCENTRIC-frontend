@@ -11,7 +11,7 @@
               <router-link
                   to="/profile?tab=profile_card"
                   class="p-0 nav-link"
-                  style="color: #121235"
+                  style="color: #121235; min-width: 170px;"
               >
                 <i class="fa fa-user"></i>마이 페이지
               </router-link>
@@ -29,19 +29,19 @@
               <router-link
                   to="/profile?tab=social"
                   class="p-0 nav-link"
-                  style="color: #121235;"
+                  style="color: #121235; min-width: 170px;"
               >
                 <i class="fa fa-users"></i>소셜
 <!--                <span class="notification-badge" v-show="numOfFriendshipRequests > 0">{{ numOfFriendshipRequests }}</span>-->
               </router-link>
             </li>
             <li>
-              <a
-                  href="javascript:void(0)"
+            <a
+              href="javascript:void(0)"
               @click="navigateToPage"
               class="p-0 nav-link"
               aria-expanded="false"
-              style="color: #121235"
+              style="color: #121235 min-width: 170px;"
               >
               <i class="fa fa-archive"></i>파일함
               </a>

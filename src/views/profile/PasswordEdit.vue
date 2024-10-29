@@ -128,7 +128,7 @@ const updatePassword = async () => {
 }
 
 .card-body{
-  margin: 0 3rem;
+  margin: 0 17rem;
 }
 
 </style>

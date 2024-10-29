@@ -84,11 +84,13 @@ const loadNotifications = async () => {
       { validateStatus: false }
     );
     notifications.value = response.data;
+    let count = 0;
     notifications.value.forEach(notification => {
       notification.createDate = new Date(notification['createDate']).toLocaleString().substring(0, 22);
-      if (!notification.isRead) numOfNotifications.value += 1;
+      if (!notification.isRead) count += 1;
       showNotifications.value.push(true);
     });
+    numOfNotifications.value = count;
     stateStore.setNumOfNotifications(numOfNotifications.value);
   } catch (error) {
     console.log(error);
