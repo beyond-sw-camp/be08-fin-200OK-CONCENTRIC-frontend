@@ -23,7 +23,6 @@
         <div v-if="!getTasksForDay(day.date).length" class="no-events">&nbsp;</div> <!-- 빈 공간 유지 -->
       </div>
     </div>
-
     <!-- 일정 추가 모달 컴포넌트 -->
     <add-task
         v-if="isModalVisible"
@@ -278,7 +277,7 @@ export default {
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
+  /*gap: 1px;*/
   max-width: 1000px;
   width: 100%;
   margin: 0 auto;
@@ -324,7 +323,7 @@ export default {
   margin-top: 5px;
   font-size: 0.9rem;
   text-align: center;
-  border-radius: 5px;
+  /*border-radius: 5px;*/
   min-height: 20px;
   white-space: nowrap;
   overflow: hidden;
@@ -362,4 +361,6 @@ export default {
     width: 7ch;
   }
 }
+
+
 </style>

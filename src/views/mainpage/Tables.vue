@@ -7,7 +7,7 @@
             <li style="border-bottom: 0.5px solid rgba(0, 0, 0, 0.2); width: 90%; border-radius: 0; font-size: 12pt; font-weight: 600;">
               Menu
             </li>
-            <li>
+            <li v-if="!userStore.teamId">
               <router-link
                   to="/profile?tab=profile_card"
                   class="p-0 nav-link"
@@ -16,7 +16,16 @@
                 <i class="fa fa-user"></i>마이 페이지
               </router-link>
             </li>
-            <li>
+            <li v-if="userStore.teamId">
+              <router-link
+                  :to="{ path: `/team/${userStore.teamId}` }"
+                  class="p-0 nav-link"
+                  style="color: #121235"
+              >
+                <i class="fa fa-user"></i>팀 페이지
+              </router-link>
+            </li>
+            <li v-if="!userStore.teamId">
               <router-link
                   to="/profile?tab=social"
                   class="p-0 nav-link"
@@ -27,14 +36,15 @@
               </router-link>
             </li>
             <li>
-              <router-link
-                  to="/profile?tab=private_storage"
-                  class="p-0 nav-link"
-                  aria-expanded="false"
-                  style="color: #121235"
+              <a
+                  href="javascript:void(0)"
+              @click="navigateToPage"
+              class="p-0 nav-link"
+              aria-expanded="false"
+              style="color: #121235"
               >
-                <i class="fa fa-archive"></i>파일함
-              </router-link>
+              <i class="fa fa-archive"></i>파일함
+              </a>
             </li>
           </ul>
         </div>
@@ -100,13 +110,28 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, watch} from 'vue';
+import { useUserStore } from "@/store/user";
 import { Popover } from 'bootstrap';
 import Tasks from '@/views/mainpage/components/Tasks.vue';
 import { Calendar, DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
 import CalenderView from "@/views/calender/CalenderView.vue";
+import { useRouter } from 'vue-router';
 import WeekCalender from "@/views/calender/WeekCalender.vue";
+
+const userStore = useUserStore();
+
+const router = useRouter();
+const navigateToPage = () => {
+  if (userStore.teamId) {
+    // 팀 ID가 존재하면 팀 페이지로 이동
+    router.push({ path: `/team/${userStore.teamId}` });
+  } else {
+    // 팀 ID가 없으면 프로필의 파일함으로 이동
+    router.push({ path: '/profile', query: { tab: 'private_storage' } });
+  }
+};
 
 const currentView = ref('Tasks');
 let popovers = [];

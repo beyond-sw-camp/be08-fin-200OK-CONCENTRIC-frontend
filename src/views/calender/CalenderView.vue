@@ -1,5 +1,5 @@
 <template>
-  <div class="calendar-page">
+  <div class="calendar-page card">
     <!-- 상단에 보기 모드 전환 버튼 -->
     <div class="calendar-header">
 <!--      <div class="view-toggle">-->
