@@ -25,14 +25,16 @@
                   class="profile-img rounded-circle img-fluid border border-2 border-white"
                   alt="Profile"
               />
-            </a>
-            <input
+              <input
                 type="file"
                 ref="profileInput"
                 @change="onProfileFileChange"
                 accept="image/*"
                 style="display: none;"
-            />
+                class="profile-file"
+              />
+            </a>
+            
           </div>
         </div>
       </div>
@@ -231,7 +233,7 @@ onMounted(() => {
 
 .profile-img-container {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  /* aspect-ratio: 1 / 1; */
   border-radius: 50%;
   overflow: hidden;
   display: block;
