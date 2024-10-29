@@ -13,10 +13,11 @@
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter} from "vue-router";
 import axios from "axios";
 
 const route = useRoute();
+const router = useRouter();
 const activeSection = ref("profile");
 
 // 팀 수락 함수
@@ -32,6 +33,7 @@ const joinTeam = async () => {
     });
     console.log("팀 수락 성공:", response.data);
     alert("팀에 성공적으로 참여하였습니다.");
+    router.push(`/team/${teamId}`);
   } catch (error) {
     console.error("팀 수락에 실패했습니다:", error);
     alert("팀 수락에 실패하였습니다.");
