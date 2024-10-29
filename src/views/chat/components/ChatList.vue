@@ -12,7 +12,8 @@
         <ul class="chat-list">
             <li v-for="(chat, index) in sortedChatRooms" :key="index" @click="goToChatRoom(chat)"
                 class="chat-list-item">
-                <img :src="chat.profileImage" class="profile-image" />
+                <!-- <img :src="chat.profileImage" class="profile-image" /> -->
+                <img :src="chat.profileImage ? chat.profileImage : require('@/assets/img/default/profile.png')" class="profile-image" />
                 <span v-if="notificationBadge[chat.chatRoomId]" class="notification-badge"></span>
                 <!-- <span v-if="chat.unreadCount > 0" class="notification-badge">{{ chat.unreadCount }}</span> -->
                 <div class="chat-info">
@@ -38,7 +39,7 @@
 
                 <ul class="friend-list-body">
                     <li v-for="friend in friends" :key="friend.id" class="friend-list-item">
-                        <img :src="friend.profileImage ? friend.profileImage : require('@/assets/img/애옹.png')" class="profile-image" />
+                        <img :src="friend.profileImage ? friend.profileImage : require('@/assets/img/default/profile.png')" class="profile-image" />
                         <span class="friend-name">{{ friend.nickname }}</span>
                         <button @click="addPrivateChat(friend)" class="friend-list-select">
                             추가
@@ -73,7 +74,7 @@ const chatListApi = async () => {
     if (props.chatRooms && Array.isArray(props.chatRooms)) {
         const res = props.chatRooms.map(chatroom => ({
             ...chatroom,
-            profileImage: null,
+            profileImage: null
         }));
         chat.value = res;
 
@@ -310,9 +311,9 @@ const closeFriendList = () => {
 /* 채팅방 추가 */
 .friend-list-container {
     position: absolute;
-    top: 50px;
-    left: 20px;
-    width: 300px;
+    top: 60px;
+    left: 30px;
+    width: 250px;
     max-height: 400px;
     border: 1px solid #ddd;
     background: white;

@@ -61,7 +61,7 @@ const closeProfile = () => {
 };
 
 const getProfileImage = (friend) => {
-  return friend.profileImage ? friend.profileImage : require('@/assets/img/애옹.png');
+  return friend.profileImage ? friend.profileImage : require('@/assets/img/default/profile.png');
 };
 
 const deleteConfirm = (friend, idx) => {
