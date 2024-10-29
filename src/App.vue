@@ -58,7 +58,7 @@ const showConfigurator = computed(() => route.name !== 'Signin');
   >
 
     <!-- <navbar :class="[navClasses]" v-if="showNavbar" /> -->
-    <navbar>
+    <navbar v-if="showNavbar">
       <router-link to="/tables">private</router-link> |
       <router-link to="/profile">profile</router-link>
       <router-link to="/social">social</router-link>
