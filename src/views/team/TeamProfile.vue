@@ -167,13 +167,21 @@ export default {
     };
 
     const sendInvite = async () => {
+      console.log("초대할 팀 ID:", selectedTeam.value.id);
+      console.log("초대할 이메일:", inviteEmail.value);
       try {
-        await axios.post(`/team/${selectedTeam.value.id}/invite`, { email: inviteEmail.value });
+        await axios.post(`/team/${selectedTeam.value.id}/invite`, null, {
+          params: { inviteeEmail: inviteEmail.value },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // 인증 토큰 추가
+          },
+        });
+        alert("초대 메일이 성공적으로 전송되었습니다.");
         closeInviteModal();
       } catch (error) {
         console.error('초대 이메일 전송 중 오류 발생:', error);
       }
-    };
+};
 
     const confirmDelete = (member) => {
       memberToDelete.value = member;

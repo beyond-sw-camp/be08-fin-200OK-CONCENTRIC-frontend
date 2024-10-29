@@ -71,7 +71,7 @@
   team: {
     type: Object,
     default: () => ({}),
-    },
+    }, 
   });
 
   console.log("Team data in TeamProfile:", props.team); // 팀 데이터 확인
