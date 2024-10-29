@@ -1,7 +1,7 @@
 <template>
   <div class="calendar-page">
     <div class="calendar-header">
-      <button @click="prevMonth">◀</button>
+      <button type="button" @click="prevMonth">◀</button>
       <span>{{ currentMonthYear }}</span>
       <button @click="nextMonth">▶</button>
     </div>
@@ -23,7 +23,6 @@
         <div v-if="!getTasksForDay(day.date).length" class="no-events">&nbsp;</div> <!-- 빈 공간 유지 -->
       </div>
     </div>
-
     <!-- 일정 추가 모달 컴포넌트 -->
     <add-task
         v-if="isModalVisible"
@@ -262,8 +261,8 @@ export default {
 }
 
 .calendar-header button {
-  background-color: #28a745;
-  color: white;
+  background-color: transparent;
+  color: #121235;
   border: none;
   padding: 10px;
   margin: 0 10px;
@@ -271,15 +270,15 @@ export default {
 }
 
 .calendar-header span {
-  font-size: 1.5em;
+  font-size: 2rem;
   font-weight: bold;
 }
 
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-  max-width: 1200px;
+  /*gap: 1px;*/
+  max-width: 1000px;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
@@ -300,7 +299,7 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  min-height: 120px;
+  min-height: 80px;
 }
 
 .selected-day {
@@ -317,14 +316,14 @@ export default {
 }
 
 .event-bar, .no-events {
-  background-color: #28a745;
+  background-color: #8a9bf9;
   color: white;
   width: 100%;
   padding: 2px 5px;
   margin-top: 5px;
   font-size: 0.9rem;
   text-align: center;
-  border-radius: 5px;
+  /*border-radius: 5px;*/
   min-height: 20px;
   white-space: nowrap;
   overflow: hidden;
@@ -362,4 +361,6 @@ export default {
     width: 7ch;
   }
 }
+
+
 </style>

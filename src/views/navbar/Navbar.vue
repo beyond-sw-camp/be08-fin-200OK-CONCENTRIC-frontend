@@ -26,6 +26,19 @@ const showNotifications = ref([]);
 const minimizeSidebar = () => store.commit("sidebarMinimize");
 const toggleConfigurator = () => store.commit("toggleConfigurator");
 
+const clearTeamId = () => {
+  const userData = JSON.parse(localStorage.getItem('user')) || {};
+
+  // team_id를 null로 설정
+  if (userData.state) {
+    userData.state.team_id = null;
+    localStorage.setItem('user', JSON.stringify(userData));
+  }
+
+  // Pinia 스토어의 team_id도 업데이트
+  userStore.setTeamId(null);
+};
+
 watch(() => stateStore.numOfNotifications, (newVal) => {
   numOfNotifications.value = newVal;
 });
@@ -154,7 +167,7 @@ onBeforeUnmount(() => {
         <a href="#" @click="minimizeSidebar" class="p-0 nav-link text-white" id="iconNavbarSidenav">
         </a>
       </div>
-      <router-link to="/" class="d-flex align-items-center image-container">
+      <router-link to="/" class="d-flex align-items-center image-container" @click="clearTeamId">
         <img
           :src="require('@/assets/img/logos/logo.png')"
           class="w-60 mt-1"

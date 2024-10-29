@@ -1,12 +1,12 @@
 <template>
-  <div class="calendar-page">
+  <div class="calendar-page card">
     <!-- 상단에 보기 모드 전환 버튼 -->
     <div class="calendar-header">
-      <div class="view-toggle">
-        <button @click="setView('month')" :class="{ active: currentView === 'month' }">Month</button>
-        <button @click="setView('week')" :class="{ active: currentView === 'week' }">Week</button>
-        <button @click="setView('day')" :class="{ active: currentView === 'day' }">Day</button>
-      </div>
+<!--      <div class="view-toggle">-->
+<!--        <button @click="setView('month')" :class="{ active: currentView === 'month' }">Month</button>-->
+<!--        <button @click="setView('week')" :class="{ active: currentView === 'week' }">Week</button>-->
+<!--        <button @click="setView('day')" :class="{ active: currentView === 'day' }">Day</button>-->
+<!--      </div>-->
     </div>
 
     <!-- 보기 모드에 따른 컴포넌트 렌더링 -->
