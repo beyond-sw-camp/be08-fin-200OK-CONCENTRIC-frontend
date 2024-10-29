@@ -48,12 +48,12 @@ const imageUrl = ref("");
 const background = ref("");
 
 const getProfileImage = async () => {
-  imageUrl.value = userStore.userInfo.imageUrl ? userStore.userInfo.imageUrl : require('@/assets/img/애옹.png');
+  imageUrl.value = userStore.userInfo.imageUrl ? userStore.userInfo.imageUrl : require('@/assets/img/default/profile.png');
   console.log(imageUrl.value);
 };
 
 const getBackGroundImage = async () => {
-  background.value = userStore.userInfo.background ? userStore.userInfo.background : require('@/assets/img/애옹.png');
+  background.value = userStore.userInfo.background ? userStore.userInfo.background : require('@/assets/img/default/background.jpg');
 };
 
 onMounted(() => {

@@ -2,13 +2,15 @@
   <div v-if="showModal" class="modal-overlay" @click.self="closeProfile">
     <div class="modal-content">
       <div class="card card-profile">
-        <img :src="getImage(friend.backgroundImage)" alt="Image placeholder" class="background-img"/>
+        <img :src="getBackgroundImage(friend.backgroundImage)" alt="Image placeholder" class="background-img"/>
         <div class="row justify-content-center">
           <div class="col-4 col-lg-4 order-lg-2">
             <div class="mt-n4 mt-lg-4 mb-4 mb-lg-0">
+            <div class="profile-image-container">
               <img :src="getImage(friend.profileImage)" class="profile-image rounded-circle img-fluid border border-2 border-white" alt="Profile"/>
             </div>
           </div>
+        </div>
         </div>
         <div class="card-body pt-0">
           <div class="text-center mt-4">
@@ -39,7 +41,11 @@ const closeProfile = () => {
 };
 
 const getImage = (image) => {
-  return image ? image : require('@/assets/img/애옹.png');
+  return image ? image : require('@/assets/img/default/profile.png');
+};
+
+const getBackgroundImage = (image) => {
+  return image ? image : require('@/assets/img/default/background.jpg');
 };
 
 </script>
@@ -67,9 +73,15 @@ const getImage = (image) => {
   position: relative;
 }
 
+.profile-image-container {
+  display: flex;
+  justify-content: center;
+  margin-top: -60%; /* 배경 이미지와 겹치도록 음수 마진 */
+}
+
 .profile-image {
-  width: 100%;
-  height: 100%;
+  width: 80%;
+  height: 80%;
   object-fit: cover;
   border-radius: 50%;
 }
@@ -82,8 +94,8 @@ const getImage = (image) => {
   border-radius: 8px; /* 모서리 둥글게 */
   padding: 10px; /* 내부 여백 */
   display: flex; /* 자식 요소를 유연하게 배치 */
-  flex-direction: column; /* 세로 방향으로 정렬 */
-  justify-content: flex-end; /* 내용 하단 정렬 */
+  /* flex-direction: column; 세로 방향으로 정렬 */
+  /* justify-content: flex-end; 내용 하단 정렬 */
 }
 
 </style>

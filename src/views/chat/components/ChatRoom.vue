@@ -3,7 +3,8 @@
         <div :class="['chat-room-container', isVisible ? 'show' : '']">
         <!-- 채팅방 헤더 -->
             <div class="chat-room-header">
-                <img :src="chat.profileImage" class="profile-image" @click="goToDetails"/>
+                <img :src="chat.profileImage ? chat.profileImage : require('@/assets/img/default/profile.png')" @click="goToDetails" class="profile-image"/>
+                <!-- <img :src="chat.profileImage ? chat.profileImage : require('@/assets/img/default/profile.png')" class="profile-image" /> -->
                 <div class="profile-info">
                     <h3 class="profile-name">{{ chat.nickname }}</h3>
                 </div>
@@ -496,5 +497,12 @@ const goToDetails = () => {
 
 .send-button:hover {
     background-color: #ececec;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 40%;
+    margin-right: 12px;
 }
 </style>

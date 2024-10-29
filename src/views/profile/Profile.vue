@@ -141,7 +141,7 @@ onBeforeUnmount(() => {
 
 .card {
   border: none;
-  border-radius: 10px;
+  border-radius: 18px;
   overflow: hidden; /* 카드 안의 요소가 경계를 넘지 않도록 */
 }
 
@@ -150,7 +150,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 11pt;
   margin-right: 1rem;
   transition: background-color 0.15s, color 0.15s;
@@ -164,7 +164,7 @@ onBeforeUnmount(() => {
 
 .menu li.active,
 .menu li:hover {
-  background-color: #e3e3e3;
+  background-color: #e3e3e3ae;
   color: rgb(0, 0, 0);
 }
 
