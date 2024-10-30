@@ -80,12 +80,15 @@
           headers: {
             "Content-Type": "multipart/form-data"
           },
-          validateStatus: false
         }
       );
       if(response.status === 200) {
         userStore.updateTeam(response.data);
         alert("팀 정보가 변경되었습니다.");
+      } else if (response.status === 403) {
+        alert("그룹장만 수정할 수 있습니다.");
+      } else {
+        alert("팀 정보 수정에 실패했습니다.");
       }
     } catch (error) {
       console.error("네트워크 오류 : ", error);

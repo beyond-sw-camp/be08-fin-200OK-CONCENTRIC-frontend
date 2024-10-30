@@ -11,6 +11,7 @@ import Social from "@/views/social/FriendList.vue";
 import PrivateStorage from "@/views/storage/PrivateStorage.vue";
 import ProfileEdit from "@/views/profile/ProfileEdit.vue";
 import TeamPage from "../views/team/TeamPage.vue";
+import TeamInvitePage from "../views/team/TeamInvitePage.vue";
 import TempCalendar from "@/etc/TempCalendar.vue";
 
 
@@ -85,6 +86,11 @@ const routes = [
     path: "/team/:id",
     name: "Team",
     component: TeamPage,
+  },
+  {
+    path: "/team/invite/:id",
+    name: "TeamInvite",
+    component: TeamInvitePage,
   },
 ];
 

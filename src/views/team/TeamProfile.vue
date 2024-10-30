@@ -10,15 +10,8 @@
                 <div class="col-auto">
                   <div class="avatar avatar-xl position-relative">
                     <img
-                      :src="teamImage"
+                      :src="selectedTeam.imageUrl ? selectedTeam.imageUrl : require('@/assets/img/애옹.png')"
                       class="w-100 border-radius-lg"
-                    />
-                    <input
-                      type="file"
-                      id="file-input"
-                      @change="updateProfileImage"
-                      style="display: none;"
-                      accept="image/*"
                     />
                   </div>
                 </div>
@@ -94,7 +87,7 @@
 </template>
 
 <script>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/store/user';
 import { useRoute, useRouter } from 'vue-router';
@@ -121,10 +114,6 @@ export default {
         members.value = teamMembers.slice(1); // 나머지 팀원들을 그룹원 목록으로 설정
       }
     };
-
-    const teamImage = computed(() => 
-      selectedTeam.value.imageUrl || require('@/assets/img/애옹.png')
-    );
 
     const fetchTeamMembers = async () => {
       try {
@@ -178,13 +167,21 @@ export default {
     };
 
     const sendInvite = async () => {
+      console.log("초대할 팀 ID:", selectedTeam.value.id);
+      console.log("초대할 이메일:", inviteEmail.value);
       try {
-        await axios.post(`/team/${selectedTeam.value.id}/invite`, { email: inviteEmail.value });
+        await axios.post(`/team/${selectedTeam.value.id}/invite`, null, {
+          params: { inviteeEmail: inviteEmail.value },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // 인증 토큰 추가
+          },
+        });
+        alert("초대 메일이 성공적으로 전송되었습니다.");
         closeInviteModal();
       } catch (error) {
         console.error('초대 이메일 전송 중 오류 발생:', error);
       }
-    };
+};
 
     const confirmDelete = (member) => {
       memberToDelete.value = member;
