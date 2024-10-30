@@ -30,8 +30,9 @@
               <li v-for="team in teams" :key="team.id" class="d-flex justify-content-between align-items-center">
                 <a href="#" class="dropdown-item" @click="selectItem(team)">
                   {{ team.name }}
+                  <button v-if="userStore.userInfo && userStore.userInfo.id === team.creatorId" class="delete-icon" @click.stop="deleteTeam(team.id)">X</button>
                 </a>
-                <button v-if="userStore.userInfo && userStore.userInfo.id === team.creatorId" class="delete-icon" @click.stop="deleteTeam(team.id)">X</button>
+                
 
               </li>
               <li class="dropdown-item">
@@ -242,6 +243,14 @@ onMounted(() => {
   color: white;
 }
 
+.dropdown-menu li {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 11pt;
+  transition: background-color 0.15s, color 0.15s;
+}
+
 .image-container {
   display: inline-block;
 }
@@ -257,6 +266,7 @@ onMounted(() => {
   cursor: pointer; 
   padding: 0; 
   line-height: 1; 
+  margin-left: 70%;
 }
 
 .delete-icon:hover {

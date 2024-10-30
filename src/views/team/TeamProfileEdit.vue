@@ -1,26 +1,30 @@
 <template>
-    <div class="team-edit-container">
-      <h2>팀 정보 수정</h2>
-  
-      <!-- Team Name Input -->
-      <div class="form-group">
-        <label for="teamName">팀 이름</label>
-        <input type="text" id="teamName" v-model="selectedTeam.name" placeholder="팀 이름을 입력하세요" />
+  <div class="container">
+    <div class="card">
+      <div class="team-edit-container" >
+        <h2>팀 정보 수정</h2>
+    
+        <!-- Team Name Input -->
+        <div class="form-group">
+          <label for="teamName">팀 이름</label>
+          <input type="text" id="teamName" v-model="selectedTeam.name" placeholder="팀 이름을 입력하세요" />
+        </div>
+    
+        <!-- Team Image Upload -->
+        <div class="form-group">
+          <label for="teamImage">팀 이미지</label>
+          <input type="file" id="teamImage" @change="handleImageUpload" />
+          <img v-if="imageUrl" :src="imageUrl" alt="Team Image" class="image-preview" />
+        </div>
+    
+        <!-- Save Button -->
+        <button @click="confirmUpdate" class="save-button">수정 완료</button>
+    
+        <!-- Leave Team Button -->
+        <button @click="leaveTeam" class="leave-button">팀 나가기</button>
       </div>
-  
-      <!-- Team Image Upload -->
-      <div class="form-group">
-        <label for="teamImage">팀 이미지</label>
-        <input type="file" id="teamImage" @change="handleImageUpload" />
-        <img v-if="imageUrl" :src="imageUrl" alt="Team Image" class="image-preview" />
-      </div>
-  
-      <!-- Save Button -->
-      <button @click="confirmUpdate" class="save-button">수정 완료</button>
-  
-      <!-- Leave Team Button -->
-      <button @click="leaveTeam" class="leave-button">팀 나가기</button>
     </div>
+  </div>
   </template>
   
   <script setup>
@@ -130,17 +134,27 @@
   
   <style scoped>
   .team-edit-container {
-    max-width: 800px;
-    margin: 30px auto 0;
-    padding: 30px;
-    background-color: #f8f9fa;
-    border: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 0 10rem;
   }
-  
+
+  .card{
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    min-height: 600px;
+    width: 120vh;
+    padding-top: 6%;
+    margin: 0 1.5rem;
+  }
+
+  .container {
+  /* max-width: 600px; */
+  padding: 0;
+  }
+
   h2 {
-    margin-bottom: 30px;
-    font-size: 1.5rem;
+    margin-bottom: 50px;
+    font-size: 1.3rem;
   }
   
   .form-group {
@@ -149,8 +163,9 @@
   
   label {
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
     font-weight: bold;
+    font-size: 11pt;
   }
   
   input[type="text"],
@@ -160,22 +175,23 @@
     border-radius: 5px;
     border: 1px solid #dee2e6;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    font-size: 11pt;
   }
   
   button {
-    padding: 12px 20px;
-    background-color: #007bff;
+    padding: 6px 40px;
+    background-color: #8A9BF9;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 12px;
     cursor: pointer;
-    margin-top: 20px;
+    margin: 20px 0 0px 20px;
     transition: background-color 0.3s;
-    width: 100%;
+    font-size: 11pt;
   }
   
   button:hover {
-    background-color: #0056b3;
+    background-color: #6f80e3;
   }
   
   .image-preview {
