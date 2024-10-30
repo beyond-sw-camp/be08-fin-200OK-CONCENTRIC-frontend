@@ -1,87 +1,89 @@
 <template>
   <main>
     <div class="container-fluid profile-overview">
-      <div class="row justify-content-start">
-        <div class="col-md-10">
-          <!-- 팀 프로필 카드 -->
-          <div class="card shadow-lg mt-4">
-            <div class="card-body p-3">
-              <div class="row gx-4">
-                <div class="col-auto">
-                  <div class="avatar avatar-xl position-relative">
-                    <img
-                      :src="selectedTeam.imageUrl ? selectedTeam.imageUrl : require('@/assets/img/애옹.png')"
-                      class="w-100 border-radius-lg"
-                    />
+      <div class="card-list">
+        <!-- <div class="row justify-content-start"> -->
+          <!-- <div class="col-md-10"> -->
+            <!-- 팀 프로필 카드 -->
+            <div class="card" style="min-height: 150px;">
+              <div class="card-body p-3">
+                <!-- <div class="row gx-4"> -->
+                  <div class="col-auto">
+                    <div class="avatar avatar-xl position-relative mt-2">
+                      <img
+                        :src="selectedTeam.imageUrl ? selectedTeam.imageUrl : require('@/assets/img/default/profile.png')"
+                        class="w-100 border-radius-lg"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div class="col-auto my-auto">
-                  <div class="h-100">
-                    <h5 class="mb-1">{{ selectedTeam.name }}</h5>
-                    <!-- <p class="mb-0 font-weight-bold text-sm">{{ selectedTeam.role }}</p> -->
+                  <div class="col-auto my-auto">
+                    <div class="h-100">
+                      <h5 class="mb-1">{{ selectedTeam.name }}</h5>
+                      <!-- <p class="mb-0 font-weight-bold text-sm">{{ selectedTeam.role }}</p> -->
+                    </div>
                   </div>
-                </div>
+                <!-- </div> -->
               </div>
             </div>
-          </div>
 
-          <!-- 팀원 리스트 -->
-          <div class="card mt-4">
-            <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-              <h5 class="mb-0">Member</h5>
-              <button class="btn btn-custom btn-sm" @click="showInviteModal">
-                팀원 추가
-              </button>
-            </div>
-            <div class="card-body">
-              <!-- 그룹장 섹션 -->
-              <div v-if="leader" class="group-leader">
-                <h6 class="text-uppercase">그룹장</h6>
-                <div class="profile-box position-relative">
-                  <img :src="leader.profileImage ? leader.profileImage : require('@/assets/img/애옹.png')" class="member-icon" />
-                  <span class="member-name">{{ leader.nickname }}</span>
-                </div>
-                <hr class="horizontal dark" />
+            <!-- 팀원 리스트 -->
+            <div class="card mt-4" style="min-height: 425px;">
+              <div class="card-header pb-0 mt-2 d-flex justify-content-between align-items-center" style="margin: 0 3rem;">
+                <h5 class="mb-0">Member</h5>
+                <button class="btn btn-custom btn-sm" @click="showInviteModal">
+                  팀원 추가
+                </button>
               </div>
-
-              <!-- 그룹원 섹션 -->
-              <div class="group-members mt-4">
-                <h6 class="text-uppercase">그룹원</h6>
-                <div v-for="member in members" :key="member.id" class="position-relative member-item">
-                  <div class="member-box">
-                    <img :src="member.profileImage ? member.profileImage : require('@/assets/img/애옹.png')" class="member-icon" />
-                    <span class="member-name">{{ member.nickname }}</span>
-                    <span class="delete-icon"  @click="confirmDelete(member)">X</span>
+              <div class="card-body" style="margin: 0 3rem;">
+                <!-- 그룹장 섹션 -->
+                <div v-if="leader" class="group-leader">
+                  <h6 class="text-uppercase">그룹장</h6>
+                  <div class="profile-box position-relative">
+                    <img :src="leader.profileImage ? leader.profileImage : require('@/assets/img/default/profile.png')" class="member-icon" />
+                    <span class="member-name">{{ leader.nickname }}</span>
                   </div>
+                  <hr class="horizontal dark" />
                 </div>
-                <hr class="horizontal dark" />
+
+                <!-- 그룹원 섹션 -->
+                <div class="group-members mt-4">
+                  <h6 class="text-uppercase">그룹원</h6>
+                  <div v-for="member in members" :key="member.id" class="position-relative member-item">
+                    <div class="member-box">
+                      <img :src="member.profileImage ? member.profileImage : require('@/assets/img/default/profile.png')" class="member-icon" />
+                      <span class="member-name">{{ member.nickname }}</span>
+                      <span class="delete-icon"  @click="confirmDelete(member)">X</span>
+                    </div>
+                  </div>
+                  <hr class="horizontal dark" />
+                </div>
+              </div>
+            </div>
+
+            <!-- 팀원 추가 모달 -->
+            <div v-if="isModalVisible" class="modal">
+              <div class="modal-content">
+                <span class="close" @click="closeInviteModal">&times;</span>
+                <h6>팀원 초대하기</h6>
+                <input type="email" v-model="inviteEmail" placeholder="이메일 입력" class="form-control" />
+                <button class="btn btn-primary mt-3" @click="sendInvite">전송</button>
+              </div>
+            </div>
+
+            <!-- 팀원 삭제 확인 모달 -->
+            <div v-if="isDeleteModalVisible" class="modal">
+              <div class="modal-content">
+                <span class="close" @click="closeDeleteModal">&times;</span>
+                <h6>팀원을 삭제하시겠습니까?</h6>
+                <div class="d-flex justify-content-end mt-4">
+                  <button class="btn btn-danger me-3" @click="deleteMember">삭제</button>
+                  <button class="btn btn-secondary" @click="closeDeleteModal">취소</button>
+                </div>
               </div>
             </div>
           </div>
-
-          <!-- 팀원 추가 모달 -->
-          <div v-if="isModalVisible" class="modal">
-            <div class="modal-content">
-              <span class="close" @click="closeInviteModal">&times;</span>
-              <h6>팀원 초대하기</h6>
-              <input type="email" v-model="inviteEmail" placeholder="이메일 입력" class="form-control" />
-              <button class="btn btn-primary mt-3" @click="sendInvite">전송</button>
-            </div>
-          </div>
-
-          <!-- 팀원 삭제 확인 모달 -->
-          <div v-if="isDeleteModalVisible" class="modal">
-            <div class="modal-content">
-              <span class="close" @click="closeDeleteModal">&times;</span>
-              <h6>팀원을 삭제하시겠습니까?</h6>
-              <div class="d-flex justify-content-end mt-4">
-                <button class="btn btn-danger me-3" @click="deleteMember">삭제</button>
-                <button class="btn btn-secondary" @click="closeDeleteModal">취소</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        <!-- </div> -->
+      <!-- </div> -->
     </div>
   </main>
 </template>
@@ -228,42 +230,49 @@ export default {
   
   <style scoped>
   .container-fluid {
-  padding: 0 2cm;
-  /* padding-left: 5cm; 왼쪽 패딩 추가로 오른쪽으로 이동 */
-  /* padding-right: 1cm; */
+  padding: 0;
+  }
+
+  .card-list{
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    min-height: 600px;
+    width: 120vh;
+    margin: 0 1.5rem;
   }
   
-  .card {
+  /* .card {
   margin-top: 2rem;
-  }
+  } */
   
-  .card-body {
+  /* .card-body {
   padding: 1rem;
   }
-  
+   */
   .group-leader,
   .group-members {
   margin-bottom: 1rem;
   }
   
   .member-icon, .profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
+  width: 60px;
+  height: 60px;
+  border-radius: 30%;
+  margin-right: 2rem;
   }
   
   .profile-name, .member-name{
   font-weight: bold;
-  margin-right: 700px;
-  text-align: left;
+  /* text-align: left; */
   }
 
   .member-box, .profile-box {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px;
+  justify-content: left;
+  margin-left: 1rem;
+  /* padding: 10px; */
   }
   
   .delete-icon {
@@ -303,11 +312,20 @@ export default {
   }
   
   .btn-custom {
-  background-color: #007bff;
+  background-color: #8A9BF9;
   color: white;
   }
   
   .btn-custom:hover {
-  background-color: #0056b3;
+  background-color: #6f80e3;
+  color: white;
+  }
+
+  .card{
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-color: none;
+  width: 120vh;
   }
   </style>

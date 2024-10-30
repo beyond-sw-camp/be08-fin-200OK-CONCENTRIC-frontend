@@ -1,34 +1,41 @@
 <template>
-  <div class="team-page-container d-flex">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <ul class="menu">
-        <li style="pointer-events: none;">
-          팀 정보 페이지
-        </li>
-        <li :class="{ active: activeSection === 'profile' }" @click="setActiveSection('profile')">
-          <i class="fa fa-user" aria-hidden="true"></i> 팀 정보
-        </li>
-        <li :class="{ active: activeSection === 'edit' }" @click="setActiveSection('edit')">
-          <i class="fa fa-edit" aria-hidden="true"></i> 정보 수정
-        </li>
-<!--          <li :class="{ active: activeSection === 'schedule' }" @click="setActiveSection('schedule')">-->
-<!--            <i class="ni ni-calendar-grid-58 text-warning"></i> 팀 일정-->
-<!--          </li>-->
-        <!-- <li :class="{ active: activeSection === 'files' }" @click="setActiveSection('files')">
-          <i class="fa fa-archive" aria-hidden="true"></i> 파일함
-        </li> -->
-        <li :class="{ active: activeSection === 'team_storage' }" @click="setActiveSection('teamstorage')">
-            <i class="fa fa-archive" aria-hidden="true"></i>파일함
-        </li>   
-      </ul>
+  <div class="team-page-container row min-vh-75">
+    <div class="col-2 py-4">
+      <div class="card" style="min-width: 210px;">
+        <!-- Sidebar -->
+        <div class="sidebar d-flex flex-column align-items-start" style="min-height: 600px;">
+          <ul class="menu" style="padding-left: 1rem; width: 100%;">
+            <li style="border-bottom: 0.5px solid rgba(0, 0, 0, 0.2); width: 90%; border-radius: 0; font-size: 12pt; font-weight: 600; pointer-events: none;">
+              팀 정보 페이지
+            </li>
+            <li :class="{ active: activeSection === 'profile' }" @click="setActiveSection('profile')">
+              <i class="fa fa-user" aria-hidden="true"></i> 팀 정보
+            </li>
+            <li :class="{ active: activeSection === 'edit' }" @click="setActiveSection('edit')">
+              <i class="fa fa-edit" aria-hidden="true"></i> 정보 수정
+            </li>
+    <!--          <li :class="{ active: activeSection === 'schedule' }" @click="setActiveSection('schedule')">-->
+    <!--            <i class="ni ni-calendar-grid-58 text-warning"></i> 팀 일정-->
+    <!--          </li>-->
+            <!-- <li :class="{ active: activeSection === 'files' }" @click="setActiveSection('files')">
+              <i class="fa fa-archive" aria-hidden="true"></i> 파일함
+            </li> -->
+            <li :class="{ active: activeSection === 'team_storage' }" @click="setActiveSection('teamstorage')">
+                <i class="fa fa-archive" aria-hidden="true"></i>파일함
+            </li>   
+          </ul>
+        </div>
+      </div>
     </div>
-  
-    <!-- Main content -->
-    <div class="main-content">
-      <TeamProfile v-if="activeSection === 'profile'" :team="team" />
-      <TeamProfileEdit v-if="activeSection === 'edit'" :team="team" />  
-      <TeamStorage v-if="activeSection == 'teamstorage'" :team="team" />
+    <div class="col-10 py-4 container-fluid position-relative">
+      <div class="content-box">
+        <!-- Main content -->
+        <div class="main-content">
+          <TeamProfile v-if="activeSection === 'profile'" :team="team" />
+          <TeamProfileEdit v-if="activeSection === 'edit'" :team="team" />  
+          <TeamStorage v-if="activeSection == 'teamstorage'" :team="team" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -74,16 +81,35 @@ const setActiveSection = (section) => {
 </script>
 
 <style scoped>
-.team-page-container {
+/* .team-page-container {
   display: flex;
   height: 100vh;
+} */
+
+.team-page-container {
+  padding: 0;
 }
 
-.sidebar {
+/* .sidebar {
   width: 15%;
   padding: 1rem 1rem 1rem 3rem;
   border-right: 1px solid #dee2e6;
   flex-shrink: 0;
+} */
+
+.main-content {
+  bottom: 0;
+  /* transform: translateX(-50%); */
+  width: 100%;
+  text-align: center; 
+  position: relative;
+}
+
+.sidebar {
+  width: 100%;
+  padding-top: 1rem;
+  flex-shrink: 0;
+  align-content: center;
 }
 
 .menu {
@@ -96,17 +122,21 @@ const setActiveSection = (section) => {
   display: flex;
   align-items: center;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-size: 11pt;
+  margin-right: 1rem;
   transition: background-color 0.15s, color 0.15s;
 }
 
 .menu li i {
   margin-right: 1rem;
+  font-size: 12pt;
+  align-items: left;
 }
 
 .menu li.active,
 .menu li:hover {
-  background-color: #e3e3e3;
+  background-color: #e3e3e3ae;
   color: rgb(0, 0, 0);
 }
 
