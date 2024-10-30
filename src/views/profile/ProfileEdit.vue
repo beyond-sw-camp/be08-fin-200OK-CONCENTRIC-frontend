@@ -25,14 +25,16 @@
                   class="profile-img rounded-circle img-fluid border border-2 border-white"
                   alt="Profile"
               />
-            </a>
-            <input
+              <input
                 type="file"
                 ref="profileInput"
                 @change="onProfileFileChange"
                 accept="image/*"
                 style="display: none;"
-            />
+                class="profile-file"
+              />
+            </a>
+            
           </div>
         </div>
       </div>
@@ -118,11 +120,11 @@ const getUser = () => {
 };
 
 const getProfileImage = async () => {
-  imageUrl.value = userStore.userInfo.imageUrl ? userStore.userInfo.imageUrl : require('@/assets/img/애옹.png');
+  imageUrl.value = userStore.userInfo.imageUrl ? userStore.userInfo.imageUrl : require('@/assets/img/default/profile.png');
 };
 
 const getBackGroundImage = async () => {
-  background.value = userStore.userInfo.background ? userStore.userInfo.background : require('@/assets/img/애옹.png');
+  background.value = userStore.userInfo.background ? userStore.userInfo.background : require('@/assets/img/default/background.jpg');
 };
 
 const triggerProfileInput = () => {
@@ -231,7 +233,7 @@ onMounted(() => {
 
 .profile-img-container {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  /* aspect-ratio: 1 / 1; */
   border-radius: 50%;
   overflow: hidden;
   display: block;

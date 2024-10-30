@@ -30,7 +30,7 @@ const closeProfile = () => {
 };
 
 const getProfileImage = (friendRequest) => {
-  return friendRequest.profileImage ? friendRequest.profileImage : require('@/assets/img/애옹.png');
+  return friendRequest.profileImage ? friendRequest.profileImage : require('@/assets/img/default/profile.png');
 };
 
 const acceptFriend = async (friendRequest, tof, idx) => {

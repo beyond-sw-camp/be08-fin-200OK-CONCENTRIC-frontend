@@ -1,15 +1,5 @@
 <template>
   <div class="row col-auto me-4">
-    <!-- <div class="col image-container">
-      <a :href="selectedItem.link || '/'" class="image-link align-content-center">
-        <img
-          :src="selectedItem.image || defaultImage"
-          class="w-25 ms-5"
-          alt="profile_image"
-        />
-
-      </a>
-    </div> -->
     <div class="col">
       <router-link class="m-0 navbar-brand " to="#">
         <div class="dropdown-placeholder">
@@ -193,7 +183,7 @@ onMounted(() => {
 
 <style scoped>
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: opacity 0.1s ease, transform 0.1s ease;
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;

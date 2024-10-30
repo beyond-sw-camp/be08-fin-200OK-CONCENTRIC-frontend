@@ -26,6 +26,19 @@ const showNotifications = ref([]);
 const minimizeSidebar = () => store.commit("sidebarMinimize");
 const toggleConfigurator = () => store.commit("toggleConfigurator");
 
+const clearTeamId = () => {
+  const userData = JSON.parse(localStorage.getItem('user')) || {};
+
+  // team_id를 null로 설정
+  if (userData.state) {
+    userData.state.team_id = null;
+    localStorage.setItem('user', JSON.stringify(userData));
+  }
+
+  // Pinia 스토어의 team_id도 업데이트
+  userStore.setTeamId(null);
+};
+
 watch(() => stateStore.numOfNotifications, (newVal) => {
   numOfNotifications.value = newVal;
 });
@@ -71,11 +84,13 @@ const loadNotifications = async () => {
       { validateStatus: false }
     );
     notifications.value = response.data;
+    let count = 0;
     notifications.value.forEach(notification => {
       notification.createDate = new Date(notification['createDate']).toLocaleString().substring(0, 22);
-      if (!notification.isRead) numOfNotifications.value += 1;
+      if (!notification.isRead) count += 1;
       showNotifications.value.push(true);
     });
+    numOfNotifications.value = count;
     stateStore.setNumOfNotifications(numOfNotifications.value);
   } catch (error) {
     console.log(error);
@@ -152,7 +167,7 @@ onBeforeUnmount(() => {
         <a href="#" @click="minimizeSidebar" class="p-0 nav-link text-white" id="iconNavbarSidenav">
         </a>
       </div>
-      <router-link to="/" class="d-flex align-items-center image-container">
+      <router-link to="/" class="d-flex align-items-center image-container" @click="clearTeamId">
         <img
           :src="require('@/assets/img/logos/logo.png')"
           class="w-60 mt-1"
