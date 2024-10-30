@@ -15,10 +15,22 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter} from "vue-router";
 import axios from "axios";
+import { useUserStore } from "@/store/user.js";
 
 const route = useRoute();
 const router = useRouter();
-const activeSection = ref("profile");
+const userStore = useUserStore();
+
+onMounted(() => {
+  if (!userStore.isLoggedIn) {
+    router.push({
+      path: "/signin",
+      query: { redirect: route.fullPath }, // 현재 경로로 리다이렉트 설정
+    });
+  }
+});
+
+
 
 // 팀 수락 함수
 const joinTeam = async () => {
