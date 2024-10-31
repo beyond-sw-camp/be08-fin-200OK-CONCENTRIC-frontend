@@ -22,6 +22,10 @@
             <label for="description">Description</label>
             <input type="text" id="description" v-model="newTask.description" class="form-control" />
           </div>
+          <div class="form-group d-flex align-items-center">
+            <label for="personal" class="mb-0 me-2">Personal</label>
+            <input type="checkbox" id="teamExist"/>
+          </div>
           <div class="form-group" style="position: relative;">
             <label for="startDate">Start Date</label>
             <div style="position: absolute; top: 0; right: 0;">
@@ -53,16 +57,16 @@
             <label for="importance">Importance</label>
             <input type="number" id="importance" v-model="newTask.importance" class="form-control" min="0" max="5" />
           </div>
-          <div class="form-group">
-            <label>
-              <input type="checkbox" v-model="newTask.startNotification" /> Start Notification
-            </label>
-          </div>
-          <div class="form-group">
-            <label>
-              <input type="checkbox" v-model="newTask.endNotification" /> End Notification
-            </label>
-          </div>
+<!--          <div class="form-group">-->
+<!--            <label>-->
+<!--              <input type="checkbox" v-model="newTask.startNotification" /> Start Notification-->
+<!--            </label>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label>-->
+<!--              <input type="checkbox" v-model="newTask.endNotification" /> End Notification-->
+<!--            </label>-->
+<!--          </div>-->
           <button type="submit" class="btn btn-primary">Add Task</button>
         </form>
       </div>
@@ -71,7 +75,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import axios from "axios";
 async function saveTaskToDatabase(task) {
   try {
@@ -205,7 +209,15 @@ export default {
     function endDrag() {
       isDragging.value = false;
     }
-
+    watch(
+        () => props.isVisible,
+        (newVal) => {
+          if (newVal) {
+            offsetX.value = 0
+            offsetY.value = 0
+          }
+        }
+    );
     return {
       newTask,
       confirm,
