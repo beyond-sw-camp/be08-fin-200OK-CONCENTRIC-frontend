@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <component
+    <component class="mt-n6"
         :is="currentViewComponent"
         :tasks="tasks"
         :selectedDate="selectedDate"
