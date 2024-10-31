@@ -9,8 +9,8 @@
           </a>
           정렬
         </button>
-        <button type="button" class="btn btn-success ms-3" @click="showAddTaskModal">
-          + New Task
+        <button type="button" class="btn btn-success ms-3">
+          개인 일정만 보이게 하는 버튼
         </button>
       </div>
     </div>
@@ -91,11 +91,13 @@
         </table>
       </div>
     </div>
-    <AddTask
-        :isVisible="modals.addTaskModal"
-        @close="closeAddTaskModal"
-        @confirm="handleAddTaskConfirm"
-    />
+    <transition name="slideUp" appear>
+      <AddTask
+          :isVisible="modals.addTaskModal"
+          @close="closeAddTaskModal"
+          @confirm="handleAddTaskConfirm"
+          user-id="userState.userId"/>
+      </transition>
   </div>
 </template>
 
@@ -343,5 +345,33 @@ p {
 
 .table-active {
   background-color: #e0f7fa !important;
+}
+
+/* 나타날 때와 사라질 때 트랜지션 */
+.slideUp-enter-active{
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: center center;
+}
+
+.slideUp-leave-active {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* 나타날 때 시작 위치 */
+.slideUp-enter {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+/* 나타날 때 최종 위치 */
+.slideUp-enter-to {
+  transform: translateY(0px);
+  opacity: 1;
+}
+
+/* 사라질 때 위치 */
+.slideUp-leave-to {
+  transform: translateY(20px);
+  opacity: 0;
 }
 </style>

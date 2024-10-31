@@ -3,38 +3,44 @@
     <div class="calendar-header">
       <button type="button" @click="prevMonth">◀</button>
       <span>{{ currentMonthYear }}</span>
-      <button @click="nextMonth">▶</button>
+      <button type="button" @click="nextMonth">▶</button>
     </div>
-
-    <div class="calendar">
+    <div class="week-header">
       <div class="day-header" v-for="day in daysOfWeek" :key="day">{{ day }}</div>
-
+    </div>
+    <transition-group
+        name="slide"
+        tag="div"
+        class="calendar"
+    >
       <div
           class="day-cell"
-          v-for="(day, index) in calendarDays"
-          :key="index"
-          :class="{ 'prev-next-month-day': day.isOtherMonth, 'selected-day': isSelectedDay(day.date) }"
-          @click="handleDayClick(day)"
+          v-for="day in calendarDays"
+          :key="day.date"
+      :class="{ 'prev-next-month-day': day.isOtherMonth, 'selected-day': isSelectedDay(day.date) }"
+      @click="handleDayClick(day)"
       >
-        <div class="day-number">{{ day.day }}</div>
-        <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar">
-          {{ truncateTitle(task.title) }}
-        </div>
-        <div v-if="!getTasksForDay(day.date).length" class="no-events">&nbsp;</div> <!-- 빈 공간 유지 -->
+      <div class="day-number">{{ day.day }}</div>
+      <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar">
+        {{ truncateTitle(task.title) }}
       </div>
-    </div>
-    <!-- 일정 추가 모달 컴포넌트 -->
-    <add-task
-        v-if="isModalVisible"
-        :isVisible="isModalVisible"
-        :userId="userId"
-        @close="closeModal"
-        @confirm="addTask"
-        :selectedStartDate="selectedStartDate"
-        :selectedEndDate="selectedEndDate"
-    />
+      <div v-if="!getTasksForDay(day.date).length" class="no-events">&nbsp;</div> <!-- 빈 공간 유지 -->
+  </div>
+  </transition-group>
+
+  <add-task
+      v-if="isModalVisible"
+      :isVisible="isModalVisible"
+      :userId="userId"
+      @close="closeModal"
+      @confirm="addTask"
+      :selectedStartDate="selectedStartDate"
+      :selectedEndDate="selectedEndDate"
+  />
   </div>
 </template>
+
+
 
 <script>
 import { ref, computed, watch } from "vue";
@@ -117,13 +123,15 @@ export default {
       return days;
     });
 
-    // 이전 달로 이동하는 함수
+    const slideDirection = ref("next"); // 슬라이드 방향을 저장하는 상태
+
     const prevMonth = () => {
+      slideDirection.value = "prev"; // 이전 달로 이동 시
       currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1);
     };
 
-    // 다음 달로 이동하는 함수
     const nextMonth = () => {
+      slideDirection.value = "next"; // 다음 달로 이동 시
       currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1);
     };
 
@@ -224,6 +232,7 @@ export default {
     };
 
     return {
+      slideDirection,
       daysOfWeek,
       calendarDays,
       prevMonth,
@@ -324,7 +333,7 @@ export default {
   font-size: 0.9rem;
   text-align: center;
   /*border-radius: 5px;*/
-  min-height: 20px;
+  min-height: 10px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -362,5 +371,73 @@ export default {
   }
 }
 
+.week-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  width: 100%;
+}
+
+/* transition-group의 enter-active 및 leave-active에 슬라이드 효과 추가 */
+.slide-enter-active {
+  animation: slideInRight 0.5s ease forwards;
+}
+
+.slide-leave-active {
+  animation: slideOutLeft 0.5s ease forwards;
+}
+
+/* prev와 next의 슬라이드 방향 */
+.slide-prev-enter-active {
+  animation: slideInLeft 0.5s ease forwards;
+}
+
+.slide-prev-leave-active {
+  animation: slideOutRight 0.5s ease forwards;
+}
+
+@keyframes slideInRight {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
 
 </style>

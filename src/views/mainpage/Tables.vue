@@ -69,7 +69,7 @@
           <div class="carousel-item active tasks-slide">
             <Tasks class="d-block w-100" alt="First slide" />
           </div>
-          <div class="carousel-item">
+          <div class="carousel-item tasks-slide">
             <CalenderView class="d-block w-100" alt="Second slide" />
           </div>
         </div>
