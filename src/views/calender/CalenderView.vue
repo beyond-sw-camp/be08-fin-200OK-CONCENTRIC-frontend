@@ -1,15 +1,25 @@
 <template>
-  <div class="calendar-page card">
+  <div class="calendar-page card px-4">
     <!-- 상단에 보기 모드 전환 버튼 -->
     <div class="calendar-header">
-<!--      <div class="view-toggle">-->
-<!--        <button @click="setView('month')" :class="{ active: currentView === 'month' }">Month</button>-->
-<!--        <button @click="setView('week')" :class="{ active: currentView === 'week' }">Week</button>-->
-<!--        <button @click="setView('day')" :class="{ active: currentView === 'day' }">Day</button>-->
-<!--      </div>-->
+      <div class="view-toggle">
+        <button @click="setView('month')"
+                :class="{ active: currentView === 'month' }"
+                type="button"
+                class="btn-success btn"
+                v-if="currentView === 'week'">
+          Month
+        </button>
+        <button @click="setView('week')"
+                :class="{ active: currentView === 'week' }"
+                type="button"
+                class="btn-success btn"
+                v-if="currentView === 'month'">
+          Week
+        </button>
+      </div>
     </div>
 
-    <!-- 보기 모드에 따른 컴포넌트 렌더링 -->
     <component
         :is="currentViewComponent"
         :tasks="tasks"
@@ -32,6 +42,12 @@ export default {
     const tasks = ref([]); // 일정 데이터를 저장할 배열
     const selectedDate = ref(new Date().toISOString().split('T')[0]); // 선택된 날짜
 
+    const currentDate = ref(new Date());
+    const currentMonthYear = computed(() => {
+      const month = currentDate.value.toLocaleString("default", { month: "long" });
+      const year = currentDate.value.getFullYear();
+      return `${month} ${year}`;
+    });
     // 현재 보기 모드에 맞는 컴포넌트 결정
     const currentViewComponent = computed(() => {
       if (currentView.value === 'week') return 'WeekView';
@@ -60,6 +76,7 @@ export default {
     });
 
     return {
+      currentMonthYear,
       currentView,
       currentViewComponent,
       tasks,
@@ -79,16 +96,17 @@ export default {
 
 .calendar-header {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   width: 90%;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
 
 .view-toggle {
   display: flex;
   gap: 10px;
   margin-left: 20px;
+  margin-top: 30px;
 }
 
 .btn-view {
@@ -100,4 +118,10 @@ export default {
   background-color: #28a745;
   color: white;
 }
+
+.selectTypeButton{
+  border: none;
+  background-color: transparent;
+}
+
 </style>
