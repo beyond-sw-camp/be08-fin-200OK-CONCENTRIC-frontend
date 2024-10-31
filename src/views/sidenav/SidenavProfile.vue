@@ -32,7 +32,7 @@
                   {{ team.name }}
                   <button v-if="userStore.userInfo && userStore.userInfo.id === team.creatorId" class="delete-icon" @click.stop="deleteTeam(team.id)">X</button>
                 </a>
-                
+
 
               </li>
               <li class="dropdown-item">
