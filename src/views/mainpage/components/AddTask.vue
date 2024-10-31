@@ -22,6 +22,31 @@
             <label for="description">Description</label>
             <input type="text" id="description" v-model="newTask.description" class="form-control" />
           </div>
+          <div class="form-group">
+            <div class="d-flex align-items-center my-2">
+              <label for="personal" class="mb-0 me-2">Personal</label>
+              <input type="checkbox" id="teamExist" v-model="isChecked"/>
+            </div>
+            <div class="custom-dropdown" v-if="!isChecked">
+              <div class="dropdown-label" @click="togglePersonalDropdown">
+                <span>{{ selectedPersonalOption?.label || "팀 선택" }}</span>
+                <i :class="isPersonalDropdownOpen ? 'fa fa-caret-up' : 'fa fa-caret-down'" class="dropdown-icon" aria-hidden="true"></i>
+              </div>
+              <transition name="dropdown-fade-slide">
+                <div v-if="isPersonalDropdownOpen" class="dropdown-options">
+                  <div
+                      v-for="option in personalOptions"
+                      :key="option.value"
+                      :class="{ 'option-selected': option.value === selectedPersonalOption?.value }"
+                      class="dropdown-option"
+                      @click="selectPersonalOption(option)"
+                  >
+                    {{ option.label }}
+                  </div>
+                </div>
+              </transition>
+            </div>
+          </div>
           <div class="form-group" style="position: relative;">
             <label for="startDate">Start Date</label>
             <div style="position: absolute; top: 0; right: 0;">
@@ -43,26 +68,35 @@
           </div>
           <div class="form-group">
             <label for="status">Status</label>
-            <select id="status" v-model="newTask.status" class="form-control">
-              <option value="ACTIVE">Active</option>
-              <option value="INACTIVE">Inactive</option>
-              <option value="COMPLETED">Completed</option>
-            </select>
+            <div class="custom-dropdown">
+              <div class="dropdown-label" :class="{ 'dropdown-active': isStatusDropdownOpen }" @click="toggleStatusDropdown">
+                {{ selectedStatusOption.label }}
+                <i :class="isStatusDropdownOpen ? 'fa fa-caret-up' : 'fa fa-caret-down'" class="dropdown-icon" aria-hidden="true"></i>
+              </div>
+              <transition name="dropdown-fade-slide">
+                <div v-if="isStatusDropdownOpen" class="dropdown-options">
+                  <div v-for="option in options" :key="option.value" :class="{ 'option-selected': option.value === newTask.status }"
+                       class="dropdown-option" @click="selectStatusOption(option)">
+                    {{ option.label }}
+                  </div>
+                </div>
+              </transition>
+            </div>
           </div>
           <div class="form-group">
             <label for="importance">Importance</label>
             <input type="number" id="importance" v-model="newTask.importance" class="form-control" min="0" max="5" />
           </div>
-          <div class="form-group">
-            <label>
-              <input type="checkbox" v-model="newTask.startNotification" /> Start Notification
-            </label>
-          </div>
-          <div class="form-group">
-            <label>
-              <input type="checkbox" v-model="newTask.endNotification" /> End Notification
-            </label>
-          </div>
+<!--          <div class="form-group">-->
+<!--            <label>-->
+<!--              <input type="checkbox" v-model="newTask.startNotification" /> Start Notification-->
+<!--            </label>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label>-->
+<!--              <input type="checkbox" v-model="newTask.endNotification" /> End Notification-->
+<!--            </label>-->
+<!--          </div>-->
           <button type="submit" class="btn btn-primary">Add Task</button>
         </form>
       </div>
@@ -71,7 +105,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import axios from "axios";
 async function saveTaskToDatabase(task) {
   try {
@@ -92,6 +126,11 @@ async function saveTaskToDatabase(task) {
 }
 
 export default {
+  data(){
+    return{
+      isChecked: true,
+    }
+  },
   props: {
     isVisible: {
       type: Boolean,
@@ -111,6 +150,60 @@ export default {
     },
   },
   setup(props, {emit}) {
+    const options = [
+      { value: "ACTIVE", label: "Active" },
+      { value: "INACTIVE", label: "Inactive" },
+      { value: "COMPLETED", label: "Completed" },
+    ];
+
+    const personalOptions = ref([]);
+    const selectedPersonalOption = ref(null);
+    const isPersonalDropdownOpen = ref(false);
+
+    const fetchTeamList = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/v1/api/team/list", {
+          headers: {
+            Authorization: `Bearer YOUR_ACCESS_TOKEN` // 실제 토큰으로 교체
+          }
+        });
+        personalOptions.value = response.data.map(team => ({
+          value: team.id,
+          label: team.name
+        }));
+        selectedPersonalOption.value = personalOptions.value[0] || null;
+      } catch (error) {
+        console.error("Failed to fetch team list:", error);
+      }
+    };
+
+    onMounted(fetchTeamList);
+
+    const selectedStatusOption = ref(
+        options.find((option) => option.value === props.value) || options[0]
+    );
+
+    const isStatusDropdownOpen = ref(false);
+
+    const toggleStatusDropdown = () => {
+      isStatusDropdownOpen.value = !isStatusDropdownOpen.value;
+    };
+
+    const togglePersonalDropdown = () => {
+      isPersonalDropdownOpen.value = !isPersonalDropdownOpen.value;
+    };
+
+    const selectStatusOption = (option) => {
+      selectedStatusOption.value = options.find((opt) => opt.value === option.value) || options[0];
+      isStatusDropdownOpen.value = false;
+      emit("update:value", selectedStatusOption.value); // 선택한 값의 value를 부모에 전달
+    };
+
+    const selectPersonalOption = (option) => {
+      selectedPersonalOption.value = option;
+      isPersonalDropdownOpen.value = false;
+    };
+
     const newTask = ref(getInitialTask());
     const isDragging = ref(false);
     const offsetX = ref(0);
@@ -205,8 +298,27 @@ export default {
     function endDrag() {
       isDragging.value = false;
     }
-
+    watch(
+        () => props.isVisible,
+        (newVal) => {
+          if (newVal) {
+            offsetX.value = 0
+            offsetY.value = 0
+          }
+        }
+    );
     return {
+      options,
+      personalOptions,
+      isStatusDropdownOpen,
+      isPersonalDropdownOpen,
+      selectedStatusOption,
+      selectedPersonalOption,
+      toggleStatusDropdown,
+      togglePersonalDropdown,
+      selectStatusOption,
+      selectPersonalOption,
+
       newTask,
       confirm,
       closeModal,
@@ -246,7 +358,7 @@ export default {
   max-width: 90%;
   z-index: 10000;
   cursor: grab;
-  transform: translateY(20%);
+  transform: translateY(10%);
 }
 
 .modal-content:active {
@@ -265,5 +377,82 @@ export default {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+}
+
+.form-control:hover{
+  transition:0.3s;
+}
+
+.custom-dropdown {
+  position: relative;
+  width: 50%;
+  cursor: default;
+
+}
+
+.dropdown-label {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  padding: 0.4rem 0.4rem 0.4rem 1rem;
+}
+
+.dropdown-label:hover{
+  transition:0.3s;
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.dropdown-option {
+  padding: 0.4rem 0.4rem 0.4rem 1rem;
+  transition: background-color 0.3s ease; /* 천천히 변하는 트랜지션 */
+}
+
+.dropdown-option:hover {
+  background-color: #e0f7fa;
+}
+
+.dropdown-active {
+  border-color: #9caafa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-inactive{
+  transition:0.1s;
+}
+
+.option-selected {
+  background-color: #e0f7fa;
+}
+
+.dropdown-fade-slide-enter-active, .dropdown-fade-slide-leave-active {
+  transition: all 0.3s ease;
+}
+.dropdown-fade-slide-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.dropdown-fade-slide-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+.dropdown-fade-slide-leave {
+  opacity: 1;
+  transform: translateY(0);
+}
+.dropdown-fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>
