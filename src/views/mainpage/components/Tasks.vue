@@ -93,6 +93,7 @@
     </div>
     <transition name="slideUp" appear>
       <AddTask
+          ischecekd
           :isVisible="modals.addTaskModal"
           @close="closeAddTaskModal"
           @confirm="handleAddTaskConfirm"

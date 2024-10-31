@@ -25,9 +25,9 @@
           <div class="form-group">
             <div class="d-flex align-items-center my-2">
               <label for="personal" class="mb-0 me-2">Personal</label>
-              <input type="checkbox" id="teamExist"/>
+              <input type="checkbox" id="teamExist" v-model="isChecked"/>
             </div>
-            <div class="custom-dropdown">
+            <div class="custom-dropdown" v-if="!isChecked">
               <div class="dropdown-label" @click="togglePersonalDropdown">
                 <span>{{ selectedPersonalOption?.label || "팀 선택" }}</span>
                 <i :class="isPersonalDropdownOpen ? 'fa fa-caret-up' : 'fa fa-caret-down'" class="dropdown-icon" aria-hidden="true"></i>
@@ -126,6 +126,11 @@ async function saveTaskToDatabase(task) {
 }
 
 export default {
+  data(){
+    return{
+      isChecked: true,
+    }
+  },
   props: {
     isVisible: {
       type: Boolean,
