@@ -102,15 +102,20 @@
 </template>
 
 <script>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted,watch } from 'vue';
 import axios from 'axios';
 import AddTask from "@/views/mainpage/components/AddTask.vue";
+import { useUserStore } from '@/store/user';
 
 export default {
   components: {
     AddTask
   },
   setup() {
+
+
+    const userStore = useUserStore();
+
     const columns = ref([
       { key: 'title', label: '제목' },
       { key: 'startDate', label: '시작 날짜' },
@@ -129,53 +134,29 @@ export default {
     const selectAll = ref(false);
     const sortOrder = reactive({ key: '', order: 'asc' });
 
-
-    // const fetchTasks = async () => {
-    //   try {
-    //     const response = await axios.get('/schedule/list');
-    //     tasks.value = response.data;
-
-    //     const user = JSON.parse(localStorage.getItem('user'));
-    //     const teamId = user?.team_id ?? user?.state?.team_id;
-    //     console.log('Team ID:', teamId);
-
-    //     if (teamId) {
-    //       const promises = tasks.value.map(async (task) => {
-    //         const requestData = {
-    //           team_Id: teamId,
-    //           schedule_Id: task.id,
-    //         };
-    //         console.log('Request Data:', requestData); // 요청 데이터 확인
-
-    //         try {
-    //           await axios.post('/team_schedule/create', requestData);
-    //           requestData.push
-    //         } catch (error) {
-    //           console.error(`스케줄 ${task.id} 생성 실패:`, error.response.data);
-    //         }
-    //       });
-
-    //       await Promise.all(promises);
-    //       console.log('team_schedule에 데이터가 성공적으로 추가되었습니다.');
-    //     } else {
-    //       console.error('team_id가 없습니다.');
-    //     }
-    //   } catch (error) {
-    //     console.error('요청 중 오류가 발생했습니다.', error);
-    //   }
-    // };
-
-
     const fetchTasks = async () => {
       try {
-        const response = await axios.get('/schedule/list');
+        const userState = JSON.parse(localStorage.getItem('user'));
+        const teamId = userState?.state?.team_id;
+
+        const url = teamId
+            ? `http://localhost:8080/v1/api/schedule/list/team?teamId=${teamId}`
+            : 'http://localhost:8080/v1/api/schedule/list';
+
+        const response = await axios.get(url);
+
         tasks.value = response.data;
         originalTasks.value = [...response.data];
       } catch (error) {
         console.error('요청 중 오류가 발생했습니다.', error);
       }
     };
-
+    watch(
+        () => userStore.teamId, // teamId가 변경될 때만 감시
+        () => {
+          fetchTasks(); // teamId 변경 시 fetchTasks 호출
+        }
+    );
     onMounted(fetchTasks);
 
     const toggleTaskView = () => {
@@ -313,7 +294,6 @@ export default {
     };
 
     onMounted(fetchTasks);
-
     return {
       columns,
       tasks,
