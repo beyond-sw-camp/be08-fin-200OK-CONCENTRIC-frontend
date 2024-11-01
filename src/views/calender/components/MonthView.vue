@@ -11,7 +11,7 @@
     <transition-group
         name="slide"
         tag="div"
-        class="calendar"
+        class="calendar mb-4"
     >
       <div
           class="day-cell"
@@ -20,7 +20,7 @@
       :class="{ 'prev-next-month-day': day.isOtherMonth, 'selected-day': isSelectedDay(day.date) }"
       @click="handleDayClick(day)"
       >
-      <div class="day-number">{{ day.day }}</div>
+      <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}</div>
       <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar">
         {{ truncateTitle(task.title) }}
       </div>
@@ -77,7 +77,7 @@ export default {
     const currentMonthYear = computed(() => {
       const month = currentDate.value.toLocaleString("default", { month: "long" });
       const year = currentDate.value.getFullYear();
-      return `${month} ${year}`;
+      return `${year}년 ${month}`;
     });
 
     // 달력에 표시될 날짜들을 계산하는 속성
@@ -273,20 +273,20 @@ export default {
   background-color: transparent;
   color: #121235;
   border: none;
-  padding: 10px;
+  /* padding: 10px; */
   margin: 0 10px;
   cursor: pointer;
 }
 
 .calendar-header span {
-  font-size: 2rem;
+  font-size: 1.2rem;
   font-weight: bold;
 }
 
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  /*gap: 1px;*/
+  /* gap: 1px; */
   max-width: 1000px;
   width: 100%;
   margin: 0 auto;
@@ -294,25 +294,27 @@ export default {
 }
 
 .day-header {
+  border: 0.5px solid #ddd;
   font-weight: bold;
+  font-size: 10pt;
   text-align: center;
-  padding: 10px;
+  padding: 3px;
   background-color: #f0f0f0;
 }
 
 .day-cell {
-  border: 1px solid #ddd;
+  border: 0.5px solid #ddd;
   padding: 10px;
   background-color: white;
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  min-height: 80px;
+  min-height: 100px;
 }
 
 .selected-day {
-  background-color: #a0c4ff;
+  background-color: #fffde0;
 }
 
 .prev-next-month-day.selected-day {
@@ -328,12 +330,13 @@ export default {
   background-color: #8a9bf9;
   color: white;
   width: 100%;
-  padding: 2px 5px;
-  margin-top: 5px;
-  font-size: 0.9rem;
+  /* padding: 0px 5px; */
+  /* margin-top: 3px; */
+  margin-bottom: 3px;
+  font-size: 0.7rem;
   text-align: center;
   /*border-radius: 5px;*/
-  min-height: 10px;
+  min-height: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -366,7 +369,7 @@ export default {
   }
 
   .event-bar {
-    font-size: 0.7rem;
+    font-size: 0.5rem;
     width: 7ch;
   }
 }

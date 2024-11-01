@@ -6,21 +6,24 @@
         <button @click="setView('month')"
                 :class="{ active: currentView === 'month' }"
                 type="button"
-                class="btn-success btn"
+                class="btn-primary btn"
                 v-if="currentView === 'week'">
           Month
         </button>
         <button @click="setView('week')"
                 :class="{ active: currentView === 'week' }"
                 type="button"
-                class="btn-success btn"
+                class="btn-primary btn"
                 v-if="currentView === 'month'">
           Week
+        </button>
+        <button type="button" class="btn btn-success ms-3" @click="toggleTaskView">
+          {{ isShowingPrivate ? '전체 일정 보기' : '개인 일정만 보기' }}
         </button>
       </div>
     </div>
 
-    <component class="mt-n6"
+    <component class="calendar-view"
         :is="currentViewComponent"
         :tasks="tasks"
         :selectedDate="selectedDate"
@@ -41,6 +44,9 @@ export default {
     const currentView = ref('month');
     const tasks = ref([]); // 일정 데이터를 저장할 배열
     const selectedDate = ref(new Date().toISOString().split('T')[0]); // 선택된 날짜
+
+    const originalTasks = ref([]);
+    const isShowingPrivate = ref(false);
 
     const currentDate = ref(new Date());
     const currentMonthYear = computed(() => {
@@ -65,6 +71,7 @@ export default {
       try {
         const response = await axios.get('/schedule/list');
         tasks.value = response.data; // 가져온 데이터를 tasks 배열에 저장
+        originalTasks.value = [...response.data];
       } catch (error) {
         console.error('Error fetching tasks:', error);
       }
@@ -75,6 +82,16 @@ export default {
       fetchTasks();
     });
 
+    const toggleTaskView = () => {
+      if (isShowingPrivate.value) {
+        tasks.value = [...originalTasks.value];
+      } else {
+        tasks.value = originalTasks.value.filter(task => task.type === 'PRIVATE');
+      }
+      isShowingPrivate.value = !isShowingPrivate.value;
+    };
+
+
     return {
       currentMonthYear,
       currentView,
@@ -82,6 +99,8 @@ export default {
       tasks,
       selectedDate,
       setView,
+      toggleTaskView,
+      isShowingPrivate
     };
   },
 };
@@ -98,14 +117,18 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  width: 90%;
-  margin-bottom: 5px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+.calendar-view {
+  margin-top: -2.8rem;
 }
 
 .view-toggle {
   display: flex;
-  gap: 10px;
-  margin-left: 20px;
+  /* gap: 10px; */
+  margin-right: 10px;
   margin-top: 30px;
 }
 
@@ -122,6 +145,19 @@ export default {
 .selectTypeButton{
   border: none;
   background-color: transparent;
+}
+
+.btn-primary {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+  /* font-weight: 400; */
+}
+
+.btn-success {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+  /* font-weight: 400; */
+
 }
 
 </style>

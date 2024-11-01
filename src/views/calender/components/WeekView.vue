@@ -8,14 +8,14 @@
       <div class="week-header">
         <div class="day-header" v-for="day in daysOfWeek" :key="day">{{ day }}</div>
       </div>
-      <div class="week">
+      <div class="week mb-4">
         <div
             v-for="(day, index) in weekDays"
             :key="index"
             class="day-cell"
             @click="handleDayClick(day)"
         >
-          <div class="day-number">{{ day.day }}</div>
+          <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}</div>
           <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar">
             {{ task.title }}
           </div>
@@ -37,7 +37,7 @@ export default {
     const currentMonthYear = computed(() => {
       const month = currentDate.value.toLocaleString("default", { month: "long" });
       const year = currentDate.value.getFullYear();
-      return `${month} ${year}`;
+      return `${year}년 ${month}`;
     });
 
     const weekDays = computed(() => {
@@ -97,7 +97,7 @@ export default {
 }
 
 .calendar-header span {
-  font-size: 2rem;
+  font-size: 1.2rem;
   font-weight: bold;
 }
 
@@ -115,7 +115,7 @@ export default {
 }
 
 .day-cell {
-  border: 1px solid #e1e1e1;
+  border: 0.5px solid #e1e1e1;
   height: 500px;
   padding: 5px;
   cursor: pointer;
@@ -124,22 +124,25 @@ export default {
 }
 
 .day-number {
-  font-weight: bold;
+  padding: 0.3rem;
+  /* font-weight: bold; */
 }
 
 .event-bar {
-  background-color: #a0c4ff;
+  background-color: #8a9bf9;
   color: white;
   margin-top: 5px;
   padding: 3px;
-  font-size: 0.8em;
+  font-size: 0.7em;
   text-align: center;
 }
 
 .day-header {
+  border: 0.5px solid #ddd;
   font-weight: bold;
+  font-size: 10pt;
   text-align: center;
-  padding: 10px;
+  padding: 3px;
   background-color: #f0f0f0;
 }
 </style>
