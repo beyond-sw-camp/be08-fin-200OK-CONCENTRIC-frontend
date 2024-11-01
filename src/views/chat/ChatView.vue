@@ -83,7 +83,7 @@ const notificationBadge = ref([]);
 // 웹소켓 연결
 const connectWebSocket = (chatRooms) => {
     if (!stompClient.value || !stompClient.value.connected) {
-        const socket = new SockJS(`${baseURL}/ws`);
+        const socket = new SockJS('http://api.200concentric.com/ws');
         stompClient.value = Stomp.over(socket);
         stompClient.value.debug = function (string) {
             if (!(string.includes('ping')) && !(string.includes('pong'))) {
