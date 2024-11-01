@@ -48,6 +48,7 @@ import Stomp from 'stompjs';
 let lastPingTime = ref(null);
 let timeoutHandle;
 let lastMessageTime = [];
+const baseURL = axios.defaults.baseURL;
 
 import ChatRoom from './components/ChatRoom.vue';
 import ChatFile from './components/ChatFile.vue';

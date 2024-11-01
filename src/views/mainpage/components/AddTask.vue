@@ -25,9 +25,9 @@
           <div class="form-group">
             <div class="d-flex align-items-center my-2">
               <label for="personal" class="mb-0 me-2">Personal</label>
-              <input type="checkbox" id="teamExist" v-model="isChecked"/>
+              <input type="checkbox" id="teamExist" v-model="isPrivate" @change="updateTaskType"/>
             </div>
-            <div class="custom-dropdown" v-if="!isChecked">
+            <div class="custom-dropdown" v-if="!isPrivate">
               <div class="dropdown-label" @click="togglePersonalDropdown">
                 <span>{{ selectedPersonalOption?.label || "팀 선택" }}</span>
                 <i :class="isPersonalDropdownOpen ? 'fa fa-caret-up' : 'fa fa-caret-down'" class="dropdown-icon" aria-hidden="true"></i>
@@ -76,7 +76,7 @@
               <transition name="dropdown-fade-slide">
                 <div v-if="isStatusDropdownOpen" class="dropdown-options">
                   <div v-for="option in options" :key="option.value" :class="{ 'option-selected': option.value === newTask.status }"
-                       class="dropdown-option" @click="selectStatusOption(option)">
+                      class="dropdown-option" @click="selectStatusOption(option)">
                     {{ option.label }}
                   </div>
                 </div>
@@ -97,7 +97,7 @@
 <!--              <input type="checkbox" v-model="newTask.endNotification" /> End Notification-->
 <!--            </label>-->
 <!--          </div>-->
-          <button type="submit" class="btn btn-primary">Add Task</button>
+          <button type="submit" class="btn btn-primary" @click="confirm">Add Task</button>
         </form>
       </div>
     </div>
@@ -129,6 +129,12 @@ export default {
   data(){
     return{
       isChecked: true,
+      isPrivate: false
+    }
+  },
+  methods: {
+    updateTaskType() {
+      this.newTask.type = this.isPrivate ? 'PRIVATE' : 'TEAM';
     }
   },
   props: {
@@ -152,7 +158,6 @@ export default {
   setup(props, {emit}) {
     const options = [
       { value: "ACTIVE", label: "Active" },
-      { value: "INACTIVE", label: "Inactive" },
       { value: "COMPLETED", label: "Completed" },
     ];
 
@@ -163,9 +168,6 @@ export default {
     const fetchTeamList = async () => {
       try {
         const response = await axios.get("http://localhost:8080/v1/api/team/list", {
-          headers: {
-            Authorization: `Bearer YOUR_ACCESS_TOKEN` // 실제 토큰으로 교체
-          }
         });
         personalOptions.value = response.data.map(team => ({
           value: team.id,
@@ -201,6 +203,10 @@ export default {
 
     const selectPersonalOption = (option) => {
       selectedPersonalOption.value = option;
+      console.log("option: ", option.value)
+      newTask.value.teamId = option.value;
+      newTask.value.type = 'TEAM';
+      console.log(newTask);
       isPersonalDropdownOpen.value = false;
     };
 
@@ -222,9 +228,8 @@ export default {
         startTime: '',
         endTime: '',
         importance: 0,
-        startNotification: false,
-        endNotification: false,
-        allDay: false,
+        type: '',
+        teamId: '',
       };
     }
 
