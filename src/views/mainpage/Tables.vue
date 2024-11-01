@@ -197,6 +197,9 @@ const toggleView = async () => {
   initializePopovers();
 };
 
+
+
+
 onMounted(initializePopovers);
 
 const updateView = (view) => {

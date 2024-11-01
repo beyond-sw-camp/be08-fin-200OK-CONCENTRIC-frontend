@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import {ref, onMounted, watchEffect} from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
@@ -125,7 +125,6 @@ const selectItem = (item) => {
   selectedItem.value = item;
   showMenu.value = false;
   router.push(`/tables`);
-
   // 선택된 팀 정보를 로컬 스토리지에 저장
   userStore.setTeamId(item.id);
 };
@@ -180,6 +179,7 @@ const deleteTeam = async (teamId) => {
 onMounted(() => {
   fetchUserTeams();
 });
+
 </script>
 
 <style scoped>

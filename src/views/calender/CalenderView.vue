@@ -27,7 +27,15 @@
         :is="currentViewComponent"
         :tasks="tasks"
         :selectedDate="selectedDate"
+        @openDetails="openTaskDetails"
     />
+    <transition name="slideUp" appear>
+      <viewDetails
+          :isVisible=isDetailsVisible
+          @close="isDetailsVisible = false"
+          user-id="userState.userId"
+          :task-details="selectedTaskDetails"/>
+    </transition>
   </div>
 </template>
 
@@ -37,9 +45,10 @@ import axios from 'axios';  // 서버에서 일정 데이터를 가져오기 위
 import MonthView from '@/views/calender/components/MonthView.vue';
 import WeekView from '@/views/calender/components/WeekView.vue';
 import DayView from '@/views/calender/components/DayView.vue';
+import ViewDetails from "@/views/calender/components/viewDetails.vue";
 
 export default {
-  components: { MonthView, WeekView, DayView },
+  components: {ViewDetails, MonthView, WeekView, DayView },
   setup() {
     const currentView = ref('month');
     const tasks = ref([]); // 일정 데이터를 저장할 배열
@@ -47,6 +56,9 @@ export default {
 
     const originalTasks = ref([]);
     const isShowingPrivate = ref(false);
+
+    const isDetailsVisible = ref(false);
+    const selectedTaskDetails = ref(null);
 
     const currentDate = ref(new Date());
     const currentMonthYear = computed(() => {
@@ -91,6 +103,10 @@ export default {
       isShowingPrivate.value = !isShowingPrivate.value;
     };
 
+    const openTaskDetails = (taskDetails) => {
+      selectedTaskDetails.value = taskDetails;
+      isDetailsVisible.value = true;
+    };
 
     return {
       currentMonthYear,
@@ -100,7 +116,10 @@ export default {
       selectedDate,
       setView,
       toggleTaskView,
-      isShowingPrivate
+      isShowingPrivate,
+      isDetailsVisible,
+      selectedTaskDetails,
+      openTaskDetails,
     };
   },
 };
