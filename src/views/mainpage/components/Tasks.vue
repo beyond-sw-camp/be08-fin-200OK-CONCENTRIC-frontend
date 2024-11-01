@@ -19,7 +19,7 @@
         <table class="table align-items-center justify-content-center mb-3">
           <thead>
           <tr>
-            <th>
+            <th style="padding: 0; text-align: auto;">
               <input type="checkbox" v-model="selectAll" @change="toggleSelectAll" />
             </th>
             <th v-for="(column, index) in columns" :key="index" class="position-relative" @click="toggleSortOrder(column.key)">
@@ -80,8 +80,8 @@
           </tr>
           <tr>
             <td colspan="7" class="text-start">
-              <button class="btn shadow-none" @click="showAddTaskModal">+ New Task</button>
-              <button type="button" class="btn btn-link text-danger ms-3" @click="deleteSelectedTasks" v-if="selectedTasks.length > 0">
+              <button class="btn shadow-none" @click="showAddTaskModal" style="font-size: 10pt">+ New Task</button>
+              <button type="button" class="btn btn-link text-danger ms-3" @click="deleteSelectedTasks" style="font-size: 10pt" v-if="selectedTasks.length > 0">
                 - Delete Selected Tasks
               </button>
             </td>
@@ -348,7 +348,7 @@ h1 {
 }
 
 p {
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .sort-icons {
@@ -386,5 +386,35 @@ p {
 .slideUp-leave-to {
   transform: translateY(20px);
   opacity: 0;
+}
+
+.btn-primary {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+  /* font-weight: 400; */
+}
+
+.btn-success {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+  /* font-weight: 400; */
+}
+
+.table-responsive {
+  Font-size: 10.5pt;
+}
+
+.table thead th {
+    padding: 0.75rem 1rem; 
+    text-align: center; 
+    text-transform: capitalize;
+    letter-spacing: 0px;
+}
+
+.table td {
+    padding: 0.5rem 1rem; 
+    text-align: center; 
+    text-transform: capitalize;
+    letter-spacing: 0px;
 }
 </style>

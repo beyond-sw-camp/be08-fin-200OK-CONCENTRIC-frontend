@@ -21,7 +21,7 @@
       @click="handleDayClick(day)"
       >
       <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}</div>
-      <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar">
+      <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar" :class="{ 'team-task': task.type === 'TEAM' }">
         {{ truncateTitle(task.title) }}
       </div>
       <div v-if="!getTasksForDay(day.date).length" class="no-events">&nbsp;</div> <!-- 빈 공간 유지 -->
@@ -267,6 +267,7 @@ export default {
   justify-content: center;
   align-items: center;
   margin-bottom: 20px;
+  color: #344767;
 }
 
 .calendar-header button {
@@ -298,6 +299,7 @@ export default {
   font-weight: bold;
   font-size: 10pt;
   text-align: center;
+  color: #344767;
   padding: 3px;
   background-color: #f0f0f0;
 }
@@ -318,7 +320,7 @@ export default {
 }
 
 .prev-next-month-day.selected-day {
-  background-color: #a0c4ff;
+  background-color: #fffbd0;
 }
 
 .prev-next-month-day {
@@ -327,19 +329,20 @@ export default {
 }
 
 .event-bar, .no-events {
-  background-color: #8a9bf9;
-  color: white;
+  background-color: #c9cff3;
+  color: #344767;
   width: 100%;
-  /* padding: 0px 5px; */
-  /* margin-top: 3px; */
   margin-bottom: 3px;
   font-size: 0.7rem;
   text-align: center;
-  /*border-radius: 5px;*/
   min-height: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.team-task {
+  background-color: #cef6ee; 
 }
 
 .no-events {

@@ -61,6 +61,7 @@ export default {
     };
 
     const getTasksForDay = (date) => {
+      console.log(props.tasks)
       return props.tasks.filter((task) => task.startDate <= date && task.endDate >= date);
     };
 
@@ -81,6 +82,7 @@ export default {
   justify-content: center;
   align-items: center;
   margin-bottom: 20px;
+  color: #344767;
 }
 
 .calender-page {
@@ -94,6 +96,7 @@ export default {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
+  color: #344767;
 }
 
 .calendar-header span {

@@ -157,7 +157,6 @@ export default {
   padding: 0.3rem 0.6rem;
   font-size: 0.7rem;
   /* font-weight: 400; */
-
 }
 
 </style>
