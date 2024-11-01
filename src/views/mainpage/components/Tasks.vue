@@ -140,8 +140,8 @@ export default {
         const teamId = userState?.state?.team_id;
 
         const url = teamId
-            ? `http://localhost:8080/v1/api/schedule/list/team?teamId=${teamId}`
-            : 'http://localhost:8080/v1/api/schedule/list';
+            ? `/schedule/list/team?teamId=${teamId}`
+            : '/schedule/list';
 
         const response = await axios.get(url);
 

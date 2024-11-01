@@ -21,7 +21,10 @@
       @click="handleDayClick(day)"
       >
       <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}</div>
-      <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar" :class="{ 'team-task': task.type === 'TEAM' }">
+      <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar" :class="{ 'team-task': task.type === 'TEAM' }"
+           @click.stop="handleTaskClick(task)"
+           style="cursor: pointer"
+      >
         {{ truncateTitle(task.title) }}
       </div>
       <div v-if="!getTasksForDay(day.date).length" class="no-events">&nbsp;</div> <!-- 빈 공간 유지 -->
@@ -231,6 +234,10 @@ export default {
       });
     };
 
+    const handleTaskClick = (task) => {
+      emit('openDetails', task); // 클릭된 task를 부모로 전달
+    };
+
     return {
       slideDirection,
       daysOfWeek,
@@ -249,6 +256,7 @@ export default {
       selectedEndDate,
       isSelectedDay,
       localTasks,
+      handleTaskClick,
     };
   },
 };
@@ -446,4 +454,30 @@ export default {
   }
 }
 
+.slideUp-enter-active{
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: center center;
+}
+
+.slideUp-leave-active {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* 나타날 때 시작 위치 */
+.slideUp-enter {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+/* 나타날 때 최종 위치 */
+.slideUp-enter-to {
+  transform: translateY(0px);
+  opacity: 1;
+}
+
+/* 사라질 때 위치 */
+.slideUp-leave-to {
+  transform: translateY(20px);
+  opacity: 0;
+}
 </style>
