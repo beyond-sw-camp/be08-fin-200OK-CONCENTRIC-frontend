@@ -115,7 +115,10 @@ const toggleCompletion = (subtask) => {
 };
 
 const updateSubtaskApi = async (subtask) => {
-  await axios.put(`/subtask/update/status?subScheduleId=${subtask.id}&status=${subtask.status}`);
+  const response = await axios.put(`/subtask/update/status?subScheduleId=${subtask.id}&status=${subtask.status}`);
+  if(response.status === 403){
+      alert("권한이 없는 사용자입니다.");
+    }
   await getSubtasks();
 };
 
