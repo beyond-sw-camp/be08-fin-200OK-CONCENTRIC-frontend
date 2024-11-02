@@ -10,7 +10,7 @@ import ArgonDashboard from "./argon-dashboard";
 import ganttastic from "@infectoone/vue-ganttastic";
 
 import axios from 'axios';
-axios.defaults.baseURL = 'http://api.200concentric.com/v1/api';
+axios.defaults.baseURL = 'https://api.200concentric.com/v1/api';
 axios.interceptors.request.use((config) => {
     if(config.url === '/member/login') {
         config.headers.authorization = undefined;
