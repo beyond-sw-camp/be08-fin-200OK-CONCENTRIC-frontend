@@ -1,59 +1,62 @@
 <template>
   <div v-if="isVisible" class="modal-overlay" @click.self="closeModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">View Details</h5>
+    <div class="modal-content" @mousedown="!isSubtaskModalOpen && startDrag"
+      @mousemove="!isSubtaskModalOpen && drag"
+      @mouseup="!isSubtaskModalOpen && endDrag" :style="{ top: offsetY + 'px', left: offsetX + 'px' }">
+      <div class="details-section">
+        <div class="modal-header">
+          <h5 class="modal-title">View Details</h5>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="confirm">
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input type="text" id="title" v-model="details.title" class="form-control" required readonly />
+            </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <input type="text" id="description" v-model="details.description" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+              <label for="type">type</label>
+              <input type="text" id="type" v-model="details.type" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+              <label for="startDate">Start Date</label>
+              <input type="date" id="startDate" v-model="details.startDate" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+              <label for="endDate">End Date</label>
+              <input type="date" id="endDate" v-model="details.endDate" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+              <label for="status">status</label>
+              <input type="text" id="status" v-model="details.status" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+              <label for="importance">Importance</label>
+              <input type="number" id="importance" v-model="details.importance" class="form-control" min="0" max="5" readonly />
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="sub-details-section">
         <button type="button" class="close" @click="closeModal">&times;</button>
+        <ViewSubDetails :task-details="taskDetails" />
       </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="title">Title</label>
-            <input type="text" id="title" v-model="details.title" class="form-control" readonly />
-          </div>
-          <div class="form-group">
-            <label for="description">Description</label>
-            <input type="text" id="description" v-model="details.description" class="form-control" readonly />
-          </div>
-          <div class="form-group">
-            <label for="status">Status</label>
-            <input type="text" id="status" v-model="details.status" class="form-control" readonly />
-          </div>
-          <div class="form-group">
-            <label for="startDate">Start Date</label>
-            <input type="date" id="startDate" v-model="details.startDate" class="form-control" readonly />
-          </div>
-          <div class="form-group">
-            <label for="endDate">End Date</label>
-            <input type="date" id="endDate" v-model="details.endDate" class="form-control" readonly />
-          </div>
-          <div class="form-group">
-            <label for="createAt">Created At</label>
-            <input type="datetime-local" id="createAt" v-model="details.createAt" class="form-control" readonly />
-          </div>
-          <div class="form-group">
-            <label for="updateAt">Updated At</label>
-            <input type="datetime-local" id="updateAt" v-model="details.updateAt" class="form-control" readonly />
-          </div>
-          <div class="form-group">
-            <label for="importance">Importance</label>
-            <input type="number" id="importance" v-model="details.importance" class="form-control" readonly />
-          </div>
-          <div class="form-group">
-            <label for="progress">Progress</label>
-            <input type="number" id="progress" v-model="details.progress" class="form-control" readonly />
-          </div>
-          <button type="button" class="btn btn-primary" @click="closeModal">Close</button>
-        </form>
-      </div>
+      
     </div>
   </div>
 </template>
 
 <script>
-import { ref, watch } from 'vue';
+import { ref, watch, onUnmounted } from 'vue';
+import ViewSubDetails from '@/views/calender/components/ViewSubDetails.vue';
 
 export default {
+  components: {
+    ViewSubDetails,
+  },
   props: {
     isVisible: {
       type: Boolean,
@@ -65,20 +68,47 @@ export default {
     },
   },
   setup(props, { emit }) {
-    const details = ref({ ...props.taskDetails });
+
+    const isSubtaskModalOpen = ref(false);
+
+    const handleSubtaskModalToggle = (isOpen) => {
+      isSubtaskModalOpen.value = isOpen;
+    };
+
+
+    const details = ref({ 
+      title: props.taskDetails?.title || 'Untitled',
+      description: props.taskDetails?.description || 'No description',
+      type: props.taskDetails?.type || '',
+      startDate: props.taskDetails?.startDate ? props.taskDetails.startDate.split('T')[0] : '',
+      endDate: props.taskDetails?.endDate ? props.taskDetails.endDate.split('T')[0] : '',
+      status: props.taskDetails?.status || '',
+      importance: props.taskDetails?.importance || 0,
+    });
+
+    watch(
+      () => props.taskDetails,
+      (newVal) => {
+        if (newVal) {
+          details.value = {
+            title: props.taskDetails?.title || 'Untitled',
+            description: props.taskDetails?.description || 'No description',
+            type: props.taskDetails?.type || '',
+            startDate: props.taskDetails?.startDate ? props.taskDetails.startDate.split('T')[0] : '',
+            endDate: props.taskDetails?.endDate ? props.taskDetails.endDate.split('T')[0] : '',
+            status: props.taskDetails?.status || '',
+            importance: props.taskDetails?.importance || 0,
+          };
+        }
+      },
+      { immediate: true }
+    );
+
     const offsetX = ref(0);
     const offsetY = ref(0);
     const isDragging = ref(false);
     const startX = ref(0);
     const startY = ref(0);
-
-    watch(
-        () => props.taskDetails,
-        (newDetails) => {
-          details.value = { ...newDetails };
-        },
-        { immediate: true }
-    );
 
     function closeModal() {
       emit('close');
@@ -101,6 +131,11 @@ export default {
       isDragging.value = false;
     }
 
+    onUnmounted(() => {
+      isDragging.value = false;
+    });
+
+
     watch(
         () => props.isVisible,
         (newVal) => {
@@ -119,6 +154,9 @@ export default {
       endDrag,
       offsetX,
       offsetY,
+      ViewSubDetails,
+      isSubtaskModalOpen,
+      handleSubtaskModalToggle,
     };
   },
 };
@@ -139,11 +177,12 @@ export default {
 }
 
 .modal-content {
-  position: relative;
+  display: flex;
+  flex-direction: row;
   background: white;
   padding: 20px;
   border-radius: 8px;
-  width: 500px;
+  width: 800px;
   max-width: 90%;
   z-index: 10000;
   cursor: grab;
@@ -165,9 +204,22 @@ export default {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+  margin-left: 90%;
+  margin-bottom: 1rem;
 }
 
 .form-control:hover {
   transition: 0.3s;
+}
+
+.details-section {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.sub-details-section {
+  flex: 1;
+  border-left: 1px solid #ccc;
+  padding-left: 20px;
 }
 </style>
