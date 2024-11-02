@@ -18,8 +18,16 @@
               <input type="text" id="description" v-model="details.description" class="form-control" readonly />
             </div>
             <div class="form-group">
+              <label for="nickname">Nickname</label>
+              <input type="text" id="nickname" v-model="details.nickname" class="form-control" readonly />
+            </div>
+            <div class="form-group">
               <label for="type">type</label>
               <input type="text" id="type" v-model="details.type" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+              <label for="teamName">teamName</label>
+              <input type="text" id="teamName" v-model="details.teamName" class="form-control" readonly />
             </div>
             <div class="form-group">
               <label for="startDate">Start Date</label>
@@ -39,6 +47,13 @@
             </div>
           </form>
         </div>
+        <!-- <button
+          class="btn btn-outline-danger btn-sm mt-2 mb-2"
+          style="margin: 0 1rem;"
+          @click="showModal = true"
+        >
+          일정 삭제
+        </button> -->
       </div>
       <div class="sub-details-section">
         <button type="button" class="close" @click="closeModal">&times;</button>
@@ -79,7 +94,9 @@ export default {
     const details = ref({ 
       title: props.taskDetails?.title || 'Untitled',
       description: props.taskDetails?.description || 'No description',
+      nickname: props.taskDetails?.nickname || '',
       type: props.taskDetails?.type || '',
+      teamName: props.taskDetails?.teamName || '',
       startDate: props.taskDetails?.startDate ? props.taskDetails.startDate.split('T')[0] : '',
       endDate: props.taskDetails?.endDate ? props.taskDetails.endDate.split('T')[0] : '',
       status: props.taskDetails?.status || '',
@@ -93,7 +110,9 @@ export default {
           details.value = {
             title: props.taskDetails?.title || 'Untitled',
             description: props.taskDetails?.description || 'No description',
+            nickname: props.taskDetails?.nickname || '',
             type: props.taskDetails?.type || '',
+            teamName: props.taskDetails?.teamName || '',
             startDate: props.taskDetails?.startDate ? props.taskDetails.startDate.split('T')[0] : '',
             endDate: props.taskDetails?.endDate ? props.taskDetails.endDate.split('T')[0] : '',
             status: props.taskDetails?.status || '',
@@ -183,6 +202,7 @@ export default {
   padding: 20px;
   border-radius: 8px;
   width: 800px;
+  max-height: 770px;
   max-width: 90%;
   z-index: 10000;
   cursor: grab;
@@ -215,11 +235,16 @@ export default {
 .details-section {
   flex: 1;
   margin-right: 20px;
+  max-height: 700px;
+  overflow-y: auto; 
+  display: flex;
+  flex-direction: column;
 }
 
 .sub-details-section {
   flex: 1;
   border-left: 1px solid #ccc;
   padding-left: 20px;
+  max-height: 700px;
 }
 </style>

@@ -60,6 +60,8 @@ export default {
     const isDetailsVisible = ref(false);
     const selectedTaskDetails = ref(null);
 
+    const taskDetails = ref([]);
+
     const currentDate = ref(new Date());
     const currentMonthYear = computed(() => {
       const month = currentDate.value.toLocaleString("default", { month: "long" });
@@ -103,8 +105,20 @@ export default {
       isShowingPrivate.value = !isShowingPrivate.value;
     };
 
-    const openTaskDetails = (taskDetails) => {
-      selectedTaskDetails.value = taskDetails;
+    const taskDetailsApi = async (task) => {
+      try {
+        // console.log("task.id: ", task.id);
+        const response = await axios.get(`/schedule/list/${task.id}`);
+        taskDetails.value = response.data;
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
+    const openTaskDetails = async (task) => {
+      await taskDetailsApi(task);
+      selectedTaskDetails.value = taskDetails.value;
+      // console.log("taskDetails: ", taskDetails.value);
       isDetailsVisible.value = true;
     };
 
