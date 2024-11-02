@@ -16,17 +16,22 @@
             @click="handleDayClick(day)"
         >
           <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}</div>
-          <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar">
+          <div v-for="task in getTasksForDay(day.date)"
+               :key="task.id"
+               class="event-bar"
+               @click="viewDetails"
+          >
             {{ task.title }}
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script>
-import {computed, ref} from 'vue'; // 'computed'를 제대로 import해야 합니다.
+import {computed, ref} from 'vue';
 
 export default {
   props: ['tasks'], // props를 정의해줍니다.
