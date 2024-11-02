@@ -23,6 +23,7 @@
           >
             {{ task.title }}
           </div>
+          <i class="fa fa-search day-icon" aria-hidden="true"></i>
         </div>
       </div>
     </div>
@@ -129,6 +130,20 @@ export default {
   cursor: pointer;
   display: flex;
   flex-direction: column;
+}
+
+.day-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 12px;
+  color: #666;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.day-cell:hover .day-icon {
+  opacity: 1;
 }
 
 .day-number {

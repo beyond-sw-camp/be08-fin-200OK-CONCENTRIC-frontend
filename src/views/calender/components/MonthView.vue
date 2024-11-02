@@ -20,13 +20,16 @@
       :class="{ 'prev-next-month-day': day.isOtherMonth, 'selected-day': isSelectedDay(day.date) }"
       @click="handleDayClick(day)"
       >
-      <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}</div>
+      <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}
+      </div>
       <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar" :class="{ 'team-task': task.type === 'TEAM' }"
            @click.stop="handleTaskClick(task)"
-           style="cursor: pointer"
+           style="cursor: pointer; display: flex; align-items: center; padding-left: 1rem;"
       >
         {{ truncateTitle(task.title) }}
+        <i class="fa fa-search day-icon" aria-hidden="true" style="margin-left: auto; padding-right: 1rem"></i>
       </div>
+
       <div v-if="!getTasksForDay(day.date).length" class="no-events">&nbsp;</div> <!-- 빈 공간 유지 -->
   </div>
   </transition-group>
@@ -323,6 +326,19 @@ export default {
   min-height: 100px;
 }
 
+.day-icon {
+  top: 5px;
+  right: 5px;
+  font-size: 12px;
+  color: #666;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.day-cell:hover .day-icon {
+  opacity: 1;
+}
+
 .selected-day {
   background-color: #fffde0;
 }
@@ -350,7 +366,7 @@ export default {
 }
 
 .team-task {
-  background-color: #cef6ee; 
+  background-color: #cef6ee;
 }
 
 .no-events {
