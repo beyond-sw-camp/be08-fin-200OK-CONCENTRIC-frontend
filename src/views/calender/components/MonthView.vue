@@ -23,7 +23,7 @@
       <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}
       </div>
       <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar" :class="{ 'team-task': task.type === 'TEAM' }"
-           @click.stop="handleTaskClick(task)"
+           @click.stop="handleTaskClick(task, day.date)"
            style="cursor: pointer; display: flex; align-items: center; padding-left: 1rem;"
       >
         {{ truncateTitle(task.title) }}
@@ -237,8 +237,9 @@ export default {
       });
     };
 
-    const handleTaskClick = (task) => {
-      emit('openDetails', task); // 클릭된 task를 부모로 전달
+    const handleTaskClick = (task, date) => {
+      console.log("Task Details:", task,date);
+      emit('openDetails', {task, date}); // 클릭된 task를 부모로 전달
     };
 
     return {

@@ -1,19 +1,23 @@
 <template>
   <div v-if="isVisible" class="modal-overlay" @click.self="closeModal">
-    <div class="modal-content" @mousedown="startDrag" @mousemove="drag" @mouseup="endDrag" :style="{ top: offsetY + 'px', left: offsetX + 'px' }">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">View Details</h5>
         <button type="button" class="close" @click="closeModal">&times;</button>
       </div>
       <div class="modal-body">
-        <form @submit.prevent="confirm">
+        <form>
           <div class="form-group">
             <label for="title">Title</label>
-            <input type="text" id="title" v-model="details.title" class="form-control" required readonly />
+            <input type="text" id="title" v-model="details.title" class="form-control" readonly />
           </div>
           <div class="form-group">
             <label for="description">Description</label>
             <input type="text" id="description" v-model="details.description" class="form-control" readonly />
+          </div>
+          <div class="form-group">
+            <label for="status">Status</label>
+            <input type="text" id="status" v-model="details.status" class="form-control" readonly />
           </div>
           <div class="form-group">
             <label for="startDate">Start Date</label>
@@ -24,8 +28,20 @@
             <input type="date" id="endDate" v-model="details.endDate" class="form-control" readonly />
           </div>
           <div class="form-group">
+            <label for="createAt">Created At</label>
+            <input type="datetime-local" id="createAt" v-model="details.createAt" class="form-control" readonly />
+          </div>
+          <div class="form-group">
+            <label for="updateAt">Updated At</label>
+            <input type="datetime-local" id="updateAt" v-model="details.updateAt" class="form-control" readonly />
+          </div>
+          <div class="form-group">
             <label for="importance">Importance</label>
-            <input type="number" id="importance" v-model="details.importance" class="form-control" min="0" max="5" readonly />
+            <input type="number" id="importance" v-model="details.importance" class="form-control" readonly />
+          </div>
+          <div class="form-group">
+            <label for="progress">Progress</label>
+            <input type="number" id="progress" v-model="details.progress" class="form-control" readonly />
           </div>
           <button type="button" class="btn btn-primary" @click="closeModal">Close</button>
         </form>
@@ -55,6 +71,14 @@ export default {
     const isDragging = ref(false);
     const startX = ref(0);
     const startY = ref(0);
+
+    watch(
+        () => props.taskDetails,
+        (newDetails) => {
+          details.value = { ...newDetails };
+        },
+        { immediate: true }
+    );
 
     function closeModal() {
       emit('close');

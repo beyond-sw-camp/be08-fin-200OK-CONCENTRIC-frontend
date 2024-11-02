@@ -103,9 +103,15 @@ export default {
       isShowingPrivate.value = !isShowingPrivate.value;
     };
 
-    const openTaskDetails = (taskDetails) => {
-      selectedTaskDetails.value = taskDetails;
-      isDetailsVisible.value = true;
+    const openTaskDetails = async (task) => {
+      try {
+        // task.id를 사용하여 상세 정보 요청
+        const response = await axios.get(`/schedule/list/${task.id}`);
+        selectedTaskDetails.value = response.data; // API 응답 데이터를 selectedTaskDetails에 저장
+        isDetailsVisible.value = true; // 모달 표시
+      } catch (error) {
+        console.error('Error fetching task details:', error);
+      }
     };
 
     return {

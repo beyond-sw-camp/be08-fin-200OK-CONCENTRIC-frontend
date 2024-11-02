@@ -48,11 +48,13 @@ export default {
 
     const weekDays = computed(() => {
       const today = new Date();
-      const startOfWeek = today.getDate() - today.getDay(); // 해당 주의 시작일 계산
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay()); // 해당 주의 시작일 계산
 
       const days = [];
       for (let i = 0; i < 7; i++) {
-        const currentDay = new Date(today.setDate(startOfWeek + i));
+        const currentDay = new Date(startOfWeek);
+        currentDay.setDate(startOfWeek.getDate() + i);
         days.push({
           day: currentDay.getDate(),
           date: currentDay.toISOString().split('T')[0],
