@@ -32,7 +32,10 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="task in tasks" :key="task.id" :class="{ 'table-active': selectedTasks.includes(task.id) }">
+          <tr v-for="task in tasks" :key="task.id" :class="{ 
+            'table-active': selectedTasks.includes(task.id), 
+            'private-task': task.type === 'PRIVATE',
+            'overdue-task': new Date(task.endDate) < new Date()}">
             <td>
               <input type="checkbox" v-model="selectedTasks" :value="task.id" />
             </td>
@@ -329,6 +332,14 @@ h1 {
 
 p {
   font-size: 20px;
+}
+
+.private-task {
+  background-color: #fffef2; 
+}
+
+.overdue-task {
+  background-color: #fff7f7; 
 }
 
 .sort-icons {
