@@ -105,11 +105,9 @@ router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem("user")) || false;
   const isLoggedIn = user.state?.isLoggedIn || false;
 
-  if (to.path === "/signin") {
-    next();
-  } else if (!isLoggedIn) {
+  if(to.path !== "/signin" && !isLoggedIn){
     next("/signin");
-  } else {
+  }else{
     next();
   }
 });
