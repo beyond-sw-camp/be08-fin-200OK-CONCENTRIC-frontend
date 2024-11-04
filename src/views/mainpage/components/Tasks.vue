@@ -32,7 +32,10 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="task in tasks" :key="task.id" :class="{ 'table-active': selectedTasks.includes(task.id) }">
+          <tr v-for="task in tasks" :key="task.id" :class="{ 
+            'table-active': selectedTasks.includes(task.id), 
+            'private-task': task.type === 'PRIVATE',
+            'overdue-task': new Date(task.endDate) < new Date()}">
             <td>
               <input type="checkbox" v-model="selectedTasks" :value="task.id" />
             </td>
@@ -196,7 +199,9 @@ export default {
         try {
           const response = await axios.put(`/schedule/update?scheduleId=${task.id}`, updatedTask);
           Object.assign(task, response.data);
-          console.log('일정이 성공적으로 수정되었습니다.');
+          if(response.status === 403){
+            alert("수정 권한이 없는 사용자입니다.");
+          }
         } catch (error) {
           console.error('일정을 수정하는 중 오류가 발생했습니다.', error);
         }
@@ -209,7 +214,10 @@ export default {
     const deleteSelectedTasks = async () => {
       try {
         for (const taskId of selectedTasks.value) {
-          await axios.delete(`/schedule/delete?scheduleId=${taskId}`);
+          const response = await axios.delete(`/schedule/delete?scheduleId=${taskId}`);
+          if(response.status === 403){
+            alert("삭제 권한이 없는 사용자입니다.");
+          }
         }
         tasks.value = tasks.value.filter(task => !selectedTasks.value.includes(task.id));
         selectedTasks.value = [];
@@ -329,6 +337,14 @@ h1 {
 
 p {
   font-size: 20px;
+}
+
+.private-task {
+  background-color: #fffef2; 
+}
+
+.overdue-task {
+  background-color: #fff7f7; 
 }
 
 .sort-icons {
