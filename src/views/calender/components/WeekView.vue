@@ -154,8 +154,8 @@ export default {
 }
 
 .event-bar {
-  background-color: #8a9bf9;
-  color: white;
+  background-color: #c9cff3;
+  color: #344767;
   margin-top: 5px;
   padding: 3px;
   font-size: 0.7em;
