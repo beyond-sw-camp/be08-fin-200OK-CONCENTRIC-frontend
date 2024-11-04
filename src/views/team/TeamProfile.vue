@@ -310,8 +310,8 @@ export default {
   
   .close {
   cursor: pointer;
-  float: left;
-  margin-right: auto;
+  float: right;
+  margin-left: auto;
   }
   
   hr.horizontal {
