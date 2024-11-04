@@ -20,8 +20,8 @@
           </a>
 
           <div v-else class="p-0 dropdown-hover ms-4 d-flex align-items-center">
-            <button type="button" class="" @click="openCreateTeamModal" style="width: 100%; text-align: left; padding: 8px;">
-              + 팀 생성
+            <button type="button" class="btn btn-success ms-3" @click="openCreateTeamModal" style="width: 100%; text-align: left; font-size: 13px; padding: 8px; margin-top: 12px; padding-left: 14px; padding-right: 14px;">
+              + 팀 생성 
             </button>
           </div>
 
@@ -259,7 +259,7 @@ onMounted(() => {
 }
 
 .dropdown-item button:hover {
-  background-color: #f0f0f0; /* 호버 효과 */
+  background-color: #f0f0f0; 
 }
 
 </style>
