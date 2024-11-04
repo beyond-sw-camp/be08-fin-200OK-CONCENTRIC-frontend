@@ -61,6 +61,16 @@
                       회원 가입
                     </a>
                   </p>
+                  <p class="mx-auto mb-4 text-sm">
+                    <a
+                        href="javascript:;"
+                        class="text-success text-gradient font-weight-bold"
+                        @click="openFindPasswordModal"
+                    >
+                      비밀번호
+                    </a>
+                    를 잊어버리셨나요?
+                  </p>
                 </div>
               </div>
             </div>
@@ -256,7 +266,22 @@ import axios from "axios";
 import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
 import ArgonSwitch from "@/components/ArgonComponents/ArgonSwitch.vue";
+import FindPasswordModal from './findPassword.vue';
+import FindPassword from "@/views/sign/findPassword.vue";
 
+const isFindPasswordModalVisible = ref(false);
+
+function openFindPasswordModal() {
+  window.open(
+      '/find-password',
+      '_blank',
+      'width=600,height=400,left=100,top=100'
+  );
+}
+
+function closeFindPasswordModal() {
+  isFindPasswordModalVisible.value = false;
+}
 
 const store = useStore();
 const router = useRouter();
