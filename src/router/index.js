@@ -13,6 +13,7 @@ import ProfileEdit from "@/views/profile/ProfileEdit.vue";
 import TeamPage from "../views/team/TeamPage.vue";
 import TeamInvitePage from "../views/team/TeamInvitePage.vue";
 import TempCalendar from "@/etc/TempCalendar.vue";
+import FindPassword from "@/views/sign/findPassword.vue";
 
 
 
@@ -104,9 +105,11 @@ router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem("user")) || false;
   const isLoggedIn = user.state?.isLoggedIn || false;
 
-  if(to.path !== "/signin" && !isLoggedIn){
+  if (to.path === "/signin") {
+    next();
+  } else if (!isLoggedIn) {
     next("/signin");
-  }else{
+  } else {
     next();
   }
 });
