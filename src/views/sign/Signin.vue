@@ -324,6 +324,7 @@ const loginApi = async () => {
 
       userStore.setUser(response.data);
       userStore.setToken(response.headers.authorization);
+      userStore.setTeamId(null);
       
       alert("로그인을 성공했습니다.");
       
