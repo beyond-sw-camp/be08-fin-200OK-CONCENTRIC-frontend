@@ -13,6 +13,7 @@ import ProfileEdit from "@/views/profile/ProfileEdit.vue";
 import TeamPage from "../views/team/TeamPage.vue";
 import TeamInvitePage from "../views/team/TeamInvitePage.vue";
 import TempCalendar from "@/etc/TempCalendar.vue";
+import FindPassword from "@/views/sign/findPassword.vue";
 
 
 

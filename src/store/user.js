@@ -41,7 +41,7 @@ export const useUserStore = defineStore('user', () => {
 
         // 기존의 user 객체를 가져와 업데이트
         const userData = JSON.parse(localStorage.getItem('user')) || {};
-        userData['state.team_id'] = team_id;  // team_id 설정
+        userData.state.team_id = team_id;  // team_id 설정
 
         // 업데이트된 객체를 다시 로컬스토리지에 저장
         localStorage.setItem('user', JSON.stringify(userData));

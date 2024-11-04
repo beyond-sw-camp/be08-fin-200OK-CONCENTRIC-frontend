@@ -61,6 +61,16 @@
                       회원 가입
                     </a>
                   </p>
+                  <p class="mx-auto mb-4 text-sm">
+                    <a
+                        href="javascript:;"
+                        class="text-success text-gradient font-weight-bold"
+                        @mousedown="openFindPasswordModal"
+                    >
+                      비밀번호
+                    </a>
+                    를 잊어버리셨나요?
+                  </p>
                 </div>
               </div>
             </div>
@@ -243,11 +253,14 @@
         </div>
       </div>
     </main>
+    <div v-if="isFindPasswordModalVisible">
+      <find-password @close="closeFindPasswordModal" />
+    </div>
   </div>
 </template>
 
 <script setup>
-import {ref, onBeforeUnmount, onBeforeMount, onMounted, watch} from "vue";
+import { ref, onBeforeUnmount, onBeforeMount, onMounted, watch} from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user.js";
@@ -256,7 +269,17 @@ import axios from "axios";
 import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
 import ArgonSwitch from "@/components/ArgonComponents/ArgonSwitch.vue";
+import FindPassword from "@/views/sign/findPassword.vue";
 
+const isFindPasswordModalVisible = ref(false);
+
+function openFindPasswordModal() {
+  isFindPasswordModalVisible.value = true;
+}
+
+function closeFindPasswordModal() {
+  isFindPasswordModalVisible.value = false;
+}
 
 const store = useStore();
 const router = useRouter();
@@ -324,6 +347,7 @@ const loginApi = async () => {
 
       userStore.setUser(response.data);
       userStore.setToken(response.headers.authorization);
+      userStore.setTeamId(null);
       
       alert("로그인을 성공했습니다.");
       

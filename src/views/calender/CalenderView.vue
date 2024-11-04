@@ -131,21 +131,16 @@ export default {
       isShowingPrivate.value = !isShowingPrivate.value;
     };
 
-    const taskDetailsApi = async (task) => {
-      try {
-        // console.log("task.id: ", task.id);
-        const response = await axios.get(`/schedule/list/${task.id}`);
-        taskDetails.value = response.data;
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-      }
-    };
 
     const openTaskDetails = async (task) => {
-      await taskDetailsApi(task);
-      selectedTaskDetails.value = taskDetails.value;
-      // console.log("taskDetails: ", taskDetails.value);
-      isDetailsVisible.value = true;
+      try {
+        // task.id를 사용하여 상세 정보 요청
+        const response = await axios.get(`/schedule/list/${task.id}`);
+        selectedTaskDetails.value = response.data; // API 응답 데이터를 selectedTaskDetails에 저장
+        isDetailsVisible.value = true; // 모달 표시
+      } catch (error) {
+        console.error('Error fetching task details:', error);
+      }
     };
 
     return {

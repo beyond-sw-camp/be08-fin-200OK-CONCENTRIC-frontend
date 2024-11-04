@@ -23,6 +23,7 @@
           >
             {{ task.title }}
           </div>
+          <i class="fa fa-search day-icon" aria-hidden="true"></i>
         </div>
       </div>
     </div>
@@ -47,11 +48,13 @@ export default {
 
     const weekDays = computed(() => {
       const today = new Date();
-      const startOfWeek = today.getDate() - today.getDay(); // 해당 주의 시작일 계산
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay()); // 해당 주의 시작일 계산
 
       const days = [];
       for (let i = 0; i < 7; i++) {
-        const currentDay = new Date(today.setDate(startOfWeek + i));
+        const currentDay = new Date(startOfWeek);
+        currentDay.setDate(startOfWeek.getDate() + i);
         days.push({
           day: currentDay.getDate(),
           date: currentDay.toISOString().split('T')[0],
@@ -131,14 +134,28 @@ export default {
   flex-direction: column;
 }
 
+.day-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 12px;
+  color: #666;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.day-cell:hover .day-icon {
+  opacity: 1;
+}
+
 .day-number {
   padding: 0.3rem;
   /* font-weight: bold; */
 }
 
 .event-bar {
-  background-color: #8a9bf9;
-  color: white;
+  background-color: #c9cff3;
+  color: #344767;
   margin-top: 5px;
   padding: 3px;
   font-size: 0.7em;
