@@ -91,10 +91,10 @@ const toggleModal = (isOpen) => {
 const getSubtasks = async () => {
   try {
     const scheduleId = props.taskDetails.id;
-    console.log("Task details:", props.taskDetails);
-    console.log("Schedule ID:", scheduleId);
+    // console.log("Task details:", props.taskDetails);
+    // console.log("Schedule ID:", scheduleId);
     const response = await axios.get(`/subtask/list?scheduleId=${scheduleId}`);
-    console.log("API Response:", response.data);
+    // console.log("API Response:", response.data);
     subtasks.value = response.data;
     showSubtasks.value = new Array(subtasks.value.length).fill(true);
   } catch (error) {
@@ -115,19 +115,27 @@ const toggleCompletion = (subtask) => {
 };
 
 const updateSubtaskApi = async (subtask) => {
-  await axios.put(`/subtask/update/status?subScheduleId=${subtask.id}&status=${subtask.status}`);
+  const response = await axios.put(`/subtask/update/status?subScheduleId=${subtask.id}&status=${subtask.status}`);
+  if(response.status === 403){
+      alert("권한이 없는 사용자입니다.");
+    }
   await getSubtasks();
 };
 
 
 const deleteSubtask = async (subtaskId) => {
   try {
-    await axios.delete(`/subtask/delete?subScheduleId=${subtaskId}`);
+    const response = await axios.delete(`/subtask/delete?subScheduleId=${subtaskId}`);
+    if(response.status === 403){
+      alert("권한이 없는 사용자입니다.");
+    }
     subtasks.value = subtasks.value.filter((subtask) => subtask.id !== subtaskId);
     showSubtasks.value = showSubtasks.value.slice(0, subtasks.value.length);
+
     await getSubtasks();
   } catch (error) {
     console.error(error);
+    alert("삭제 중 문제가 발생했습니다.");
   }
 };
 
@@ -140,6 +148,9 @@ const addSubtask = async () => {
       status: 'ACTIVE',
       scheduleId: props.taskDetails.id,
     });
+    if(response.status === 403){
+      alert("권한이 없는 사용자입니다.");
+    }
     subtasks.value.push(response.data);
     await getSubtasks();
     showModal.value = false;
@@ -172,6 +183,8 @@ onMounted(() => {
 
 .card-list {
   margin: 0;
+  max-height: 580px;
+  overflow-y: auto; 
 }
 
 .subtask-list {

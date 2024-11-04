@@ -258,12 +258,14 @@ export default {
   .member-icon, .profile-icon {
   width: 60px;
   height: 60px;
-  border-radius: 30%;
+  border-radius: 50%;
   margin-right: 2rem;
+  object-fit: cover;
   }
   
   .profile-name, .member-name{
   font-weight: bold;
+  white-space: nowrap;
   /* text-align: left; */
   }
 
@@ -272,13 +274,19 @@ export default {
   align-items: center;
   justify-content: left;
   margin-left: 1rem;
+  position: relative;
   /* padding: 10px; */
+  }
+
+  .member-item {
+    margin-bottom: 2rem; 
   }
   
   .delete-icon {
+  position: absolute;
+  right: 10px; 
   cursor: pointer;
   color: red;
-  margin-left: 10px; 
   }
   
   .modal {
@@ -303,6 +311,7 @@ export default {
   .close {
   cursor: pointer;
   float: right;
+  margin-left: auto;
   }
   
   hr.horizontal {

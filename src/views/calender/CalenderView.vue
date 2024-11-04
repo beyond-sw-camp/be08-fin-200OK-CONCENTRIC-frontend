@@ -40,16 +40,18 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';  // 서버에서 일정 데이터를 가져오기 위한 axios
 import MonthView from '@/views/calender/components/MonthView.vue';
 import WeekView from '@/views/calender/components/WeekView.vue';
 import DayView from '@/views/calender/components/DayView.vue';
 import ViewDetails from "@/views/calender/components/viewDetails.vue";
+import { useUserStore } from '@/store/user';
 
 export default {
   components: {ViewDetails, MonthView, WeekView, DayView },
   setup() {
+    const userStore = useUserStore();
     const currentView = ref('month');
     const tasks = ref([]); // 일정 데이터를 저장할 배열
     const selectedDate = ref(new Date().toISOString().split('T')[0]); // 선택된 날짜
@@ -59,6 +61,8 @@ export default {
 
     const isDetailsVisible = ref(false);
     const selectedTaskDetails = ref(null);
+
+    const taskDetails = ref([]);
 
     const currentDate = ref(new Date());
     const currentMonthYear = computed(() => {
@@ -78,16 +82,40 @@ export default {
       currentView.value = view;
     };
 
-    // 서버에서 일정 데이터 가져오기 (임시로 axios 사용)
+    // 서버에서 일정 데이터 가져오기
+    // const fetchTasks = async () => {
+    //   try {
+    //     const response = await axios.get('/schedule/list');
+    //     tasks.value = response.data; // 가져온 데이터를 tasks 배열에 저장
+    //     originalTasks.value = [...response.data];
+    //   } catch (error) {
+    //     console.error('Error fetching tasks:', error);
+    //   }
+    // };
+
     const fetchTasks = async () => {
       try {
-        const response = await axios.get('/schedule/list');
-        tasks.value = response.data; // 가져온 데이터를 tasks 배열에 저장
+        const userState = JSON.parse(localStorage.getItem('user'));
+        const teamId = userState?.state?.team_id;
+
+        const url = teamId
+            ? `/schedule/list/team?teamId=${teamId}`
+            : '/schedule/list';
+
+        const response = await axios.get(url);
+
+        tasks.value = response.data;
         originalTasks.value = [...response.data];
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        console.error('요청 중 오류가 발생했습니다.', error);
       }
     };
+    watch(
+        () => userStore.teamId, // teamId가 변경될 때만 감시
+        () => {
+          fetchTasks(); // teamId 변경 시 fetchTasks 호출
+        }
+    );
 
     // 컴포넌트가 마운트될 때 일정 데이터를 가져옴
     onMounted(() => {
@@ -102,6 +130,7 @@ export default {
       }
       isShowingPrivate.value = !isShowingPrivate.value;
     };
+
 
     const openTaskDetails = async (task) => {
       try {

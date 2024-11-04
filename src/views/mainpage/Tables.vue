@@ -1,8 +1,8 @@
 <template>
-  <div class="row min-vh-75 container">
+  <div class="row min-vh-75 container" style="min-height: 100%;">
     <div class="col-2 py-4" >
-      <div class="card " style="min-width: 210px;">
-        <div class="sidebar d-flex flex-column align-items-start" style="min-height: 600px;">
+      <div class="card " style="min-width: 210px; height: 100%;">
+        <div class="sidebar d-flex flex-column align-items-start" style="height: 100%;">
           <ul class="menu" style="padding-left: 1rem; width: 100%;">
             <li style="border-bottom: 0.5px solid rgba(0, 0, 0, 0.2); width: 90%; border-radius: 0; font-size: 12pt; font-weight: 600; pointer-events: none;">
               Menu
