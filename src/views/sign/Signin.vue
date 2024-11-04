@@ -65,7 +65,7 @@
                     <a
                         href="javascript:;"
                         class="text-success text-gradient font-weight-bold"
-                        @click="openFindPasswordModal"
+                        @mousedown="openFindPasswordModal"
                     >
                       비밀번호
                     </a>
@@ -253,11 +253,14 @@
         </div>
       </div>
     </main>
+    <div v-if="isFindPasswordModalVisible">
+      <find-password @close="closeFindPasswordModal" />
+    </div>
   </div>
 </template>
 
 <script setup>
-import {ref, onBeforeUnmount, onBeforeMount, onMounted, watch} from "vue";
+import { ref, onBeforeUnmount, onBeforeMount, onMounted, watch} from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user.js";
@@ -266,17 +269,12 @@ import axios from "axios";
 import ArgonInput from "@/components/ArgonComponents/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonComponents/ArgonButton.vue";
 import ArgonSwitch from "@/components/ArgonComponents/ArgonSwitch.vue";
-import FindPasswordModal from './findPassword.vue';
 import FindPassword from "@/views/sign/findPassword.vue";
 
 const isFindPasswordModalVisible = ref(false);
 
 function openFindPasswordModal() {
-  window.open(
-      '/find-password',
-      '_blank',
-      'width=600,height=400,left=100,top=100'
-  );
+  isFindPasswordModalVisible.value = true;
 }
 
 function closeFindPasswordModal() {

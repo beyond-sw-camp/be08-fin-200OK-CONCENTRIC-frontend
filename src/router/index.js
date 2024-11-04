@@ -19,11 +19,6 @@ import FindPassword from "@/views/sign/findPassword.vue";
 
 const routes = [
   {
-    path: "/find-password",
-    name: "FindPassword",
-    component: FindPassword,
-  },
-  {
     path: "/temp",
     name: "temp",
     component: TempCalendar,
@@ -110,7 +105,7 @@ router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem("user")) || false;
   const isLoggedIn = user.state?.isLoggedIn || false;
 
-  if (to.path === "/signin" || to.path === "/find-password") {
+  if (to.path === "/signin") {
     next();
   } else if (!isLoggedIn) {
     next("/signin");
