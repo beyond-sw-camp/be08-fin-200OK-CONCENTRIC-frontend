@@ -24,6 +24,7 @@ jobs:
         run: |
           npm install
           npm run build
+          ls ./dist
           
       - name: Upload /dist folder as artifact
         uses: actions/upload-artifact@v3
@@ -48,6 +49,9 @@ jobs:
           name: dist
           path: ./dist
 
+      - name: Verify /dist folder
+        run: ls ./
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -65,6 +69,7 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
+          ls ./
           IMAGE_TAG="1.${{ github.run_number }}"
           ECR_URI="${{ secrets.ECR_REPOSITORY }}:${IMAGE_TAG}"
           docker build -t $ECR_URI .
