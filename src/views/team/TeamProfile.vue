@@ -172,11 +172,13 @@ export default {
       console.log("초대할 팀 ID:", selectedTeam.value.id);
       console.log("초대할 이메일:", inviteEmail.value);
       try {
-        await axios.post(`/team/${selectedTeam.value.id}/invite`, null, {
-          params: { inviteeEmail: inviteEmail.value },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // 인증 토큰 추가
-          },
+        await axios.post(`/team/invite`,
+            null,
+            {
+              params: {
+                teamId: selectedTeam.value.id,
+                email: inviteEmail.value
+              },
         });
         alert("초대 메일이 성공적으로 전송되었습니다.");
         closeInviteModal();
