@@ -153,9 +153,7 @@ jobs:
     steps:
       - name: Send notification to Discord
         if: success()
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           curl -H "Content-Type: application/json" \
             -d "{\"content\":\"**CI/CD Pipeline Success**\nBuild Number: ${GITHUB_RUN_NUMBER}\"}" \
-            "$DISCORD_WEBHOOK"
+            "${{ secrets.DISCORD_WEBHOOK }}"
