@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 506746029679.dkr.ecr.ap-northeast-2.amazonaws.com/concentric/frontend:latest
+          image: $ECR_REPOSITORY:1.10
           resources:
             requests:
               memory: "512Mi"
