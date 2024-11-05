@@ -1,0 +1,169 @@
+name: frontend-pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'k8s/frontend-deployment.yaml'
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    environment: actions
+    steps:
+      - name: Checkout code from GitHub
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22.8.0'
+
+      - name: Install and Build Frontend
+        run: |
+          npm install
+          npm run build
+          ls ./dist
+          
+      - name: Upload /dist folder as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: ./dist
+
+  docker-build-push:
+    runs-on: ubuntu-latest
+    environment: actions
+    needs: build-frontend
+    steps:
+      - name: Checkout code from GitHub
+        uses: actions/checkout@v3
+    
+      - name: Create an empty dist folder
+        run: mkdir -p ./dist
+    
+      - name: Download /dist folder
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: ./dist
+
+      - name: Verify /dist folder
+        run: ls ./
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          region: ${{ secrets.AWS_REGION }}
+
+      - name: Build and push Docker image
+        env:
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          ls ./
+          IMAGE_TAG="1.${{ github.run_number }}"
+          ECR_URI="${{ secrets.ECR_REPOSITORY }}:${IMAGE_TAG}"
+          docker build -t $ECR_URI .
+          docker push $ECR_URI
+
+  update-deployment-file:
+    runs-on: ubuntu-latest
+    environment: actions
+    needs: docker-build-push
+    steps:
+      - name: Checkout code from GitHub
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Update deployment.yaml
+        env:
+          IMAGE_TAG: "1.${{ github.run_number }}"
+        run: |
+          sed -i "s|image:.*|image: \$ECR_REPOSITORY:$IMAGE_TAG|g" k8s/frontend-deployment.yaml
+
+      - name: Set up SSH for git push
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          
+      - name: Commit & Push changes
+        env:
+          GIT_USER: "henhen7"
+          GIT_EMAIL: "eatho@naver.com"
+          IMAGE_TAG: "1.${{ github.run_number }}"
+        run: |
+          git config user.name "$GIT_USER"
+          git config user.email "$GIT_EMAIL"
+          git add k8s/frontend-deployment.yaml
+          git commit -m "Update Image Version to $IMAGE_TAG"
+          git push git@github.com:beyond-sw-camp/be08-fin-200OK-CONCENTRIC-frontend.git main
+
+      - name: Check if deployment.yaml changed
+        id: check_frontend_deployment_change
+        run: |
+          # 변경 사항이 있는지 확인
+          if git diff --name-only HEAD~1 | grep -q "k8s/frontend-deployment.yaml"; then
+            echo "frontend_deployment_changed=true" >> $GITHUB_ENV
+          else
+            echo "frontend_deployment_changed=false" >> $GITHUB_ENV
+          fi
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    environment: actions
+    needs: update-deployment-file
+    steps:
+      - name: Checkout code from GitHub
+        uses: actions/checkout@v3
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_IP }}
+          username: ${{ secrets.REMOTE_SSH_ID }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
+          script: |
+            export ECR_REPOSITORY="${{ secrets.ECR_REPOSITORY }}"
+            export IMAGE_TAG="1.${{ github.run_number }}"
+      
+            echo "ECR_REPOSITORY: $ECR_REPOSITORY"
+            echo "IMAGE_TAG: $IMAGE_TAG"
+
+            kubectl describe deployment frontend-deployment -n concentric
+            kubectl set image deployment frontend-deployment frontend=$ECR_REPOSITORY:$IMAGE_TAG -n concentric
+      
+  notify-discord:
+    runs-on: ubuntu-latest
+    environment: actions
+    needs: [build-frontend, docker-build-push, update-deployment-file, deploy-frontend]
+    if: always()
+    steps:
+      - name: Send notification to Discord
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+                  "embeds": [
+                    {
+                      "title": "**🔗 Frontend Build**",
+                      "description": "**Status**: Success\n**Build Number**: '${GITHUB_RUN_NUMBER}'",
+                      "color": 3066993,
+                      "timestamp": "'$(date --iso-8601=seconds)'"
+                    }
+                  ]
+                }' \
+            "${{ secrets.DISCORD_WEBHOOK }}"
