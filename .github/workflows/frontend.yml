@@ -24,6 +24,12 @@ jobs:
         run: |
           npm install
           npm run build
+          
+      - name: Upload /dist folder as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-folder
+          path: ./dist
 
   docker-build-push:
     runs-on: ubuntu-latest
@@ -32,6 +38,12 @@ jobs:
     steps:
       - name: Checkout code from GitHub
         uses: actions/checkout@v3
+    
+      - name: Download /dist folder
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-folder
+          path: .
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -125,3 +137,13 @@ jobs:
             
             kubectl set image deployment frontend-deployment frontend=$ECR_REPOSITORY:$IMAGE_TAG -n concentric
       
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification to Discord
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          message: |
+            **TEST**
+            Build Number: ${{ github.run_number }}
