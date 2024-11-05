@@ -40,11 +40,14 @@ jobs:
       - name: Checkout code from GitHub
         uses: actions/checkout@v3
     
+      - name: Create an empty dist folder
+        run: mkdir -p ./dist
+    
       - name: Download /dist folder
         uses: actions/download-artifact@v3
         with:
           name: dist
-          path: .
+          path: ./dist
 
       - name: Verify /dist folder
         run: ls ./
@@ -149,6 +152,6 @@ jobs:
         uses: tsickert/discord-webhook@v5.3.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}  # GitHub Secrets에 저장된 Discord 웹훅 URL
-          message: |
+          content: |
             **TEST**
             Build Number: ${{ github.run_number }}
