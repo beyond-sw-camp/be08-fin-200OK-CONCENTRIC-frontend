@@ -148,6 +148,7 @@ jobs:
       
   notify-discord:
     runs-on: ubuntu-latest
+    environment: actions
     needs: [build-frontend, docker-build-push, update-deployment-file, deploy-frontend]
     if: always()
     steps:
