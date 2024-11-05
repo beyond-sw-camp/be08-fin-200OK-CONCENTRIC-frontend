@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dist-folder
-          path: ./dist
+          path: dist
 
   docker-build-push:
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
           path: .
 
       - name: Verify /dist folder
-        run: ls -la ./dist
+        run: ls ./
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -65,7 +65,7 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          ls -la ./dist
+          ls ./
           IMAGE_TAG="1.${{ github.run_number }}"
           ECR_URI="${{ secrets.ECR_REPOSITORY }}:${IMAGE_TAG}"
           docker build -t $ECR_URI .
