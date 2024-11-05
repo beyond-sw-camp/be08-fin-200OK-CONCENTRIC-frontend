@@ -142,7 +142,8 @@ jobs:
       
             echo "ECR_REPOSITORY: $ECR_REPOSITORY"
             echo "IMAGE_TAG: $IMAGE_TAG"
-            
+
+            kubectl describe deployment frontend-deployment -n concentric
             kubectl set image deployment frontend-deployment frontend=$ECR_REPOSITORY:$IMAGE_TAG -n concentric
       
   notify-discord:
