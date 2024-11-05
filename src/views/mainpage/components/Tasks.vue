@@ -35,7 +35,8 @@
           <tr v-for="task in tasks" :key="task.id" :class="{ 
             'table-active': selectedTasks.includes(task.id), 
             'private-task': task.type === 'PRIVATE',
-            'overdue-task': new Date(task.endDate) < new Date()}">
+            'overdue-task': new Date(task.endDate) < new Date()}"
+            @dblclick="showTaskDetails(task)">
             <td>
               <input type="checkbox" v-model="selectedTasks" :value="task.id" />
             </td>
@@ -99,8 +100,13 @@
           :isVisible="modals.addTaskModal"
           @close="closeAddTaskModal"
           @confirm="handleAddTaskConfirm"
-          user-id="userState.userId"/>
+          :userId=loggedInMemberId />
       </transition>
+      <viewDetails
+        :isVisible=isDetailsVisible
+        @close="isDetailsVisible = false"
+        :userId=loggedInMemberId
+        :task-details="selectedTaskDetails"/>
   </div>
 </template>
 
@@ -109,15 +115,17 @@ import { ref, reactive, computed, onMounted,watch } from 'vue';
 import axios from 'axios';
 import AddTask from "@/views/mainpage/components/AddTask.vue";
 import { useUserStore } from '@/store/user';
+import ViewDetails from "@/views/calender/components/viewDetails.vue";
 
 export default {
   components: {
-    AddTask
+    AddTask, ViewDetails
   },
   setup() {
 
-
     const userStore = useUserStore();
+    const loggedInMemberId = computed(() => userStore.userInfo.id);
+    
 
     const columns = ref([
       { key: 'title', label: '제목' },
@@ -136,6 +144,10 @@ export default {
     const selectedTasks = ref([]);
     const selectAll = ref(false);
     const sortOrder = reactive({ key: '', order: 'asc' });
+
+    const isDetailsVisible = ref(false);
+    const selectedTaskDetails = ref(null);
+    const taskDetails = ref([]);
 
     const fetchTasks = async () => {
       try {
@@ -301,6 +313,22 @@ export default {
       });
     };
 
+    const taskDetailsApi = async (task) => {
+      try {
+        // console.log("task.id: ", task.id);
+        const response = await axios.get(`/schedule/list/${task.id}`);
+        taskDetails.value = response.data;
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
+    const showTaskDetails = async (task) => {
+      await taskDetailsApi(task);
+      selectedTaskDetails.value = taskDetails.value;
+      isDetailsVisible.value = true;
+    };
+
     onMounted(fetchTasks);
     return {
       columns,
@@ -323,7 +351,11 @@ export default {
       toggleSelectAll,
       validateDates,
       toggleTaskView,
-      isShowingPrivate
+      isShowingPrivate,
+      loggedInMemberId,
+      showTaskDetails,
+      selectedTaskDetails,
+      isDetailsVisible
     };
   },
 };
