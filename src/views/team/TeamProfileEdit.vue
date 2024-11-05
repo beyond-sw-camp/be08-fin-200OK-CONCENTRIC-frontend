@@ -102,13 +102,21 @@
   const leaveTeam = async () => {
     if (confirm("정말로 팀을 나가시겠습니까?")) {
       try {
-        await axios.delete(`/team/leave/${route.params.id}`); // 팀 나가기 API 호출
-        userStore.leaveTeam(route.params.id); // 유저 스토어에서 팀 제거
-        alert("팀에서 나갔습니다.");
-        router.push('/tables'); 
+        const response = await axios.delete(`/team/leave/${route.params.id}`,
+            {
+              validateStatus: false
+            }
+        ); // 팀 나가기 API 호출
+        if(response.status === 200) {
+          userStore.leaveTeam(route.params.id); // 유저 스토어에서 팀 제거
+          alert("팀에서 나갔습니다.");
+          router.push('/tables');
+        } else if(response.status === 400) {
+          alert("팀장은 팀을 나갈수 없습니다.");
+        }
       } catch (error) {
         console.error("팀 나가기 오류 : ", error);
-        alert("팀 나가기 실패했습니다.");
+        // alert("팀 나가기 실패했습니다.");
       }
     }
   };

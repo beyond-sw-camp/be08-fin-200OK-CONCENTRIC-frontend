@@ -59,7 +59,7 @@
 <script setup>
 import {ref, onMounted, watchEffect} from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from '@/store/user';
 
 const userStore = useUserStore();
@@ -72,6 +72,7 @@ const showCreateTeamModal = ref(false);
 const newTeamName = ref('');
 
 const router = useRouter();
+const route = useRoute();
 
 const resetTeamId = () => {
   // Pinia 상태의 team_id를 null로 설정
@@ -93,14 +94,9 @@ const toggleMenu = () => {
 const fetchUserTeams = async () => {
   const userStore = useUserStore();
   try {
-    const response = await axios.get("/team/list", {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${userStore.token}`
-      }
-    });
-    
-    teams.value = response.data.filter(team => 
+    const response = await axios.get("/team/list");
+
+    teams.value = response.data.filter(team =>
       team.createdBy === userStore.userId || team.members.includes(userStore.userId)
     );
 
@@ -144,11 +140,6 @@ const createTeam = async () => {
     await axios.post("/team/register", {
       name: newTeamName.value,
       createdBy: userStore.userId
-    }, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${userStore.token}`
-      }
     });
     await fetchUserTeams();
     closeCreateTeamModal();
@@ -162,12 +153,7 @@ const deleteTeam = async (teamId) => {
   
   if (!confirm("정말로 이 팀을 삭제하시겠습니까?")) return;
   try {
-    await axios.delete(`/team/delete/${teamId}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${userStore.token}`
-      }
-    });
+    await axios.delete(`/team/delete/${teamId}`);
     await fetchUserTeams();
     router.push('/tables'); // 팀 삭제 후 팀 리스트 갱신
   
@@ -177,6 +163,8 @@ const deleteTeam = async (teamId) => {
 };
 
 onMounted(() => {
+  if(route.path.startsWith('team/invite')) return;
+  if(!userStore.isLoggedIn) return;
   fetchUserTeams();
 });
 
