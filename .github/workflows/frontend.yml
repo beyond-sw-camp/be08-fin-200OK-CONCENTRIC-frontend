@@ -45,6 +45,9 @@ jobs:
           name: dist-folder
           path: .
 
+      - name: Verify /dist folder
+        run: ls -la ./dist
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -62,6 +65,7 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
+          ls -la ./dist
           IMAGE_TAG="1.${{ github.run_number }}"
           ECR_URI="${{ secrets.ECR_REPOSITORY }}:${IMAGE_TAG}"
           docker build -t $ECR_URI .
@@ -143,7 +147,7 @@ jobs:
       - name: Send notification to Discord
         uses: tsickert/discord-webhook@v5.3.0
         with:
-          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}  # GitHub Secrets에 저장된 Discord 웹훅 URL
           message: |
             **TEST**
             Build Number: ${{ github.run_number }}
