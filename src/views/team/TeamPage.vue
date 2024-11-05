@@ -33,7 +33,7 @@
         <div class="main-content">
           <TeamProfile v-if="activeSection === 'profile'" :team="team" />
           <TeamProfileEdit v-if="activeSection === 'edit'" :team="team" />  
-          <TeamStorage v-if="activeSection == 'teamstorage'" :team="team" />
+          <TeamStorage v-if="activeSection === 'teamstorage'" :team="team" />
         </div>
       </div>
     </div>
