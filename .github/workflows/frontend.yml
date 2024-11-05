@@ -153,9 +153,9 @@ jobs:
     steps:
       - name: Send notification to Discord
         if: success()
-        uses: tsickert/discord-webhook@v5.3.0
-        with:
-          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}  # GitHub Secrets에 저장된 Discord 웹훅 URL
-          content: |
-            **TEST**
-            Build Number: ${{ github.run_number }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d "{\"content\":\"**CI/CD Pipeline Success**\nBuild Number: ${GITHUB_RUN_NUMBER}\"}" \
+            "$DISCORD_WEBHOOK"
