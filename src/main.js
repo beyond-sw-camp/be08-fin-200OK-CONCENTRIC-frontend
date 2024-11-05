@@ -10,7 +10,7 @@ import ArgonDashboard from "./argon-dashboard";
 import ganttastic from "@infectoone/vue-ganttastic";
 
 import axios from 'axios';
-axios.defaults.baseURL = 'http://localhost:8080/v1/api';
+axios.defaults.baseURL = 'https://api.200concentric.com/v1/api';
 axios.interceptors.request.use((config) => {
     const user = JSON.parse(localStorage.getItem('user')) || { state: {} };
     user.state.team_id = null;  // team_id 초기화
