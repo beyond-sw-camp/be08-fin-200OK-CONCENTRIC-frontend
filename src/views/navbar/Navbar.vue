@@ -146,7 +146,7 @@ const handleClickOutside = (event) => {
 };
 
 onMounted(() => {
-  if(route.path) return;
+  if(route.path === "team/invite") return;
   document.addEventListener('click', handleClickOutside);
   if (!checkLogin()) return;
   loadNotifications();

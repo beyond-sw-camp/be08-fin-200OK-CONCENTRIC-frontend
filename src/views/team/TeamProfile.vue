@@ -46,7 +46,7 @@
                 <div class="member-box">
                   <img :src="member.profileImage ? member.profileImage : require('@/assets/img/default/profile.png')" class="member-icon" />
                   <span class="member-name">{{ member.nickname }}</span>
-                  <span class="delete-icon" @click="confirmDelete(member)"v-if="isLeader">내보내기</span>
+                  <span class="delete-icon" @click="confirmDelete(member)" v-if="isLeader">내보내기</span>
                 </div>
               </div>
               <hr class="horizontal dark" />
