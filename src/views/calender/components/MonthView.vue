@@ -20,16 +20,13 @@
       :class="{ 'prev-next-month-day': day.isOtherMonth, 'selected-day': isSelectedDay(day.date) }"
       @click="handleDayClick(day)"
       >
-      <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}
-      </div>
+      <div class="day-number mb-2" style="font-size: 9pt">{{ day.day }}</div>
       <div v-for="task in getTasksForDay(day.date)" :key="task.id" class="event-bar" :class="{ 'team-task': task.type === 'TEAM' }"
-           @click.stop="handleTaskClick(task, day.date)"
-           style="cursor: pointer; display: flex; align-items: center; padding-left: 1rem;"
+           @click.stop="handleTaskClick(task)"
+           style="cursor: pointer"
       >
         {{ truncateTitle(task.title) }}
-        <i class="fa fa-search day-icon" aria-hidden="true" style="margin-left: auto; padding-right: 1rem"></i>
       </div>
-
       <div v-if="!getTasksForDay(day.date).length" class="no-events">&nbsp;</div> <!-- 빈 공간 유지 -->
   </div>
   </transition-group>
@@ -50,7 +47,9 @@
 
 <script>
 import { ref, computed, watch } from "vue";
+import axios from 'axios';
 import AddTask from "@/views/mainpage/components/AddTask.vue";
+import { useUserStore } from '@/store/user';
 
 export default {
   components: { AddTask },
@@ -71,6 +70,7 @@ export default {
     const selectedEndDate = ref(null); // 두 번째 선택한 날짜
     const isModalVisible = ref(false); // 모달 표시 여부
 
+    const userStore = useUserStore();
     // 로컬 상태로 `tasks`를 복사
     const localTasks = ref([...props.tasks]);
 
@@ -195,18 +195,40 @@ export default {
     };
 
     // 모달에서 일정 추가 완료 시 실행되는 함수
-    const addTask = (task) => {
+    const addTask = async (task) => {
       // 선택된 날짜를 일정에 자동으로 설정
       if (selectedStartDate.value) {
-        task.startDate = selectedStartDate.value;
+        let startDate = new Date(`${selectedStartDate.value}T00:00`);
+        
+        // StartDate와 EndDate가 같은 경우 StartDate의 시간을 23:59로 설정
+        if (selectedEndDate.value && selectedStartDate.value === selectedEndDate.value) {
+          startDate = new Date(`${selectedStartDate.value}T23:59`);
+        }
+
+        task.startDate = startDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
       }
+
       if (selectedEndDate.value) {
-        task.endDate = selectedEndDate.value;
+        const endDate = new Date(`${selectedEndDate.value}T00:00`);
+        task.endDate = endDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
       }
-      task.id = Date.now(); // 임시로 유일한 ID 생성
-      localTasks.value.push(task); // 로컬 상태 업데이트
-      emit('update:tasks', [...localTasks.value]); // 부모 컴포넌트에 변경 사항 전달
-      closeModal(); // 모달 닫기
+      
+      // task.id = Date.now();
+      
+      try {
+        // API 호출
+        const response = await axios.post('/schedule/create', task);
+        console.log('Task successfully added:', response.data);
+
+        // 로컬 상태 업데이트
+        localTasks.value.push(response.data);
+        emit('update:tasks', [...localTasks.value]); // 부모 컴포넌트에 변경 사항 전달
+
+      } catch (error) {
+        console.error('새 일정을 추가하는 중 오류가 발생했습니다.', error);
+      } finally {
+        closeModal(); // 모달 닫기
+      }
     };
 
     // 모달 닫기
@@ -237,9 +259,8 @@ export default {
       });
     };
 
-    const handleTaskClick = (task, date) => {
-      console.log("Task Details:", task,date);
-      emit('openDetails', {task, date}); // 클릭된 task를 부모로 전달
+    const handleTaskClick = (task) => {
+      emit('openDetails', task); // 클릭된 task를 부모로 전달
     };
 
     return {
@@ -327,19 +348,6 @@ export default {
   min-height: 100px;
 }
 
-.day-icon {
-  top: 5px;
-  right: 5px;
-  font-size: 12px;
-  color: #666;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.day-cell:hover .day-icon {
-  opacity: 1;
-}
-
 .selected-day {
   background-color: #fffde0;
 }
@@ -367,7 +375,7 @@ export default {
 }
 
 .team-task {
-  background-color: #cef6ee;
+  background-color: #cef6ee; 
 }
 
 .no-events {
