@@ -26,7 +26,8 @@ const showNotifications = ref([]);
 const minimizeSidebar = () => store.commit("sidebarMinimize");
 const toggleConfigurator = () => store.commit("toggleConfigurator");
 
-const clearTeamId = () => {
+const clearTeamId = (event) => {
+  event.preventDefault();
   const userData = JSON.parse(localStorage.getItem('user')) || {};
 
   // team_id를 null로 설정
@@ -168,13 +169,13 @@ onBeforeUnmount(() => {
         <a href="#" @click="minimizeSidebar" class="p-0 nav-link text-white" id="iconNavbarSidenav">
         </a>
       </div>
-      <a href="/" class="d-flex align-items-center image-container" @click="clearTeamId">
+      <router-link to="/" class="d-flex align-items-center image-container" @click="clearTeamId">
         <img
           :src="require('@/assets/img/logos/logo.png')"
           class="w-60 mt-1"
           alt="profile_image"
         />
-      </a>
+      </router-link>
       <!-- <div class="sidenav-toggler-inner">
             <i class="sidenav-toggler-line bg-white"></i>
             <i class="sidenav-toggler-line bg-white"></i>
@@ -188,9 +189,9 @@ onBeforeUnmount(() => {
           <li class="nav-item dropdown d-flex align-items-center me-3">
             <a href="#" class="p-0 nav-link text-white" :class="[showMenu ? 'show' : '']" id="dropdownMenuButton"
               aria-expanded="showMenu" @click.stop="toggleDropdown">
+            </a>
               <i class="cursor-pointer fa fa-bell"></i>
               <span class="notification-badge" v-show="numOfNotifications > 0">{{ numOfNotifications }}</span>
-            </a>
             <ul class="px-2 py-3 dropdown-menu dropdown-menu-end me-n4" :class="showMenu ? 'show' : ''"
               aria-labelledby="dropdownMenuButton" v-show="showMenu">
               <transition-group class="dropdown-menu-animation" name="fade" tag="ul"

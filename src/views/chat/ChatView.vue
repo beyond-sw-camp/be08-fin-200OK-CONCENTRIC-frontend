@@ -41,14 +41,12 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import axios from 'axios';
-import { useStore } from "vuex";
 
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 let lastPingTime = ref(null);
 let timeoutHandle;
 let lastMessageTime = [];
-const baseURL = axios.defaults.baseURL;
 
 import ChatRoom from './components/ChatRoom.vue';
 import ChatFile from './components/ChatFile.vue';
@@ -80,12 +78,10 @@ import { useNotificationStore } from '@/store/notification';
 const notificationStore = useNotificationStore();
 const notificationBadge = ref([]);
 
+const isConnected = ref(true);
+
 // 웹소켓 연결
 const connectWebSocket = (chatRooms) => {
-    if (stompClient.value && stompClient.value.connected) {
-        console.log('이미 웹소켓에 연결된 상태입니다.');
-        return;
-    }
     if (!stompClient.value || !stompClient.value.connected) {
         const socket = new SockJS('https://api.200concentric.com/wss');
         stompClient.value = Stomp.over(socket);
@@ -94,7 +90,6 @@ const connectWebSocket = (chatRooms) => {
             console.log(string);
             }
         };
-    }
 
         stompClient.value.connect({ Authorization: `${accessToken}` }, () => {
             subscribeChatRoom(chatRooms);
@@ -106,7 +101,7 @@ const connectWebSocket = (chatRooms) => {
                 timeoutHandle = setTimeout(() => {
                     handlePingTimeout();
                 }, 60000);
-            }, 20000);  
+            }, 60000);  
             
             stompClient.value.subscribe('/sub/pong', (message) => {
                 console.log("Pong 받음:", message.body);
@@ -115,18 +110,19 @@ const connectWebSocket = (chatRooms) => {
         }, (error) => {
             console.error('채팅방을 연결하는 데 실패했습니다.', error);
         });
-    };
+    }
+};
 
 // WebSocket 연결 해제
 const disconnectWebSocket = () => {
     if (stompClient.value && stompClient.value.connected) {
         stompClient.value.disconnect();
     }
+    isConnected.value = false;
 };
 
 watch(() => userStore.isLoggedIn, (isLoggedIn) => {
     if (!isLoggedIn) {
-        // 로그아웃 상태일 때 WebSocket 연결 해제
         disconnectWebSocket();
     }
 });
@@ -149,17 +145,17 @@ const handleClickOutside = (event) => {
 };
 
 const chatListApi = async () => {
+    if (!isConnected.value) return;
+    isConnected.value = false;
     try {
         const response = await axios.get("/chat/list");
         chatRooms.value = response.data;
         // console.log(chat.value);
         chatRooms.value.forEach((room) => {
-            messages.value[room.chatRoomId] = [];  // 각 chatRoomId에 빈 배열 생성
+            messages.value[room.chatRoomId] = [];  
             notificationBadge.value[room.chatRoomId] = false;
         });
 
-        console.log(notificationBadge.value);
-        // console.log(messages.value);
         if (subscribedChatRooms.length === 0) {
             connectWebSocket(chatRooms.value);
         }
@@ -217,7 +213,6 @@ const subscribeChatRoom = (chatRooms) => {
         if (!subscribedChatRooms.includes(room.chatRoomId)) {
             stompClient.value.subscribe(`/sub/chat/${room.chatRoomId}`, (message) => {
                 const receivedMessage = JSON.parse(message.body);
-                // 해당 채팅방의 알림 뱃지 설정
                 if (receivedMessage.memberId === loggedInMemberId.value) {
                     notificationBadge.value[room.chatRoomId] = false; 
                 } else {
@@ -231,7 +226,6 @@ const subscribeChatRoom = (chatRooms) => {
             
             });
             subscribedChatRooms.push(room.chatRoomId);
-            // console.log(subscribedChatRooms);
         } else {
             console.log(`이미 연결된 채팅방입니다. ${room.chatRoomId}`);
         }
@@ -254,6 +248,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     document.removeEventListener('click', handleClickOutside);
+    disconnectWebSocket();
 });
 
 const openChatView = () => {
@@ -293,10 +288,10 @@ const addChatRoom = async (newChatRoom) => {
     stompClient.value.subscribe(`/sub/chat/${newChatRoom.id}`, (message) => {
         const receivedMessage = JSON.parse(message.body);
         messages.value[newChatRoom.id] = [receivedMessage];
-        notificationStore.showNotification(receivedMessage.memberId, `${receivedMessage.nickname}: ${receivedMessage.message}`, 2000);
+        // notificationStore.showNotification(receivedMessage.memberId, `${receivedMessage.nickname}: ${receivedMessage.message}`, 2000);
     });
     subscribedChatRooms.push(newChatRoom.id);
-    console.log(subscribedChatRooms);
+    // console.log(subscribedChatRooms);
 };
 
 const closeChatRoom = () => {
@@ -325,6 +320,10 @@ const closeChatRoomDetails = () => {
     selectedChatRoomDetails.value = false;
     preventClose = true;
 }
+
+window.addEventListener('beforeunload', () => {
+    disconnectWebSocket();
+});
 
 </script>
 
