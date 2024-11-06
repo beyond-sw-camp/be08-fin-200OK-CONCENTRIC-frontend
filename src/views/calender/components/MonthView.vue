@@ -37,8 +37,8 @@
       :userId="userId"
       @close="closeModal"
       @confirm="addTask"
-      :selectedStartDate="selectedStartDate"
-      :selectedEndDate="selectedEndDate"
+      :selectedStartDate="selectedStartDate.slice(0,10)"
+      :selectedEndDate="selectedEndDate.slice(0,10)"
   />
   </div>
 </template>
@@ -66,36 +66,31 @@ export default {
   setup(props, { emit }) {
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const currentDate = ref(new Date());
-    const selectedStartDate = ref(null); // 첫 번째 선택한 날짜
-    const selectedEndDate = ref(null); // 두 번째 선택한 날짜
-    const isModalVisible = ref(false); // 모달 표시 여부
+    const selectedStartDate = ref(null);
+    const selectedEndDate = ref(null);
+    const isModalVisible = ref(false);
 
-    const userStore = useUserStore();
-    // 로컬 상태로 `tasks`를 복사
     const localTasks = ref([...props.tasks]);
 
-    // props가 업데이트될 때 localTasks도 업데이트되도록 watch 사용
     watch(() => props.tasks, (newTasks) => {
       localTasks.value = [...newTasks];
     });
 
-    // 현재 달과 연도를 계산하는 속성
     const currentMonthYear = computed(() => {
       const month = currentDate.value.toLocaleString("default", { month: "long" });
       const year = currentDate.value.getFullYear();
       return `${year}년 ${month}`;
     });
 
-    // 달력에 표시될 날짜들을 계산하는 속성
     const calendarDays = computed(() => {
       const startOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1);
       const endOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0);
 
-      const startDay = startOfMonth.getDay();  // 0: Sunday, 1: Monday, etc.
+      const startDay = startOfMonth.getDay(); 
       const totalDays = endOfMonth.getDate();
       const days = [];
 
-      // 이전 달의 날짜 계산 (수정된 방식)
+      // 이전 달의 날짜 계산 
       for (let i = 0; i < startDay; i++) {
         const prevDate = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), -(startDay - i - 1));
         days.push({
@@ -115,8 +110,8 @@ export default {
         });
       }
 
-      // 다음 달의 날짜 계산 (수정된 방식)
-      const remainingDays = 42 - days.length; // 6x7 grid를 유지하기 위해 42개의 칸 필요
+      // 다음 달의 날짜 계산 
+      const remainingDays = 42 - days.length; 
       for (let i = 1; i <= remainingDays; i++) {
         const nextDate = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, i);
         days.push({
@@ -129,48 +124,41 @@ export default {
       return days;
     });
 
-    const slideDirection = ref("next"); // 슬라이드 방향을 저장하는 상태
+    const slideDirection = ref("next"); 
 
     const prevMonth = () => {
-      slideDirection.value = "prev"; // 이전 달로 이동 시
+      slideDirection.value = "prev"; 
       currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1);
     };
 
     const nextMonth = () => {
-      slideDirection.value = "next"; // 다음 달로 이동 시
+      slideDirection.value = "next"; 
       currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1);
     };
 
-    // 날짜 셀을 클릭했을 때 실행되는 함수
     const handleDayClick = (day) => {
       const clickedDate = new Date(day.date);
-      clickedDate.setHours(0, 0, 0, 0); // 시간을 제거하여 날짜만 비교
+      clickedDate.setHours(0, 0, 0, 0);
 
       if (!selectedStartDate.value) {
-        // 첫 번째 날짜를 선택한 경우
-        selectedStartDate.value = clickedDate.toLocaleDateString('en-CA');
+        selectedStartDate.value = formatDateTime(clickedDate);
       } else if (!selectedEndDate.value) {
-        // 두 번째 날짜를 선택한 경우
-        selectedEndDate.value = clickedDate.toLocaleDateString('en-CA');
+        selectedEndDate.value = formatDateTime(clickedDate);
 
-        // 날짜 순서 정렬 (시작일이 종료일보다 나중일 경우 변경)
         if (new Date(selectedStartDate.value) > new Date(selectedEndDate.value)) {
           [selectedStartDate.value, selectedEndDate.value] = [selectedEndDate.value, selectedStartDate.value];
         }
 
-        // 모달 열기
         isModalVisible.value = true;
       } else {
-        // 이미 두 날짜가 선택된 경우 새로 시작
-        selectedStartDate.value = clickedDate.toLocaleDateString('en-CA');
+        selectedStartDate.value = formatDateTime(clickedDate);
         selectedEndDate.value = null;
       }
     };
 
-    // 선택된 날짜 강조 여부 확인
     const isSelectedDay = (date) => {
       const targetDate = new Date(date);
-      targetDate.setHours(0, 0, 0, 0); // 시간을 제거하여 날짜만 비교
+      targetDate.setHours(0, 0, 0, 0); 
 
       if (selectedStartDate.value && selectedEndDate.value) {
         const startDate = new Date(selectedStartDate.value);
@@ -179,7 +167,6 @@ export default {
         startDate.setHours(0, 0, 0, 0);
         endDate.setHours(0, 0, 0, 0);
 
-        // 선택된 날짜가 시작일과 종료일 사이에 있는지 확인
         return targetDate >= startDate && targetDate <= endDate;
       }
 
@@ -187,51 +174,25 @@ export default {
         const startDate = new Date(selectedStartDate.value);
         startDate.setHours(0, 0, 0, 0);
 
-        // 시작일과 동일한 날짜인지 확인
         return targetDate.getTime() === startDate.getTime();
       }
 
       return false;
     };
 
-    // 모달에서 일정 추가 완료 시 실행되는 함수
     const addTask = async (task) => {
-      // 선택된 날짜를 일정에 자동으로 설정
-      if (selectedStartDate.value) {
-        let startDate = new Date(`${selectedStartDate.value}T00:00`);
-        
-        // StartDate와 EndDate가 같은 경우 StartDate의 시간을 23:59로 설정
-        if (selectedEndDate.value && selectedStartDate.value === selectedEndDate.value) {
-          startDate = new Date(`${selectedStartDate.value}T23:59`);
-        }
-
-        task.startDate = startDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
-      }
-
-      if (selectedEndDate.value) {
-        const endDate = new Date(`${selectedEndDate.value}T00:00`);
-        task.endDate = endDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
-      }
-      
-      // task.id = Date.now();
-      
       try {
-        // API 호출
         const response = await axios.post('/schedule/create', task);
         console.log('Task successfully added:', response.data);
-
-        // 로컬 상태 업데이트
         localTasks.value.push(response.data);
-        emit('update:tasks', [...localTasks.value]); // 부모 컴포넌트에 변경 사항 전달
-
+        emit('update:tasks', [...localTasks.value]);
       } catch (error) {
         console.error('새 일정을 추가하는 중 오류가 발생했습니다.', error);
       } finally {
-        closeModal(); // 모달 닫기
+        closeModal();
       }
     };
 
-    // 모달 닫기
     const closeModal = () => {
       isModalVisible.value = false;
       selectedStartDate.value = null;
@@ -260,7 +221,21 @@ export default {
     };
 
     const handleTaskClick = (task) => {
-      emit('openDetails', task); // 클릭된 task를 부모로 전달
+      emit('openDetails', task); 
+    };
+
+    const formatDateTime = (dateTime) => {
+      if (!dateTime || isNaN(new Date(dateTime).getTime())) return '';
+      
+      const date = new Date(dateTime);
+      
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
     };
 
     return {
@@ -282,6 +257,7 @@ export default {
       isSelectedDay,
       localTasks,
       handleTaskClick,
+      formatDateTime
     };
   },
 };

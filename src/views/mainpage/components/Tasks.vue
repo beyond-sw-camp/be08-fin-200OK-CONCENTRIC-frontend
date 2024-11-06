@@ -3,13 +3,16 @@
     <div class="card-header pb-0 d-flex justify-content-between align-items-center">
       <h5>Tasks</h5>
       <div class="d-inline-flex align-items-center">
-        <button type="button" class="btn btn-primary ms-auto" @click="sortTasks">
+        <button type="button" class="btn btn-primary ms-auto" @click="toggleActiveView">
           <a class="mx-1">
             <i class="fa fa-bars"></i>
           </a>
-          정렬
+          {{ isShowingActive ? '전체 일정 보기' : '진행 중인 일정만 보기' }}
         </button>
         <button type="button" class="btn btn-success ms-3" @click="toggleTaskView">
+          <a class="mx-1">
+            <i class="fa fa-bars"></i>
+          </a>
           {{ isShowingPrivate ? '전체 일정 보기' : '개인 일정만 보기' }}
         </button>
       </div>
@@ -61,7 +64,9 @@
                 <option value="COMPLETED">완료</option>
               </select>
             </td>
-            <td v-else @click="startEditing(task, 'status')">{{ task.status }}</td>
+            <td v-else @click="startEditing(task, 'status')">
+              <span v-if="task.status === 'ACTIVE'">진행 중</span>
+              <span v-else-if="task.status === 'COMPLETED'">완료</span></td>
 
             <td v-if="editingTask.id === task.id && editingTask.column === 'importance'">
               <input type="number" v-model="task.importance" min="0" max="5" @blur="stopEditing" @keyup.enter="stopEditing" />
@@ -138,6 +143,7 @@ export default {
 
     const tasks = ref([]);
     const originalTasks = ref([]);
+    const isShowingActive = ref(false);
     const isShowingPrivate = ref(false);
     const editingTask = reactive({ id: null, column: null });
     const modals = reactive({ addTaskModal: false });
@@ -167,20 +173,36 @@ export default {
       }
     };
     watch(
-        () => userStore.teamId, // teamId가 변경될 때만 감시
+        () => userStore.teamId,
         () => {
-          fetchTasks(); // teamId 변경 시 fetchTasks 호출
+          fetchTasks();
         }
     );
     onMounted(fetchTasks);
 
+    const toggleActiveView = () => {
+      isShowingActive.value = !isShowingActive.value;
+      applyFilters();
+    };
+
+
     const toggleTaskView = () => {
-      if (isShowingPrivate.value) {
-        tasks.value = [...originalTasks.value];
-      } else {
-        tasks.value = originalTasks.value.filter(task => task.type === 'PRIVATE');
-      }
       isShowingPrivate.value = !isShowingPrivate.value;
+      applyFilters();
+    };
+
+    const applyFilters = () => {
+      let filteredTasks = [...originalTasks.value];
+
+      if (isShowingActive.value) {
+        filteredTasks = filteredTasks.filter(task => task.status === 'ACTIVE');
+      }
+      
+      if (isShowingPrivate.value) {
+        filteredTasks = filteredTasks.filter(task => task.type === 'PRIVATE');
+      }
+
+      tasks.value = filteredTasks;
     };
 
     const startEditing = (task, column) => {
@@ -355,7 +377,10 @@ export default {
       loggedInMemberId,
       showTaskDetails,
       selectedTaskDetails,
-      isDetailsVisible
+      toggleActiveView,
+      isDetailsVisible,
+      isShowingActive,
+      applyFilters
     };
   },
 };
@@ -430,6 +455,8 @@ p {
 
 .table-responsive {
   Font-size: 10.5pt;
+  max-height: 500px;
+
 }
 
 .table thead th {
