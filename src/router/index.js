@@ -14,6 +14,7 @@ import TeamPage from "../views/team/TeamPage.vue";
 import TeamInvitePage from "../views/team/TeamInvitePage.vue";
 import TempCalendar from "@/etc/TempCalendar.vue";
 import FindPassword from "@/views/sign/findPassword.vue";
+import TeamStorage from "../views/storage/TeamStorage.vue";
 
 
 
@@ -92,6 +93,11 @@ const routes = [
     path: "/team-invite",
     name: "TeamInvite",
     component: TeamInvitePage,
+  },
+  {
+    path: "/storage/team",
+    name: "TeamStorage",
+    component: TeamStorage,
   },
 ];
 

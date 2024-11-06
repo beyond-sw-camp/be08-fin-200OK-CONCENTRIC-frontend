@@ -5,44 +5,44 @@
       @mouseup="!isSubtaskModalOpen && endDrag" :style="{ top: offsetY + 'px', left: offsetX + 'px' }">
       <div class="details-section">
         <div class="modal-header">
-          <h5 class="modal-title">View Details</h5>
+          <h5 class="modal-title">상세 보기</h5>
         </div>
         <div class="modal-body">
           <form @submit.prevent="confirm">
             <div class="form-group">
-              <label for="title">Title</label>
+              <label for="title">제목</label>
               <input type="text" id="title" v-model="details.title" class="form-control" required readonly />
             </div>
             <div class="form-group">
-              <label for="description">Description</label>
+              <label for="description">설명</label>
               <input type="text" id="description" v-model="details.description" class="form-control" readonly />
             </div>
             <div class="form-group">
-              <label for="nickname">Nickname</label>
+              <label for="nickname">닉네임</label>
               <input type="text" id="nickname" v-model="details.nickname" class="form-control" readonly />
             </div>
             <div class="form-group">
-              <label for="type">type</label>
+              <label for="type">구분</label>
               <input type="text" id="type" v-model="details.type" class="form-control" readonly />
             </div>
             <div class="form-group">
-              <label for="teamName">teamName</label>
+              <label for="teamName">팀명</label>
               <input type="text" id="teamName" v-model="details.teamName" class="form-control" readonly />
             </div>
             <div class="form-group">
-              <label for="startDate">Start Date</label>
-              <input type="date" id="startDate" v-model="details.startDate" class="form-control" readonly />
+              <label for="startDate">시작일</label>
+              <input type="datetime-local" id="startDate" v-model="details.startDate" class="form-control" readonly />
             </div>
             <div class="form-group">
-              <label for="endDate">End Date</label>
-              <input type="date" id="endDate" v-model="details.endDate" class="form-control" readonly />
+              <label for="endDate">종료일</label>
+              <input type="datetime-local" id="endDate" v-model="details.endDate" class="form-control" readonly />
             </div>
             <div class="form-group">
-              <label for="status">status</label>
+              <label for="status">상태</label>
               <input type="text" id="status" v-model="details.status" class="form-control" readonly />
             </div>
             <div class="form-group">
-              <label for="importance">Importance</label>
+              <label for="importance">중요도</label>
               <input type="number" id="importance" v-model="details.importance" class="form-control" min="0" max="5" readonly />
             </div>
           </form>
@@ -97,8 +97,8 @@ export default {
       nickname: props.taskDetails?.nickname || '',
       type: props.taskDetails?.type || '',
       teamName: props.taskDetails?.teamName || '',
-      startDate: props.taskDetails?.startDate ? props.taskDetails.startDate.split('T')[0] : '',
-      endDate: props.taskDetails?.endDate ? props.taskDetails.endDate.split('T')[0] : '',
+      startDate: props.taskDetails?.startDate ? props.taskDetails.startDate : '',
+      endDate: props.taskDetails?.endDate ? props.taskDetails.endDate: '',
       status: props.taskDetails?.status || '',
       importance: props.taskDetails?.importance || 0,
     });
@@ -113,8 +113,8 @@ export default {
             nickname: props.taskDetails?.nickname || '',
             type: props.taskDetails?.type || '',
             teamName: props.taskDetails?.teamName || '',
-            startDate: props.taskDetails?.startDate ? props.taskDetails.startDate.split('T')[0] : '',
-            endDate: props.taskDetails?.endDate ? props.taskDetails.endDate.split('T')[0] : '',
+            startDate: props.taskDetails?.startDate ? props.taskDetails.startDate : '',
+            endDate: props.taskDetails?.endDate ? props.taskDetails.endDate : '',
             status: props.taskDetails?.status || '',
             importance: props.taskDetails?.importance || 0,
           };

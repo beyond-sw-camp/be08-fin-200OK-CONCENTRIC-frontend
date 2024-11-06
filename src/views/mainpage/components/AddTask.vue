@@ -107,23 +107,6 @@
 <script>
 import { ref, watch, onMounted } from 'vue';
 import axios from "axios";
-async function saveTaskToDatabase(task) {
-  try {
-    const userState = JSON.parse(localStorage.getItem('user'));
-    const teamId = userState?.state?.team_id;
-
-    if (teamId) {
-      const payload = {
-        schedule_id: task.id, // 서버에서 반환된 schedule의 ID 사용
-        team_id: teamId,
-      };
-      await axios.post('/api/team_schedule', payload);
-      console.log('Team schedule saved successfully.');
-    }
-  } catch (error) {
-    console.error('Failed to save team schedule:', error);
-  }
-}
 
 export default {
   data(){
@@ -173,7 +156,6 @@ export default {
           value: team.id,
           label: team.name
         }));
-        selectedPersonalOption.value = personalOptions.value[0] || null;
       } catch (error) {
         console.error("Failed to fetch team list:", error);
       }
@@ -203,7 +185,7 @@ export default {
 
     const selectPersonalOption = (option) => {
       selectedPersonalOption.value = option;
-      console.log("option: ", option.value)
+      console.log("option: ", option.value);
       newTask.value.teamId = option.value;
       newTask.value.type = 'TEAM';
       console.log(newTask);
@@ -219,7 +201,7 @@ export default {
 
     function getInitialTask() {
       return {
-        userId: props.userId,
+        // userId: props.userId,
         title: '',
         description: '',
         status: 'ACTIVE',
@@ -257,6 +239,7 @@ export default {
 
     function resetTask() {
       newTask.value = getInitialTask();
+      selectedPersonalOption.value = null;
     }
 
     function toggleAllDay() {
@@ -335,6 +318,7 @@ export default {
       endDrag,
       offsetX,
       offsetY,
+      // saveTaskToDatabase
     };
   },
 };

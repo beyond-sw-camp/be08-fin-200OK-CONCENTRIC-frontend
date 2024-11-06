@@ -82,6 +82,10 @@ const notificationBadge = ref([]);
 
 // 웹소켓 연결
 const connectWebSocket = (chatRooms) => {
+    if (stompClient.value && stompClient.value.connected) {
+        console.log('이미 웹소켓에 연결된 상태입니다.');
+        return;
+    }
     if (!stompClient.value || !stompClient.value.connected) {
         const socket = new SockJS('https://api.200concentric.com/wss');
         stompClient.value = Stomp.over(socket);

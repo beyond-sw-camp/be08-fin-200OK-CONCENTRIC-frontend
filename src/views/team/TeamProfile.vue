@@ -42,11 +42,17 @@
             <!-- 그룹원 섹션 -->
             <div class="group-members mt-4">
               <h6 class="text-uppercase">그룹원</h6>
-              <div v-for="member in members" :key="member.id" class="position-relative member-item">
-                <div class="member-box">
-                  <img :src="member.profileImage ? member.profileImage : require('@/assets/img/default/profile.png')" class="member-icon" />
-                  <span class="member-name">{{ member.nickname }}</span>
-                  <span class="delete-icon" @click="confirmDelete(member)" v-if="isLeader">내보내기</span>
+              <div v-if="members.length === 0" class="no-members-message">
+                그룹원이 없습니다
+              </div>
+
+              <div v-else>
+                <div v-for="member in members" :key="member.id" class="position-relative member-item">
+                  <div class="member-box">
+                    <img :src="member.profileImage ? member.profileImage : require('@/assets/img/default/profile.png')" class="member-icon" />
+                    <span class="member-name">{{ member.nickname }}</span>
+                    <span class="delete-icon" @click="confirmDelete(member)" v-if="isLeader">내보내기</span>
+                  </div>
                 </div>
               </div>
               <hr class="horizontal dark" />
@@ -94,8 +100,8 @@ export default {
 
     const separateMembers = (teamMembers) => {
       if (teamMembers.length > 0) {
-        leader.value = teamMembers[0]; // 배열의 첫 번째 팀원을 그룹장으로 설정
-        members.value = teamMembers.slice(1); // 나머지 팀원들을 그룹원 목록으로 설정
+        leader.value = teamMembers[0]; 
+        members.value = teamMembers.slice(1); 
       }
     };
 
@@ -299,5 +305,11 @@ hr.horizontal {
   background-position: center;
   background-color: none;
   width: 120vh;
+}
+.no-members-message {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+  margin-top: 1rem;
 }
 </style>

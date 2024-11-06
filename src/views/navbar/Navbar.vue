@@ -168,13 +168,13 @@ onBeforeUnmount(() => {
         <a href="#" @click="minimizeSidebar" class="p-0 nav-link text-white" id="iconNavbarSidenav">
         </a>
       </div>
-      <router-link to="/" class="d-flex align-items-center image-container" @click="clearTeamId">
+      <a href="/" class="d-flex align-items-center image-container" @click="clearTeamId">
         <img
           :src="require('@/assets/img/logos/logo.png')"
           class="w-60 mt-1"
           alt="profile_image"
         />
-      </router-link>
+      </a>
       <!-- <div class="sidenav-toggler-inner">
             <i class="sidenav-toggler-line bg-white"></i>
             <i class="sidenav-toggler-line bg-white"></i>
