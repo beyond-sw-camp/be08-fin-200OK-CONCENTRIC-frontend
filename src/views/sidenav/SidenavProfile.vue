@@ -58,7 +58,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from '@/store/user';
 
 const userStore = useUserStore();
@@ -69,6 +69,7 @@ const showCreateTeamModal = ref(false);
 const newTeamName = ref('');
 
 const router = useRouter();
+const route = useRoute();
 
 const toggleMenu = () => {
   showMenu.value = !showMenu.value;
@@ -76,14 +77,9 @@ const toggleMenu = () => {
 
 const fetchUserTeams = async () => {
   try {
-    const response = await axios.get("/team/list", {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${userStore.token}`
-      }
-    });
-    
-    teams.value = response.data.filter(team => 
+    const response = await axios.get("/team/list");
+
+    teams.value = response.data.filter(team =>
       team.createdBy === userStore.userId || team.members.includes(userStore.userId)
     );
 
@@ -124,11 +120,6 @@ const createTeam = async () => {
     await axios.post("/team/register", {
       name: newTeamName.value,
       createdBy: userStore.userId
-    }, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${userStore.token}`
-      }
     });
     await fetchUserTeams();
     closeCreateTeamModal();
@@ -140,12 +131,7 @@ const createTeam = async () => {
 const deleteTeam = async (teamId) => {
   if (!confirm("정말로 이 팀을 삭제하시겠습니까?")) return;
   try {
-    await axios.delete(`/team/delete/${teamId}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${userStore.token}`
-      }
-    });
+    await axios.delete(`/team/delete/${teamId}`);
     await fetchUserTeams();
     router.push('/tables'); 
   } catch (error) {
@@ -154,6 +140,8 @@ const deleteTeam = async (teamId) => {
 };
 
 onMounted(() => {
+  if(route.path.startsWith('team/invite')) return;
+  if(!userStore.isLoggedIn) return;
   fetchUserTeams();
 });
 </script>
