@@ -322,6 +322,13 @@ export default {
   justify-content: space-between;
   align-items: center;
   min-height: 100px;
+  max-height: 100px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.day-cell:hover {
+    overflow-y: auto;   /* 마우스를 올렸을 때 스크롤바 표시 */
 }
 
 .selected-day {

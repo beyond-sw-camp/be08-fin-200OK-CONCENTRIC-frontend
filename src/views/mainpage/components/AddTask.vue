@@ -156,7 +156,6 @@ export default {
           value: team.id,
           label: team.name
         }));
-        selectedPersonalOption.value = personalOptions.value[0] || null;
       } catch (error) {
         console.error("Failed to fetch team list:", error);
       }
@@ -186,7 +185,7 @@ export default {
 
     const selectPersonalOption = (option) => {
       selectedPersonalOption.value = option;
-      console.log("option: ", option.value)
+      console.log("option: ", option.value);
       newTask.value.teamId = option.value;
       newTask.value.type = 'TEAM';
       console.log(newTask);
@@ -240,6 +239,7 @@ export default {
 
     function resetTask() {
       newTask.value = getInitialTask();
+      selectedPersonalOption.value = null;
     }
 
     function toggleAllDay() {
