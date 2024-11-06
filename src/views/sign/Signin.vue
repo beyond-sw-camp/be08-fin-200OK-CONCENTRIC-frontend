@@ -326,6 +326,10 @@ const signIn = () => {
 
 const login = (event) => {
   event.preventDefault();
+  if(loginEmail.value === "" || loginEmail.value === "") {
+    alert("이메일과 비밀번호를 입력하세요.");
+    return;
+  }
   loginApi();
 };
 const loginApi = async () => {
