@@ -12,6 +12,7 @@
         <div
             v-for="(day, index) in weekDays"
             :key="index"
+            :class="{ 'prev-next-month-day': day.isOtherMonth, 'selected-day': isSelectedDay(day.date) }"
             class="day-cell"
             @click="handleDayClick(day)"
         >
@@ -19,25 +20,58 @@
           <div v-for="task in getTasksForDay(day.date)"
                :key="task.id"
                class="event-bar"
-               @click="viewDetails"
+               :class="{ 'team-task': task.type === 'TEAM' }"
+               @click.stop="handleTaskClick(task)"
+               style="cursor: pointer"
           >
-            {{ task.title }}
+            {{ truncateTitle(task.title) }}
           </div>
-          <i class="fa fa-search day-icon" aria-hidden="true"></i>
+          <div v-if="!getTasksForDay(day.date).length" class="no-events">&nbsp;</div>
         </div>
       </div>
     </div>
 
+  <add-task
+      v-if="isModalVisible"
+      :isVisible="isModalVisible"
+      :userId="userId"
+      @close="closeModal"
+      @confirm="addTask"
+      :selectedStartDate="selectedStartDate.slice(0,10)"
+      :selectedEndDate="selectedEndDate.slice(0,10)"
+  />
   </div>
 </template>
 
 <script>
-import {computed, ref} from 'vue';
+import { computed, ref, watch } from 'vue';
+import axios from 'axios';
+import AddTask from "@/views/mainpage/components/AddTask.vue";
+import { useUserStore } from '@/store/user';
 
 export default {
-  props: ['tasks'], // props를 정의해줍니다.
-  setup(props) {
+  components: { AddTask },
+  props: {
+    userId: {
+      type: Number,
+      required: true,
+    },
+    tasks: {
+      type: Array,
+      required: true,
+    }
+  },
+  setup(props, { emit }) {
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const selectedStartDate = ref(null);
+    const selectedEndDate = ref(null);
+    const isModalVisible = ref(false);
+    const userStore = useUserStore();
+    const localTasks = ref([...props.tasks]);
+
+    watch(() => props.tasks, (newTasks) => {
+      localTasks.value = [...newTasks];
+    });
 
     const currentDate = ref(new Date());
     const currentMonthYear = computed(() => {
@@ -47,9 +81,8 @@ export default {
     });
 
     const weekDays = computed(() => {
-      const today = new Date();
-      const startOfWeek = new Date(today);
-      startOfWeek.setDate(today.getDate() - today.getDay()); // 해당 주의 시작일 계산
+      const startOfWeek = new Date(currentDate.value);
+      startOfWeek.setDate(currentDate.value.getDate() - currentDate.value.getDay());
 
       const days = [];
       for (let i = 0; i < 7; i++) {
@@ -57,20 +90,103 @@ export default {
         currentDay.setDate(startOfWeek.getDate() + i);
         days.push({
           day: currentDay.getDate(),
-          date: currentDay.toISOString().split('T')[0],
+          date: formatDateTime(currentDay),
         });
       }
       return days;
     });
 
-    const handleDayClick = (day) => {
-      console.log(`Clicked day: ${day.date}`);
-      // 주별 보기는 특정 날짜에 일정을 추가하는 모달을 띄움
+    const truncateTitle = (title) => {
+      const maxLength = 10;
+      return title.length > maxLength ? title.substring(0, maxLength) + "..." : title;
     };
 
     const getTasksForDay = (date) => {
-      console.log(props.tasks)
-      return props.tasks.filter((task) => task.startDate <= date && task.endDate >= date);
+      const selectedDate = new Date(date);
+      return localTasks.value.filter((task) => {
+        const taskStart = new Date(task.startDate);
+        const taskEnd = new Date(task.endDate || task.startDate);
+        return taskStart <= selectedDate && selectedDate <= taskEnd;
+      });
+    };
+
+    const handleDayClick = (day) => {
+      const clickedDate = new Date(day.date);
+      clickedDate.setHours(0, 0, 0, 0);
+
+      if (!selectedStartDate.value) {
+        selectedStartDate.value = formatDateTime(clickedDate);
+      } else if (!selectedEndDate.value) {
+        selectedEndDate.value = formatDateTime(clickedDate);
+
+        if (new Date(selectedStartDate.value) > new Date(selectedEndDate.value)) {
+          [selectedStartDate.value, selectedEndDate.value] = [selectedEndDate.value, selectedStartDate.value];
+        }
+
+        isModalVisible.value = true;
+      } else {
+        selectedStartDate.value = formatDateTime(clickedDate);
+        selectedEndDate.value = null;
+      }
+    };
+
+    const isSelectedDay = (date) => {
+      const targetDate = new Date(date);
+      targetDate.setHours(0, 0, 0, 0);
+
+      if (selectedStartDate.value && selectedEndDate.value) {
+        const startDate = new Date(selectedStartDate.value);
+        const endDate = new Date(selectedEndDate.value);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(0, 0, 0, 0);
+        return targetDate >= startDate && targetDate <= endDate;
+      }
+
+      if (selectedStartDate.value) {
+        const startDate = new Date(selectedStartDate.value);
+        startDate.setHours(0, 0, 0, 0);
+        return targetDate.getTime() === startDate.getTime();
+      }
+
+      return false;
+    };
+
+    const addTask = async (task) => {
+
+      try {
+        const response = await axios.post('/schedule/create', task);
+        console.log('Task successfully added:', response.data);
+        localTasks.value.push(response.data);
+        emit('update:tasks', [...localTasks.value]);
+      } catch (error) {
+        console.error('새 일정을 추가하는 중 오류가 발생했습니다.', error);
+      } finally {
+        closeModal();
+      }
+    };
+
+    const closeModal = () => {
+      isModalVisible.value = false;
+      selectedStartDate.value = null;
+      selectedEndDate.value = null;
+    };
+
+    const handleTaskClick = (task) => {
+      emit('openDetails', task);
+    };
+
+    const formatDateTime = (dateTime) => {
+      if (!dateTime || isNaN(new Date(dateTime).getTime())) return '';
+      
+      const date = new Date(dateTime);
+      
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); 
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
     };
 
     return {
@@ -79,6 +195,17 @@ export default {
       weekDays,
       handleDayClick,
       getTasksForDay,
+      openModal: isModalVisible,
+      closeModal,
+      addTask,
+      isModalVisible,
+      selectedStartDate,
+      selectedEndDate,
+      isSelectedDay,
+      localTasks,
+      truncateTitle,
+      handleTaskClick,
+      formatDateTime
     };
   },
 };
@@ -129,23 +256,9 @@ export default {
   border: 0.5px solid #e1e1e1;
   height: 500px;
   padding: 5px;
-  cursor: pointer;
+  /* cursor: pointer; */
   display: flex;
   flex-direction: column;
-}
-
-.day-icon {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  font-size: 12px;
-  color: #666;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.day-cell:hover .day-icon {
-  opacity: 1;
 }
 
 .day-number {
@@ -162,6 +275,10 @@ export default {
   text-align: center;
 }
 
+.team-task {
+  background-color: #cef6ee; 
+}
+
 .day-header {
   border: 0.5px solid #ddd;
   font-weight: bold;
@@ -169,5 +286,9 @@ export default {
   text-align: center;
   padding: 3px;
   background-color: #f0f0f0;
+}
+
+.selected-day {
+  background-color: #fffcdb;
 }
 </style>

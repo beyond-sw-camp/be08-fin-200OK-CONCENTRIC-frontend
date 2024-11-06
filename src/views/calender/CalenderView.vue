@@ -1,3 +1,4 @@
+
 <template>
   <div class="calendar-page card px-4">
     <!-- 상단에 보기 모드 전환 버튼 -->
@@ -28,20 +29,22 @@
         :tasks="tasks"
         :selectedDate="selectedDate"
         @openDetails="openTaskDetails"
+        :userId=loggedInMemberId
+        @update:tasks="fetchTasks"
     />
     <transition name="slideUp" appear>
       <viewDetails
-          :isVisible=isDetailsVisible
-          @close="isDetailsVisible = false"
-          user-id="userState.userId"
-          :task-details="selectedTaskDetails"/>
+        :isVisible=isDetailsVisible
+        @close="isDetailsVisible = false"
+        :userId=loggedInMemberId
+        :task-details="selectedTaskDetails"/>
     </transition>
   </div>
 </template>
 
 <script>
 import { ref, computed, onMounted, watch } from 'vue';
-import axios from 'axios';  // 서버에서 일정 데이터를 가져오기 위한 axios
+import axios from 'axios'; 
 import MonthView from '@/views/calender/components/MonthView.vue';
 import WeekView from '@/views/calender/components/WeekView.vue';
 import DayView from '@/views/calender/components/DayView.vue';
@@ -52,9 +55,10 @@ export default {
   components: {ViewDetails, MonthView, WeekView, DayView },
   setup() {
     const userStore = useUserStore();
+    const loggedInMemberId = computed(() => userStore.userInfo.id);
     const currentView = ref('month');
-    const tasks = ref([]); // 일정 데이터를 저장할 배열
-    const selectedDate = ref(new Date().toISOString().split('T')[0]); // 선택된 날짜
+    const tasks = ref([]);
+    const selectedDate = ref(new Date().toISOString().split('T')[0]); 
 
     const originalTasks = ref([]);
     const isShowingPrivate = ref(false);
@@ -70,28 +74,15 @@ export default {
       const year = currentDate.value.getFullYear();
       return `${month} ${year}`;
     });
-    // 현재 보기 모드에 맞는 컴포넌트 결정
     const currentViewComponent = computed(() => {
       if (currentView.value === 'week') return 'WeekView';
       if (currentView.value === 'day') return 'DayView';
       return 'MonthView';
     });
 
-    // 보기 모드 전환
     const setView = (view) => {
       currentView.value = view;
     };
-
-    // 서버에서 일정 데이터 가져오기
-    // const fetchTasks = async () => {
-    //   try {
-    //     const response = await axios.get('/schedule/list');
-    //     tasks.value = response.data; // 가져온 데이터를 tasks 배열에 저장
-    //     originalTasks.value = [...response.data];
-    //   } catch (error) {
-    //     console.error('Error fetching tasks:', error);
-    //   }
-    // };
 
     const fetchTasks = async () => {
       try {
@@ -110,14 +101,14 @@ export default {
         console.error('요청 중 오류가 발생했습니다.', error);
       }
     };
+
     watch(
-        () => userStore.teamId, // teamId가 변경될 때만 감시
+        () => userStore.teamId, 
         () => {
-          fetchTasks(); // teamId 변경 시 fetchTasks 호출
+          fetchTasks();
         }
     );
 
-    // 컴포넌트가 마운트될 때 일정 데이터를 가져옴
     onMounted(() => {
       fetchTasks();
     });
@@ -131,16 +122,19 @@ export default {
       isShowingPrivate.value = !isShowingPrivate.value;
     };
 
+    const taskDetailsApi = async (task) => {
+      try {
+        const response = await axios.get(`/schedule/list/${task.id}`);
+        taskDetails.value = response.data;
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
 
     const openTaskDetails = async (task) => {
-      try {
-        // task.id를 사용하여 상세 정보 요청
-        const response = await axios.get(`/schedule/list/${task.id}`);
-        selectedTaskDetails.value = response.data; // API 응답 데이터를 selectedTaskDetails에 저장
-        isDetailsVisible.value = true; // 모달 표시
-      } catch (error) {
-        console.error('Error fetching task details:', error);
-      }
+      await taskDetailsApi(task);
+      selectedTaskDetails.value = taskDetails.value;
+      isDetailsVisible.value = true;
     };
 
     return {
@@ -155,6 +149,7 @@ export default {
       isDetailsVisible,
       selectedTaskDetails,
       openTaskDetails,
+      loggedInMemberId
     };
   },
 };

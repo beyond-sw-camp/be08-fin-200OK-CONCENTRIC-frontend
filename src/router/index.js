@@ -90,7 +90,7 @@ const routes = [
     component: TeamPage,
   },
   {
-    path: "/team/invite/:id",
+    path: "/team-invite",
     name: "TeamInvite",
     component: TeamInvitePage,
   },
@@ -107,13 +107,17 @@ const router = createRouter({
   linkActiveClass: "active",
 });
 
+const publicPages = ['/signin', '/team-invite'];
+
 router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem("user")) || false;
   const isLoggedIn = user.state?.isLoggedIn || false;
-
-  if(to.path !== "/signin" && !isLoggedIn){
+console.log("router guard. path = " + to.path);
+  if (publicPages.includes(to.path)) {
+    next();
+  } else if (!isLoggedIn) {
     next("/signin");
-  }else{
+  } else {
     next();
   }
 });

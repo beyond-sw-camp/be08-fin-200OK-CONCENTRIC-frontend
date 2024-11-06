@@ -125,7 +125,7 @@ const loadFriendshipRequest = async () => {
 const checkLogin = () => {
   console.log("checkLogin");
   console.log(userStore.isLoggedIn);
-  if (userStore.isLoggedIn === undefined || userStore.isLoggedIn === false) {
+  if ((userStore.isLoggedIn === undefined || userStore.isLoggedIn === false) && route.path === "team/invite") {
     router.push("/");
     return false;
   }
@@ -146,6 +146,7 @@ const handleClickOutside = (event) => {
 };
 
 onMounted(() => {
+  if(route.path) return;
   document.addEventListener('click', handleClickOutside);
   if (!checkLogin()) return;
   loadNotifications();
@@ -252,7 +253,7 @@ onBeforeUnmount(() => {
         <input type="text" class="form-control" :placeholder="isRTL ? 'أكتب هنا...' : 'Type here...'" />
       </div> -->
       <div class="d-flex align-items-center">
-        <right-top-clock />
+<!--        <right-top-clock />-->
       </div>
 
     </div>
