@@ -55,7 +55,7 @@ export default {
   components: {ViewDetails, MonthView, WeekView, DayView },
   setup() {
     const userStore = useUserStore();
-    const loggedInMemberId = computed(() => userStore.userInfo.id);
+    const loggedInMemberId = userStore.userInfo.id;
     const currentView = ref('month');
     const tasks = ref([]);
     const selectedDate = ref(new Date().toISOString().split('T')[0]); 
@@ -110,6 +110,7 @@ export default {
     );
 
     onMounted(() => {
+      if(userStore.isLoggedIn === undefined || userStore.isLoggedIn === false) return;
       fetchTasks();
     });
 
