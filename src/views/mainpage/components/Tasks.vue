@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, onMounted,watch } from 'vue';
+import { ref, reactive, onMounted,watch } from 'vue';
 import axios from 'axios';
 import AddTask from "@/views/mainpage/components/AddTask.vue";
 import { useUserStore } from '@/store/user';
@@ -129,7 +129,7 @@ export default {
   setup() {
 
     const userStore = useUserStore();
-    const loggedInMemberId = computed(() => userStore.userInfo.id);
+    const loggedInMemberId = userStore.userInfo.id;
     
 
     const columns = ref([
@@ -351,7 +351,10 @@ export default {
       isDetailsVisible.value = true;
     };
 
-    onMounted(fetchTasks);
+    onMounted(() => {
+      if(userStore.isLoggedIn === undefined || userStore.isLoggedIn === false) return;
+      fetchTasks();
+    });
     return {
       columns,
       tasks,
