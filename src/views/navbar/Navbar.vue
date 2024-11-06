@@ -7,6 +7,7 @@ import SidenavProfile from "@/views/sidenav/SidenavProfile.vue";
 import { useUserStore } from "@/store/user.js";
 import axios from 'axios';
 import { useStateStore } from "@/store/states";
+import codeNode from "three/src/nodes/code/CodeNode";
 // import RightTopClock from "@/views/navbar/RightTopClock.vue";
 
 const showMenu = ref(false);
@@ -90,6 +91,7 @@ const loadNotifications = async () => {
       notification.createDate = new Date(notification['createDate']).toLocaleString().substring(0, 22);
       if (!notification.isRead) count += 1;
       showNotifications.value.push(true);
+      console.log('image : ' + notification.image);
     });
     numOfNotifications.value = count;
     stateStore.setNumOfNotifications(numOfNotifications.value);
@@ -97,6 +99,11 @@ const loadNotifications = async () => {
     console.log(error);
   }
 }
+
+const getImage = (notification) => {
+  return notification.image ? notification.image : require('@/assets/img/default/profile.png');
+};
+
 const updateRead = (notification, idx) => {
   notification.isRead = !notification.isRead;
   stateStore.decreaseNumOfNotifications();
@@ -157,6 +164,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside);
+  showMenu.value = true;
 });
 </script>
 
@@ -189,9 +197,10 @@ onBeforeUnmount(() => {
           <li class="nav-item dropdown d-flex align-items-center me-3">
             <a href="#" class="p-0 nav-link text-white" :class="[showMenu ? 'show' : '']" id="dropdownMenuButton"
               aria-expanded="showMenu" @click.stop="toggleDropdown">
-            </a>
+
               <i class="cursor-pointer fa fa-bell"></i>
               <span class="notification-badge" v-show="numOfNotifications > 0">{{ numOfNotifications }}</span>
+            </a>
             <ul class="px-2 py-3 dropdown-menu dropdown-menu-end me-n4" :class="showMenu ? 'show' : ''"
               aria-labelledby="dropdownMenuButton" v-show="showMenu">
               <transition-group class="dropdown-menu-animation" name="fade" tag="ul"
@@ -203,7 +212,7 @@ onBeforeUnmount(() => {
                       :class="{ 'bg-light': notification.isRead }" style="padding-left: 0.5rem;">
                       <div class="py-1 d-flex">
                         <div class="my-auto">
-                          <img src="../../assets/img/koongya.png" class="avatar avatar-sm me-3" alt="user image" />
+                          <img :src=getImage(notification) class="avatar avatar-sm me-3" alt="user image" />
                         </div>
                         <div class="d-flex flex-column justify-content-center">
                           <h6 class="mb-1 text-sm font-weight-normal">
@@ -237,13 +246,9 @@ onBeforeUnmount(() => {
             </button>
           </li>
 
-          
-
-
-
         </ul>
       </div>
-      
+
       <!-- <div class="input-group d-flex justify-content-center" style="
       padding: 1rem;
       justify-content: center;
