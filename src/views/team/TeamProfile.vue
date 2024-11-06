@@ -46,7 +46,7 @@
                 <div class="member-box">
                   <img :src="member.profileImage ? member.profileImage : require('@/assets/img/default/profile.png')" class="member-icon" />
                   <span class="member-name">{{ member.nickname }}</span>
-                  <span class="delete-icon" @click="confirmDelete(member)">X</span>
+                  <span class="delete-icon" @click="confirmDelete(member)"v-if="isLeader">내보내기</span>
                 </div>
               </div>
               <hr class="horizontal dark" />
@@ -71,8 +71,9 @@
 <script>
 import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
-import { useUserStore } from '@/store/user';
-import { useRoute } from 'vue-router';
+import { useUserStore } from '@/store/user.js';
+import { useRoute, useRouter } from 'vue-router';
+
 
 export default {
   props: {
@@ -88,8 +89,10 @@ export default {
     const memberToDelete = ref(null);
     const route = useRoute();
     const userStore = useUserStore();
+    const isLeader = ref(false);
 
-    const separateMembers = async (teamMembers) => {
+
+    const separateMembers = (teamMembers) => {
       if (teamMembers.length > 0) {
         leader.value = teamMembers[0]; // 배열의 첫 번째 팀원을 그룹장으로 설정
         members.value = teamMembers.slice(1); // 나머지 팀원들을 그룹원 목록으로 설정
@@ -101,6 +104,9 @@ export default {
         const response = await axios.get(`/team/list/member?teamId=${route.params.id}`);
         const teamMembers = response.data || [];
         await separateMembers(teamMembers);
+        console.log("leader: ", leader.value.id);
+        console.log("members.value: ", members.value);
+        if(userStore.userInfo.id === leader.value.id) isLeader.value = true;
       } catch (error) {
         console.error('팀원 목록을 불러오는 중 오류 발생:', error);
       }
@@ -182,6 +188,7 @@ export default {
       leader,
       inviteEmail,
       isModalVisible,
+      isLeader,
       showInviteModal,
       closeInviteModal,
       sendInvite,

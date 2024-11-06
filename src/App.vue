@@ -57,7 +57,7 @@ const showConfigurator = computed(() => route.name !== 'Signin');
     class="main-content position-relative max-height-vh-100 h-100 border-radius-lg"
   >
 
-    <!-- <navbar :class="[navClasses]" v-if="showNavbar" /> -->
+<!--     <navbar :class="[navClasses]" v-if="showNavbar" />-->
     <navbar v-if="showNavbar">
       <router-link to="/tables">private</router-link> |
       <router-link to="/profile">profile</router-link>

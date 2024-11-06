@@ -1,5 +1,5 @@
 <template>
-  <div>
+<!--  <div>-->
     <!-- Main Content -->
     <div class="main-content">
       <h1 class="main-title">팀 초대 수락</h1>
@@ -8,49 +8,73 @@
         <button class="accept-button" @click="joinTeam">초대 수락하기</button>
       </div>
     </div>
-  </div>
+<!--  </div>-->
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import {ref, onMounted, watch, computed, onBeforeMount, onBeforeUnmount} from "vue";
 import { useRoute, useRouter} from "vue-router";
 import axios from "axios";
 import { useUserStore } from "@/store/user.js";
+import { useStore } from "vuex";
+
+const store = useStore();
+const showNavbar = computed(() => store.state.showNavbar);
+const showFooter = computed(() => store.state.showFooter);
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
 
-onMounted(() => {
-  if (!userStore.isLoggedIn) {
-    router.push({
-      path: "/signin",
-      query: { redirect: route.fullPath }, // 현재 경로로 리다이렉트 설정
-    });
-  }
-});
+const key = route.query.key;
+const teamId = route.query.teamId;
+const email = route.query.email;
 
+console.log("Key:", key);
+console.log("Team ID:", teamId);
+console.log("Email:", email);
 
-
-// 팀 수락 함수
 const joinTeam = async () => {
   try {
-    const teamId = route.params.id;
-    console.log("teamId : ", teamId);
-    const response = await axios.post(`/team/invite`, null, {
-      params: { teamId: teamId }, // 요청 파라미터로 teamId를 전달
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`, // 인증 토큰 추가
-      },
-    });
-    console.log("팀 수락 성공:", response.data);
-    alert("팀에 성공적으로 참여하였습니다.");
-    router.push(`/team/${teamId}`);
+    const response = await axios.post("team/invite/accept",
+        {
+          key: key,
+          teamId: teamId,
+          email: email,
+        },
+        {
+          validateStatus: false
+        }
+    );
+
+    if(response.status === 200) {
+      alert("초대가 수락되었습니다.");
+      router.push(`team/${teamId}`);
+    }else {
+      alert("유효하지 않은 링크입니다.");
+    }
   } catch (error) {
-    console.error("팀 수락에 실패했습니다:", error);
-    alert("팀 수락에 실패하였습니다.");
+    console.log(error);
   }
-};
+}
+
+
+onMounted(() => {
+
+});
+onBeforeMount(() => {
+  store.state.hideConfigButton = true;
+  store.state.showNavbar = false;
+  store.state.showSidenav = false;
+  store.state.showFooter = false;
+});
+onBeforeUnmount(() => {
+  store.state.hideConfigButton = false;
+  store.state.showNavbar = true;
+  store.state.showSidenav = true;
+  store.state.showFooter = true;
+});
+
 </script>
 
 <style scoped>
