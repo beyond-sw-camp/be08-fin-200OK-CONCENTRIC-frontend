@@ -29,10 +29,10 @@ watch(
       if (newTab) {
         activeTab.value = newTab;
       } else {
-        activeTab.value = "profile_card"; // 기본 탭
+        activeTab.value = "profile_card";
       }
     },
-    { immediate: true } // 초기값 설정
+    { immediate: true }
 );
 
 onMounted(() => {
