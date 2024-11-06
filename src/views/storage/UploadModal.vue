@@ -125,4 +125,22 @@ button {
   background-color: #86EDDA;
 }
 
+ul {
+list-style-type: none; 
+padding: 0; 
+margin: 0; 
+}
+
+li {
+text-align: left; 
+padding: 5px 0; 
+margin-left: 10px; 
+}
+
+li::before {
+  content: "• "; 
+  color: #000; 
+  margin-right: 5px; 
+}
+
 </style>

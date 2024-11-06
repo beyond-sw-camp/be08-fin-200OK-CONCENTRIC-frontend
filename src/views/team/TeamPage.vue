@@ -20,7 +20,7 @@
             <!-- <li :class="{ active: activeSection === 'files' }" @click="setActiveSection('files')">
               <i class="fa fa-archive" aria-hidden="true"></i> 파일함
             </li> -->
-            <li :class="{ active: activeSection === 'team_storage' }" @click="setActiveSection('teamstorage')">
+            <li :class="{ active: activeSection === 'teamstorage' }" @click="setActiveSection('teamstorage')">
                 <i class="fa fa-archive" aria-hidden="true"></i>파일함
             </li>   
           </ul>
