@@ -182,6 +182,11 @@ export default {
 
     const addTask = async (task) => {
       try {
+        const startDate = new Date(task.startDate);
+        const endDate = new Date(task.endDate);
+        task.startDate = convertToKSTISOString(startDate);
+        task.endDate = convertToKSTISOString(endDate);
+
         const response = await axios.post('/schedule/create', task);
         if(response.status === 400){
             alert("일정 정보를 올바르게 입력해 주세요.");
@@ -194,6 +199,11 @@ export default {
       } finally {
         closeModal();
       }
+    };
+
+    const convertToKSTISOString = (date) => {
+      const kstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+      return kstDate.toISOString();
     };
 
     const closeModal = () => {
@@ -260,7 +270,8 @@ export default {
       isSelectedDay,
       localTasks,
       handleTaskClick,
-      formatDateTime
+      formatDateTime,
+      convertToKSTISOString
     };
   },
 };
