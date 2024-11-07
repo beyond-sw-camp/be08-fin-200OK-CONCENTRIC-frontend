@@ -428,11 +428,15 @@ p {
 }
 
 .private-task {
-  background-color: #fffef2; 
+  background-color: #fffce3; 
 }
 
 .overdue-task {
-  background-color: #fff7f7; 
+  background-color: #fafafa; 
+}
+
+.overdue-task.private-task {
+  background-color: #ffecec; 
 }
 
 .sort-icons {
@@ -444,8 +448,8 @@ p {
   background-color: #e6f7ff !important;
 }
 
-.bs-table-accent-bg {
-  background-color: none;
+.table-active .bs-table-accent-bg {
+  background-color: #ffffff !important;
 }
 
 /* 나타날 때와 사라질 때 트랜지션 */
