@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: $ECR_REPOSITORY:1.31
+          image: $ECR_REPOSITORY:1.32
           resources:
             requests:
               memory: "512Mi"
