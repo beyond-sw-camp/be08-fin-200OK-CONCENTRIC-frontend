@@ -72,13 +72,21 @@ const findChatParticipantApi = async () => {
             profileImage: null,
         }));
         members.value = res;
+        console.log(members.value);
 
         await Promise.all(
             members.value.map(async (member, index) => {
-                const profileImage = await getProfileImage(member.imageUrl);
-                members.value[index].profileImage = profileImage;
+                if (member.imageUrl) {
+                    try {
+                        const profileImage = await getProfileImage(member.imageUrl);
+                        members.value[index].profileImage = profileImage;
+                    } catch (error) {
+                        console.error("이미지를 불러오는 데 실패했습니다.", error);
+                    }
+                }
             })
         );
+        return members.value;
     } catch (err) {
         console.error("참여자 목록을 가져오는데 실패했습니다.", err);
     }

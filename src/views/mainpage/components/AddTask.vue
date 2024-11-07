@@ -56,14 +56,14 @@
             </div>
             <div class="d-flex align-items-center">
               <input type="date" id="startDate" v-model="newTask.startDate" class="form-control" required @change="validateDates" />
-              <input type="time" v-model="newTask.startTime" class="form-control ml-2" :disabled="newTask.allDay" @change="validateTimes" />
+              <input type="time" v-model="newTask.startTime" class="form-control ml-2" :disabled="newTask.allDay" :required="!newTask.allDay" @change="validateTimes" />
             </div>
           </div>
           <div class="form-group">
             <label for="endDate">End Date</label>
             <div class="d-flex align-items-center">
               <input type="date" id="endDate" v-model="newTask.endDate" class="form-control" required @change="validateDates" :min="newTask.startDate" />
-              <input type="time" v-model="newTask.endTime" class="form-control ml-2" :disabled="newTask.allDay" @change="validateTimes" />
+              <input type="time" v-model="newTask.endTime" class="form-control ml-2" :disabled="newTask.allDay" :required="!newTask.allDay" @change="validateTimes" />
             </div>
           </div>
           <div class="form-group">

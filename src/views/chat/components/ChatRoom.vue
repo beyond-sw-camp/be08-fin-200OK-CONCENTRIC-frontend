@@ -382,6 +382,10 @@ const goToDetails = () => {
     overflow-y: auto;
 }
 
+.chat-room-body::-webkit-scrollbar {
+    display: none;
+}
+
 .chat-message {
     position: relative;
     display: flex;

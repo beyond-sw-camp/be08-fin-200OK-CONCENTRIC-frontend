@@ -23,10 +23,11 @@
                 :class="notification.isRead ? 'bg-light' : 'bg-white'"
                 v-if="showNotifications[i]"
             >
-              <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex justify-content-between align-items-center" style="text-align: left;">
                 <div>
                   <strong class="d-block">{{ notification.message }}</strong>
-                  <p class="mb-1 text-secondary" style="font-size: 10pt">{{ notification.message }}</p>
+                  <!-- <p class="mb-1 text-secondary" style="font-size: 10pt">{{ notification.message }}</p> -->
+                  <i class="fa fa-clock me-1" style="font-size: 10pt;"></i>
                   <small class="text-muted">{{ formatDate(notification.createDate) }}</small>
                 </div>
                 <div class="d-flex align-items-center">
@@ -127,13 +128,19 @@ onMounted(() => {
   background-size: cover;
   background-position: center;
   min-height: 600px;
+  max-height: 600px;
   width: 120vh;
   padding-top: 6%;
   margin: 0 1.5rem;
 }
 
 .card-list {
-  margin: 0 2rem;
+  padding: 0 2rem;
+  overflow-y: auto; 
+}
+
+.card-list::-webkit-scrollbar {
+  display: none;
 }
 
 .notification-list {

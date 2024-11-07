@@ -30,6 +30,7 @@
                     type="checkbox"
                     :checked="subtask.status === 'COMPLETED'"
                     @change="toggleCompletion(subtask)"
+                    :disabled="subtask.status === 'COMPLETED'"
                     class="form-check-input me-2"
                     id="checkbox-{{ subtask.id }}"
                   />
@@ -104,13 +105,8 @@ const getSubtasks = async () => {
 
 
 const toggleCompletion = (subtask) => {
-  if (subtask.status === 'COMPLETED') {
-    subtask.status = 'ACTIVE';
-    subtask.isCompleted = false; // 상태를 업데이트
-  } else {
     subtask.status = 'COMPLETED';
-    subtask.isCompleted = true; // 상태를 업데이트
-  }
+    subtask.isCompleted = true;
   updateSubtaskApi(subtask);
 };
 
