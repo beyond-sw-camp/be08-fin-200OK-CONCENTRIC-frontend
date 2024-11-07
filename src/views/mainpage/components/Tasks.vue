@@ -218,6 +218,11 @@ export default {
       if (editingTask.id) {
         const task = tasks.value.find(t => t.id === editingTask.id);
 
+        const startDate = new Date(task.startDate);
+        const endDate = new Date(task.endDate);
+        task.startDate = convertToKSTISOString(startDate);
+        task.endDate = convertToKSTISOString(endDate);
+
         const updatedTask = {
           title: task.title,
           description: task.description,
@@ -280,6 +285,11 @@ export default {
 
     const handleAddTaskConfirm = async (newTask) => {
       try {
+        const startDate = new Date(newTask.startDate);
+        const endDate = new Date(newTask.endDate);
+        newTask.startDate = convertToKSTISOString(startDate);
+        newTask.endDate = convertToKSTISOString(endDate);
+
         const response = await axios.post('/schedule/create', newTask);
         if(response.status === 400){
             alert("일정 정보를 올바르게 입력해 주세요.");
@@ -292,6 +302,11 @@ export default {
       } catch (error) {
         console.error('새 일정을 추가하는 중 오류가 발생했습니다.', error);
       }
+    };
+
+    const convertToKSTISOString = (date) => {
+      const kstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+      return kstDate.toISOString();
     };
 
 
@@ -395,7 +410,8 @@ export default {
       isDetailsVisible,
       isShowingActive,
       applyFilters,
-      isTaskId
+      isTaskId,
+      convertToKSTISOString
     };
   },
 };
