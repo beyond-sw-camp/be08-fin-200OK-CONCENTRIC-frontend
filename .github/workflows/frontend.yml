@@ -150,10 +150,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: actions
     needs: [build-frontend, docker-build-push, update-deployment-file, deploy-frontend]
-    if: always()
+    if: success()
     steps:
       - name: Send notification to Discord
-        if: success()
         run: |
           curl -H "Content-Type: application/json" \
             -d '{
