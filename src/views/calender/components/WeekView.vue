@@ -154,10 +154,10 @@ export default {
     const addTask = async (task) => {
 
       try {
-        const startDate = new Date(task.startDate);
-        const endDate = new Date(task.endDate);
-        task.startDate = convertToKSTISOString(startDate);
-        task.endDate = convertToKSTISOString(endDate);
+        // const startDate = new Date(task.startDate);
+        // const endDate = new Date(task.endDate);
+        // task.startDate = convertToKSTISOString(startDate);
+        // task.endDate = convertToKSTISOString(endDate);
 
         const response = await axios.post('/schedule/create', task);
         if(response.status === 400){

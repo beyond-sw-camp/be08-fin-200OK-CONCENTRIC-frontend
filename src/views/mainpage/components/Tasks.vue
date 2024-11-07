@@ -218,10 +218,10 @@ export default {
       if (editingTask.id) {
         const task = tasks.value.find(t => t.id === editingTask.id);
 
-        const startDate = new Date(task.startDate);
-        const endDate = new Date(task.endDate);
-        task.startDate = convertToKSTISOString(startDate);
-        task.endDate = convertToKSTISOString(endDate);
+        // const startDate = new Date(task.startDate);
+        // const endDate = new Date(task.endDate);
+        // task.startDate = convertToKSTISOString(startDate);
+        // task.endDate = convertToKSTISOString(endDate);
 
         const updatedTask = {
           title: task.title,
@@ -285,10 +285,10 @@ export default {
 
     const handleAddTaskConfirm = async (newTask) => {
       try {
-        const startDate = new Date(newTask.startDate);
-        const endDate = new Date(newTask.endDate);
-        newTask.startDate = convertToKSTISOString(startDate);
-        newTask.endDate = convertToKSTISOString(endDate);
+        // const startDate = new Date(newTask.startDate);
+        // const endDate = new Date(newTask.endDate);
+        // newTask.startDate = convertToKSTISOString(startDate);
+        // newTask.endDate = convertToKSTISOString(endDate);
 
         const response = await axios.post('/schedule/create', newTask);
         if(response.status === 400){
