@@ -80,10 +80,12 @@ const getBackgroundImage = (image) => {
 }
 
 .profile-image {
-  width: 80%;
-  height: 80%;
-  object-fit: cover;
   border-radius: 50%;
+  min-width: 150px;
+  min-height: 150px;
+  max-width: 150px;
+  max-height: 150px;
+  object-fit: cover;
 }
 
 .background-img {
