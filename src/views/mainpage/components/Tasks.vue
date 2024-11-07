@@ -9,7 +9,7 @@
           </a>
           {{ isShowingActive ? '전체 일정 보기' : '진행 중인 일정만 보기' }}
         </button>
-        <button type="button" class="btn btn-success ms-3" @click="toggleTaskView">
+        <button type="button" class="btn btn-success ms-3" @click="toggleTaskView" v-if="!isTaskId">
           <a class="mx-1">
             <i class="fa fa-bars"></i>
           </a>
@@ -154,6 +154,7 @@ export default {
     const isDetailsVisible = ref(false);
     const selectedTaskDetails = ref(null);
     const taskDetails = ref([]);
+    const isTaskId = ref(false);
 
     const fetchTasks = async () => {
       try {
@@ -168,6 +169,9 @@ export default {
 
         tasks.value = response.data;
         originalTasks.value = [...response.data];
+        if (teamId) {
+          isTaskId.value = true;
+        } else isTaskId.value = false;
       } catch (error) {
         console.error('요청 중 오류가 발생했습니다.', error);
       }
@@ -247,6 +251,11 @@ export default {
 
     const deleteSelectedTasks = async () => {
       try {
+        const isConfirmed = window.confirm("일정을 삭제하시겠습니까?");
+        if (!isConfirmed) {
+          return;
+        }
+
         for (const taskId of selectedTasks.value) {
           const response = await axios.delete(`/schedule/delete?scheduleId=${taskId}`);
           if(response.status === 403){
@@ -272,14 +281,16 @@ export default {
     const handleAddTaskConfirm = async (newTask) => {
       try {
         const response = await axios.post('/schedule/create', newTask);
-
+        if(response.status === 400){
+            alert("일정 정보를 올바르게 입력해 주세요.");
+            return;
+          }
         tasks.value.push(response.data);
         console.log(response.data.id);
 
+        closeAddTaskModal();
       } catch (error) {
         console.error('새 일정을 추가하는 중 오류가 발생했습니다.', error);
-      } finally {
-        closeAddTaskModal();
       }
     };
 
@@ -383,7 +394,8 @@ export default {
       toggleActiveView,
       isDetailsVisible,
       isShowingActive,
-      applyFilters
+      applyFilters,
+      isTaskId
     };
   },
 };
@@ -413,7 +425,11 @@ p {
 }
 
 .table-active {
-  background-color: #e0f7fa !important;
+  background-color: #e6f7ff !important;
+}
+
+.bs-table-accent-bg {
+  background-color: none;
 }
 
 /* 나타날 때와 사라질 때 트랜지션 */
@@ -459,7 +475,10 @@ p {
 .table-responsive {
   Font-size: 10.5pt;
   max-height: 500px;
+}
 
+.table-responsive::-webkit-scrollbar {
+  display: none;
 }
 
 .table thead th {

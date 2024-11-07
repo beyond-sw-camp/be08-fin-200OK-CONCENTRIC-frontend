@@ -103,6 +103,10 @@ html, body {
   background-color: #f8f9fa; /* 배경색 (필요 시 수정) */
 }
 
+.main-content::-webkit-scrollbar {
+  display: none;
+}
+
 .sidenav {
   width: 250px;
   background-color: #333; /* 사이드바 배경 */

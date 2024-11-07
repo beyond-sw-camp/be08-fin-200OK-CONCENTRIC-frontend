@@ -201,11 +201,11 @@ onBeforeUnmount(() => {
               <i class="cursor-pointer fa fa-bell"></i>
               <span class="notification-badge" v-show="numOfNotifications > 0">{{ numOfNotifications }}</span>
             </a>
-            <ul class="px-2 py-3 dropdown-menu dropdown-menu-end me-n4" :class="showMenu ? 'show' : ''"
+            <ul class="px-2 py-2 dropdown-menu dropdown-menu-end me-n4" :class="showMenu ? 'show' : ''"
               aria-labelledby="dropdownMenuButton" v-show="showMenu">
               <transition-group class="dropdown-menu-animation" name="fade" tag="ul"
                 style="padding-left: 0; margin-left: 0;">
-                <li class="mb-2" v-for="(notification, i) in notifications" :key="notification.id"
+                <li class="mb-2 dropdown-box" v-for="(notification, i) in notifications" :key="notification.id"
                   style="list-style: none;">
                   <transition name="fade">
                     <a v-if="showNotifications[i]" class="dropdown-item border-radius-md" href="javascript:;"
@@ -214,17 +214,17 @@ onBeforeUnmount(() => {
                         <div class="my-auto">
                           <img :src=getImage(notification) class="avatar avatar-sm me-3" alt="user image" />
                         </div>
-                        <div class="d-flex flex-column justify-content-center">
+                        <div class="d-flex flex-column justify-content-center text-truncate">
                           <h6 class="mb-1 text-sm font-weight-normal">
                             <span class="font-weight-bold">{{ notification.message }}</span>
                           </h6>
                           <p class="mb-0 text-xs text-secondary">
-                            <i class="fa fa-clock me-1"></i>
+                            <i class="fa fa-clock me-1" style="font-size: 10pt;"></i>
                             {{ notification.createDate }}
                           </p>
                         </div>
                         <div class="my-auto ms-auto">
-                          <button @click.stop="updateRead(notification, i)" class="btn btn-sm btn-outline-primary"
+                          <button @click.stop="updateRead(notification, i)" class="btn btn-sm btn-outline-primary ms-2 me-0"
                             style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
                             <i class="fa fa-check"></i>
                           </button>
@@ -267,6 +267,24 @@ onBeforeUnmount(() => {
   </nav>
 </template>
 <style scoped>
+.dropdown:not(.dropdown-hover) .dropdown-menu {
+  margin-top: 10px !important;
+  min-width: 20rem;
+  max-height: 20rem;
+  overflow-y: auto; 
+}
+
+.dropdown-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.text-truncate {
+  max-width: 100%;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
 .navbar-main {
   margin-right: 0 !important;
   margin-left: 0 !important;

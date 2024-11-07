@@ -1,4 +1,3 @@
-
 <template>
   <div class="calendar-page card px-4">
     <!-- 상단에 보기 모드 전환 버튼 -->
@@ -18,7 +17,9 @@
                 v-if="currentView === 'month'">
           Week
         </button>
-        <button type="button" class="btn btn-success ms-3" @click="toggleTaskView">
+        <button type="button" class="btn btn-success ms-3" 
+                @click="toggleTaskView"
+                v-if="!isTaskId">
           {{ isShowingPrivate ? '전체 일정 보기' : '개인 일정만 보기' }}
         </button>
       </div>
@@ -67,6 +68,7 @@ export default {
     const selectedTaskDetails = ref(null);
 
     const taskDetails = ref([]);
+    const isTaskId = ref(false);
 
     const currentDate = ref(new Date());
     const currentMonthYear = computed(() => {
@@ -97,6 +99,9 @@ export default {
 
         tasks.value = response.data;
         originalTasks.value = [...response.data];
+        if (teamId) {
+          isTaskId.value = true;
+        } else isTaskId.value = false;
       } catch (error) {
         console.error('요청 중 오류가 발생했습니다.', error);
       }
@@ -150,7 +155,8 @@ export default {
       isDetailsVisible,
       selectedTaskDetails,
       openTaskDetails,
-      loggedInMemberId
+      loggedInMemberId,
+      isTaskId
     };
   },
 };

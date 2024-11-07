@@ -155,7 +155,10 @@ export default {
 
       try {
         const response = await axios.post('/schedule/create', task);
-        console.log('Task successfully added:', response.data);
+        if(response.status === 400){
+            alert("일정 정보를 올바르게 입력해 주세요.");
+            return;
+          };
         localTasks.value.push(response.data);
         emit('update:tasks', [...localTasks.value]);
       } catch (error) {

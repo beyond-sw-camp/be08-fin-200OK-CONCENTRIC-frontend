@@ -242,6 +242,11 @@ const closeFriendList = () => {
 .chat-list {
     list-style: none;
     padding: 0;
+    overflow-y: auto; 
+}
+
+.chat-list::-webkit-scrollbar {
+    display: none;
 }
 
 .chat-list-item {

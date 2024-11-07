@@ -183,7 +183,10 @@ export default {
     const addTask = async (task) => {
       try {
         const response = await axios.post('/schedule/create', task);
-        console.log('Task successfully added:', response.data);
+        if(response.status === 400){
+            alert("일정 정보를 올바르게 입력해 주세요.");
+            return;
+          };
         localTasks.value.push(response.data);
         emit('update:tasks', [...localTasks.value]);
       } catch (error) {
@@ -398,94 +401,5 @@ export default {
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
   width: 100%;
-}
-
-/* transition-group의 enter-active 및 leave-active에 슬라이드 효과 추가 */
-.slide-enter-active {
-  animation: slideInRight 0.5s ease forwards;
-}
-
-.slide-leave-active {
-  animation: slideOutLeft 0.5s ease forwards;
-}
-
-/* prev와 next의 슬라이드 방향 */
-.slide-prev-enter-active {
-  animation: slideInLeft 0.5s ease forwards;
-}
-
-.slide-prev-leave-active {
-  animation: slideOutRight 0.5s ease forwards;
-}
-
-@keyframes slideInRight {
-  0% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideOutLeft {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-}
-
-@keyframes slideInLeft {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideOutRight {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
-
-.slideUp-enter-active{
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  transform-origin: center center;
-}
-
-.slideUp-leave-active {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-/* 나타날 때 시작 위치 */
-.slideUp-enter {
-  transform: translateY(20px);
-  opacity: 0;
-}
-
-/* 나타날 때 최종 위치 */
-.slideUp-enter-to {
-  transform: translateY(0px);
-  opacity: 1;
-}
-
-/* 사라질 때 위치 */
-.slideUp-leave-to {
-  transform: translateY(20px);
-  opacity: 0;
 }
 </style>
